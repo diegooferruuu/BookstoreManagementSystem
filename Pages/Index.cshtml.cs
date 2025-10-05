@@ -1,3 +1,4 @@
+﻿using BookstoreManagementSystem.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -12,8 +13,21 @@ public class IndexModel : PageModel
         _logger = logger;
     }
 
+    public string ConnectionMessage { get; private set; }
+
     public void OnGet()
     {
+
+        try
+        {
+            var connection = DataBaseConnection.Instance.GetConnection();
+            ConnectionMessage = "✅ Conexión exitosa a la base de datos.";
+            connection.Close();
+        }
+        catch (Exception ex)
+        {
+            ConnectionMessage = "❌ Error al conectar: " + ex.Message;
+        }
 
     }
 }

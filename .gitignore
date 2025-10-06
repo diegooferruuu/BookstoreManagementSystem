@@ -1,0 +1,17 @@
+# Rider IDE files
+.idea/
+
+# Build output
+bin/
+obj/
+
+# User-specific files (optional)
+*.user
+*.suo
+
+# Rider/NuGet temp files
+*.Rider*
+*.nupkg
+project.lock.json
+
+.vs/

@@ -15,19 +15,10 @@ public class IndexModel : PageModel
 
     public string ConnectionMessage { get; private set; }
 
-    public void OnGet()
+    public IActionResult OnGet()
     {
 
-        try
-        {
-            var connection = DataBaseConnection.Instance.GetConnection();
-            ConnectionMessage = "✅ Conexión exitosa a la base de datos.";
-            connection.Close();
-        }
-        catch (Exception ex)
-        {
-            ConnectionMessage = "❌ Error al conectar: " + ex.Message;
-        }
+        return RedirectToPage("/Clients/Index");
 
     }
 }

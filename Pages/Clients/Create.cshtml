@@ -1,0 +1,13 @@
+﻿@page
+@model BookstoreManagementSystem.Pages.Clients.CreateModel
+
+<h2>Nuevo Cliente</h2>
+<form method="post">
+    <input asp-for="Cliente.FirstName" placeholder="Nombre" />
+    <input asp-for="Cliente.LastName" placeholder="Apellido Paterno" />
+    <input asp-for="Cliente.MiddleName" placeholder="Apellido Materno" />
+    <input asp-for="Cliente.Email" placeholder="Email" />
+    <input asp-for="Cliente.Phone" placeholder="Teléfono" />
+    <input asp-for="Cliente.Address" placeholder="Dirección" />
+    <button type="submit">Guardar</button>
+</form>

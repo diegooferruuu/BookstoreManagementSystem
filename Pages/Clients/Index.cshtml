@@ -1,0 +1,30 @@
+﻿@page
+@model BookstoreManagementSystem.Pages.Clients.IndexModel
+
+<h2>Lista de Clientes</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Email</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model.Clientes)
+        {
+            <tr>
+                <td>@c.FirstName</td>
+                <td>@c.LastName @c.MiddleName</td>
+                <td>@c.Email</td>
+                <td>
+                    <a asp-page="Edit" asp-route-id="@c.Id">Editar</a> |
+                    <a asp-page="Delete" asp-route-id="@c.Id">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-page="Create" class="btn btn-primary">Agregar Cliente</a>

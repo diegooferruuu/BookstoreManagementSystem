@@ -6,5 +6,6 @@
         void Update(T entity);
         T Read(int id);
         void Delete(int id);
+        List<T> GetAll();
     }
 }

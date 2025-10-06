@@ -1,6 +1,7 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.5.2.0
+VisualStudioVersion = 17.14.36414.22 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookstoreManagementSystem", "BookstoreManagementSystem.csproj", "{7BDBC261-F5D3-2762-9741-B992438022AD}"
 EndProject
@@ -19,6 +20,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {B19485A5-B441-48C6-A087-8D8397787953}
+		SolutionGuid = {59A3EC97-B608-41F3-BE44-1D55B75112E1}
 	EndGlobalSection
 EndGlobal

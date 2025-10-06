@@ -1,0 +1,14 @@
+﻿@page "{id:int}"
+@model BookstoreManagementSystem.Pages.Clients.EditModel
+
+<h2>Editar Cliente</h2>
+<form method="post">
+    <input type="hidden" asp-for="Cliente.Id" />
+    <input asp-for="Cliente.FirstName" placeholder="Nombre" />
+    <input asp-for="Cliente.LastName" placeholder="Apellido Paterno" />
+    <input asp-for="Cliente.MiddleName" placeholder="Apellido Materno" />
+    <input asp-for="Cliente.Email" placeholder="Email" />
+    <input asp-for="Cliente.Phone" placeholder="Teléfono" />
+    <input asp-for="Cliente.Address" placeholder="Dirección" />
+    <button type="submit">Guardar Cambios</button>
+</form>

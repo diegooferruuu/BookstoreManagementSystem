@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\camvi\\OneDrive\\Documentos\\OCTAVO SEMESTRE\\ARQUI\\BookstoreManagementSystem\\BookstoreManagementSystem.csproj": {}
+    "/Users/diegoferrufino/Documents/UCB/VIII Semestre/Arqui/BookstoreManagementSystem/BookstoreManagementSystem.csproj": {}
   },
   "projects": {
-    "C:\\Users\\camvi\\OneDrive\\Documentos\\OCTAVO SEMESTRE\\ARQUI\\BookstoreManagementSystem\\BookstoreManagementSystem.csproj": {
+    "/Users/diegoferrufino/Documents/UCB/VIII Semestre/Arqui/BookstoreManagementSystem/BookstoreManagementSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\camvi\\OneDrive\\Documentos\\OCTAVO SEMESTRE\\ARQUI\\BookstoreManagementSystem\\BookstoreManagementSystem.csproj",
+        "projectUniqueName": "/Users/diegoferrufino/Documents/UCB/VIII Semestre/Arqui/BookstoreManagementSystem/BookstoreManagementSystem.csproj",
         "projectName": "BookstoreManagementSystem",
-        "projectPath": "C:\\Users\\camvi\\OneDrive\\Documentos\\OCTAVO SEMESTRE\\ARQUI\\BookstoreManagementSystem\\BookstoreManagementSystem.csproj",
-        "packagesPath": "C:\\Users\\camvi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\camvi\\OneDrive\\Documentos\\OCTAVO SEMESTRE\\ARQUI\\BookstoreManagementSystem\\obj\\",
+        "projectPath": "/Users/diegoferrufino/Documents/UCB/VIII Semestre/Arqui/BookstoreManagementSystem/BookstoreManagementSystem.csproj",
+        "packagesPath": "/Users/diegoferrufino/.nuget/packages/",
+        "outputPath": "/Users/diegoferrufino/Documents/UCB/VIII Semestre/Arqui/BookstoreManagementSystem/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\camvi\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/diegoferrufino/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -74,7 +68,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

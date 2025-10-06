@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "/Users/diegoferrufino/Documents/UCB/VIII Semestre/Arqui/BookstoreManagementSystem/BookstoreManagementSystem.csproj": {}
+    "C:\\Users\\camvi\\OneDrive\\Documentos\\OCTAVO SEMESTRE\\ARQUI\\BookstoreManagementSystem\\BookstoreManagementSystem.csproj": {}
   },
   "projects": {
-    "/Users/diegoferrufino/Documents/UCB/VIII Semestre/Arqui/BookstoreManagementSystem/BookstoreManagementSystem.csproj": {
+    "C:\\Users\\camvi\\OneDrive\\Documentos\\OCTAVO SEMESTRE\\ARQUI\\BookstoreManagementSystem\\BookstoreManagementSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/diegoferrufino/Documents/UCB/VIII Semestre/Arqui/BookstoreManagementSystem/BookstoreManagementSystem.csproj",
+        "projectUniqueName": "C:\\Users\\camvi\\OneDrive\\Documentos\\OCTAVO SEMESTRE\\ARQUI\\BookstoreManagementSystem\\BookstoreManagementSystem.csproj",
         "projectName": "BookstoreManagementSystem",
-        "projectPath": "/Users/diegoferrufino/Documents/UCB/VIII Semestre/Arqui/BookstoreManagementSystem/BookstoreManagementSystem.csproj",
-        "packagesPath": "/Users/diegoferrufino/.nuget/packages/",
-        "outputPath": "/Users/diegoferrufino/Documents/UCB/VIII Semestre/Arqui/BookstoreManagementSystem/obj/",
+        "projectPath": "C:\\Users\\camvi\\OneDrive\\Documentos\\OCTAVO SEMESTRE\\ARQUI\\BookstoreManagementSystem\\BookstoreManagementSystem.csproj",
+        "packagesPath": "C:\\Users\\camvi\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\camvi\\OneDrive\\Documentos\\OCTAVO SEMESTRE\\ARQUI\\BookstoreManagementSystem\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/Users/diegoferrufino/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\camvi\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -43,6 +49,12 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
+          "dependencies": {
+            "Npgsql": {
+              "target": "Package",
+              "version": "[9.0.4, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -62,7 +74,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.304/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

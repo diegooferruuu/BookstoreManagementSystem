@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "l1N8dzfmznk=",
+  "dgSpecHash": "4fzdWumjYT8=",
   "success": true,
-  "projectFilePath": "/Users/diegoferrufino/Documents/UCB/VIII Semestre/Arqui/BookstoreManagementSystem/BookstoreManagementSystem.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\Users\\camvi\\OneDrive\\Documentos\\OCTAVO SEMESTRE\\ARQUI\\BookstoreManagementSystem\\BookstoreManagementSystem.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\camvi\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.2\\microsoft.extensions.dependencyinjection.abstractions.8.0.2.nupkg.sha512",
+    "C:\\Users\\camvi\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\8.0.2\\microsoft.extensions.logging.abstractions.8.0.2.nupkg.sha512",
+    "C:\\Users\\camvi\\.nuget\\packages\\npgsql\\9.0.4\\npgsql.9.0.4.nupkg.sha512"
+  ],
   "logs": []
 }

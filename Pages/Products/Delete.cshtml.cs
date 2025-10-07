@@ -1,39 +1,38 @@
+using BookstoreManagementSystem.Models;
 using BookstoreManagementSystem.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using BookstoreManagementSystem.Models;
 using BookstoreManagementSystem.Services;
 
-
-namespace BookstoreManagementSystem.Pages.Clients
+namespace BookstoreManagementSystem.Pages.Products
 {
     public class DeleteModel : PageModel
     {
-        private readonly IDataBase<Client> _repository;
+        private readonly IDataBase<Product> _repository;
 
         [BindProperty]
-        public Client Client { get; set; } = new();
+        public Product Product { get; set; } = new();
 
         public DeleteModel()
         {
-            var creator = new ClientCreator();
+            var creator = new ProductCreator();
             _repository = creator.FactoryMethod();
         }
 
         public IActionResult OnGet(int id)
         {
-            Client = _repository.Read(id);
-
-            if (Client == null)
-                return RedirectToPage("Index");
-
+            Product = _repository.Read(id);
+            if (Product == null)
+            {
+                return NotFound();
+            }
             return Page();
         }
 
         public IActionResult OnPost()
         {
-            _repository.Delete(Client.Id);
-            return RedirectToPage("Index");
+            _repository.Delete(Product.Id);
+            return RedirectToPage("/Products/Index");
         }
     }
 }

@@ -5,26 +5,26 @@ using BookstoreManagementSystem.Models;
 using BookstoreManagementSystem.Services;
 
 
-namespace BookstoreManagementSystem.Pages.Clients
+namespace BookstoreManagementSystem.Pages.Distributors
 {
     public class DeleteModel : PageModel
     {
-        private readonly IDataBase<Client> _repository;
+        private readonly IDataBase<Distributor> _repository;
 
         [BindProperty]
-        public Client Client { get; set; } = new();
+        public Distributor Distributor { get; set; } = new();
 
         public DeleteModel()
         {
-            var creator = new ClientCreator();
+            var creator = new DistributorCreator();
             _repository = creator.FactoryMethod();
         }
 
         public IActionResult OnGet(int id)
         {
-            Client = _repository.Read(id);
+            Distributor = _repository.Read(id);
 
-            if (Client == null)
+            if (Distributor == null)
                 return RedirectToPage("Index");
 
             return Page();
@@ -32,7 +32,7 @@ namespace BookstoreManagementSystem.Pages.Clients
 
         public IActionResult OnPost()
         {
-            _repository.Delete(Client.Id);
+            _repository.Delete(Distributor.Id);
             return RedirectToPage("Index");
         }
     }

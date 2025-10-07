@@ -1,0 +1,28 @@
+﻿@page
+@model BookstoreManagementSystem.Pages.Distributors.CreateModel
+@{
+    ViewData["Title"] = "Añadir Distribuidor";
+}
+
+<h1>Add Distribuidor</h1>
+
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label">First Name</label>
+        <input asp-for="Distributor.Name" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input asp-for="Distributor.ContactEmail" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Teléfono</label>
+        <input asp-for="Distributor.Phone" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Dirección</label>
+        <input asp-for="Distributor.Address" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-success">Save</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>

@@ -1,10 +1,10 @@
 ﻿@page
 @model BookstoreManagementSystem.Pages.Clients.IndexModel
 @{
-    ViewData["Title"] = "Clientes";
+    ViewData["Title"] = "Clients";
 }
 
-<h1>Clientes</h1>
+<h1>Clients</h1>
 
 <table class="table table-striped table-bordered mt-3">
     <thead class="table-dark">
@@ -22,7 +22,7 @@
         {
             <tr>
                 <td>@client.Id</td>
-                <td>@client.LastName @client.MiddleName @client.FirstName</td>
+                <td>@client.LastName @client.FirstName @client.MiddleName</td>
                 <td>@client.Email</td>
                 <td>@client.Phone</td>
                 <td>@client.Address</td>

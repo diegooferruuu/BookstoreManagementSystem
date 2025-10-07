@@ -1,26 +1,26 @@
 @page
 @model BookstoreManagementSystem.Pages.Products.IndexModel
 @{
-    ViewData["Title"] = "Productos";
+    ViewData["Title"] = "Products";
 }
 
-<h1>Productos</h1>
+<h1>Products</h1>
 
 <div class="mb-3">
-    <a asp-page="Create" class="btn btn-primary">Añadir Producto</a>
+    <a asp-page="Create" class="btn btn-primary">Add Product</a>
 </div>
 
 <table class="table table-striped">
     <thead>
         <tr>
             <th>ID</th>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Categoría</th>
-            <th>Precio</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Price</th>
             <th>Stock</th>
-            <th>Fecha de Creación</th>
-            <th>Acciones</th>
+            <th>Creation Date</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -35,8 +35,8 @@
                 <td>@product.Stock</td>
                 <td>@product.CreatedAt.ToString("dd/MM/yyyy")</td>
                 <td>
-                    <a asp-page="Edit" asp-route-id="@product.Id" class="btn btn-sm btn-warning">Editar</a>
-                    <a asp-page="Delete" asp-route-id="@product.Id" class="btn btn-sm btn-danger">Eliminar</a>
+                    <a asp-page="Edit" asp-route-id="@product.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <a asp-page="Delete" asp-route-id="@product.Id" class="btn btn-sm btn-danger">Delete</a>
                 </td>
             </tr>
         }
@@ -46,6 +46,6 @@
 @if (!Model.Products.Any())
 {
     <div class="alert alert-info">
-        No hay productos registrados.
+        No products registered.
     </div>
 }

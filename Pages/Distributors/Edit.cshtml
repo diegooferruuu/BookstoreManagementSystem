@@ -1,10 +1,10 @@
 ﻿@page "{id:int}"
 @model BookstoreManagementSystem.Pages.Distributors.EditModel
 @{
-    ViewData["Title"] = "Editar Distribuidor";
+    ViewData["Title"] = "Edit Distributor";
 }
 
-<h1>Editar Distribuidor</h1>
+<h1>Edit Distributor</h1>
 
 <form method="post">
     <input type="hidden" asp-for="Distributor.Id" />
@@ -18,14 +18,14 @@
         <input asp-for="Distributor.ContactEmail" class="form-control" />
     </div>
     <div class="mb-3">
-        <label class="form-label">Teléfono</label>
+        <label class="form-label">Phone</label>
         <input asp-for="Distributor.Phone" class="form-control" />
     </div>
     <div class="mb-3">
-        <label class="form-label">Dirección</label>
+        <label class="form-label">Address</label>
         <input asp-for="Distributor.Address" class="form-control" />
     </div>
 
-    <button type="submit" class="btn btn-success">Guardar Cambios</button>
-    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+    <button type="submit" class="btn btn-success">Save Changes</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
 </form>

@@ -1,12 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "wzTRT02/fss=",
+  "dgSpecHash": "Ocxkf7TVDn4=",
   "success": true,
-  "projectFilePath": "/Users/diegoferrufino/Documents/UCB/VIII Semestre/Arqui/BookstoreManagementSystem/BookstoreManagementSystem.csproj",
+  "projectFilePath": "C:\\ProyectoArquiSoft2\\BookstoreManagementSystem.csproj",
   "expectedPackageFiles": [
-    "/Users/diegoferrufino/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/8.0.2/microsoft.extensions.dependencyinjection.abstractions.8.0.2.nupkg.sha512",
-    "/Users/diegoferrufino/.nuget/packages/microsoft.extensions.logging.abstractions/8.0.2/microsoft.extensions.logging.abstractions.8.0.2.nupkg.sha512",
-    "/Users/diegoferrufino/.nuget/packages/npgsql/9.0.4/npgsql.9.0.4.nupkg.sha512"
+    "C:\\Users\\Lucas Alcoba\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.2\\microsoft.extensions.dependencyinjection.abstractions.8.0.2.nupkg.sha512",
+    "C:\\Users\\Lucas Alcoba\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\8.0.2\\microsoft.extensions.logging.abstractions.8.0.2.nupkg.sha512",
+    "C:\\Users\\Lucas Alcoba\\.nuget\\packages\\npgsql\\9.0.4\\npgsql.9.0.4.nupkg.sha512"
   ],
   "logs": []
 }

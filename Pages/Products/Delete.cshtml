@@ -1,0 +1,48 @@
+@page
+@model BookstoreManagementSystem.Pages.Products.DeleteModel
+@{
+    ViewData["Title"] = "Eliminar Producto";
+}
+
+<h1>Eliminar Producto</h1>
+
+<div class="alert alert-warning">
+    <h3>¿Estás seguro de que deseas eliminar este producto?</h3>
+    <p>Esta acción no se puede deshacer.</p>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h4>Detalles del Producto</h4>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">ID:</dt>
+            <dd class="col-sm-9">@Model.Product.Id</dd>
+            
+            <dt class="col-sm-3">Nombre:</dt>
+            <dd class="col-sm-9">@Model.Product.Name</dd>
+            
+            <dt class="col-sm-3">Descripción:</dt>
+            <dd class="col-sm-9">@Model.Product.Description</dd>
+            
+            <dt class="col-sm-3">Categoría:</dt>
+            <dd class="col-sm-9">@Model.Product.CategoryName</dd>
+            
+            <dt class="col-sm-3">Precio:</dt>
+            <dd class="col-sm-9">@Model.Product.Price.ToString("C")</dd>
+            
+            <dt class="col-sm-3">Stock:</dt>
+            <dd class="col-sm-9">@Model.Product.Stock</dd>
+            
+            <dt class="col-sm-3">Fecha de Creación:</dt>
+            <dd class="col-sm-9">@Model.Product.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+        </dl>
+    </div>
+</div>
+
+<form method="post" class="mt-3">
+    <input asp-for="Product.Id" type="hidden" />
+    <button type="submit" class="btn btn-danger">Sí, Eliminar</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+</form>

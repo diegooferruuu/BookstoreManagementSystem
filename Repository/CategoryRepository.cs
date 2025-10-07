@@ -17,9 +17,8 @@ public class CategoryRepository
     {
         var categories = new List<Category>();
 
-        using (var cmd = new NpgsqlCommand("SELECT id, nombre FROM categories", _connection))
+        using (var cmd = new NpgsqlCommand("SELECT id, name FROM categories", _connection))
         {
-            _connection.Open();
             using (var reader = cmd.ExecuteReader())
             {
                 while (reader.Read())

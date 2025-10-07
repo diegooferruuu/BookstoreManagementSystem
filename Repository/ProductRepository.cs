@@ -16,12 +16,12 @@ namespace BookstoreManagementSystem.Repository
         public void Create(Product product)
         {
             using var cmd = new NpgsqlCommand(@"
-                INSERT INTO products (name, description, category, price, stock, sku)
-                VALUES (@name, @description, @category, @price, @stock)", _connection);
+                INSERT INTO products (name, description, category_id, price, stock)
+                VALUES (@name, @description, @category_id, @price, @stock)", _connection);
 
             cmd.Parameters.AddWithValue("@name", product.Name);
             cmd.Parameters.AddWithValue("@description", product.Description ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@category", product.Category ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@category_id", product.Category_id.HasValue ? (object)product.Category_id.Value : DBNull.Value);
             cmd.Parameters.AddWithValue("@price", product.Price);
             cmd.Parameters.AddWithValue("@stock", product.Stock);
 
@@ -31,7 +31,11 @@ namespace BookstoreManagementSystem.Repository
 
         public Product Read(int id)
         {
-            using var cmd = new NpgsqlCommand("SELECT * FROM products WHERE id = @id", _connection);
+            using var cmd = new NpgsqlCommand(@"
+                SELECT p.*, c.name as category_name 
+                FROM products p 
+                LEFT JOIN categories c ON p.category_id = c.id 
+                WHERE p.id = @id", _connection);
             cmd.Parameters.AddWithValue("@id", id);
 
             using var reader = cmd.ExecuteReader();
@@ -42,7 +46,8 @@ namespace BookstoreManagementSystem.Repository
                     Id = reader.GetInt32(reader.GetOrdinal("id")),
                     Name = reader.GetString(reader.GetOrdinal("name")),
                     Description = reader.IsDBNull(reader.GetOrdinal("description")) ? null : reader.GetString(reader.GetOrdinal("description")),
-                    Category = reader.IsDBNull(reader.GetOrdinal("category")) ? null : reader.GetString(reader.GetOrdinal("category")),
+                    Category_id = reader.IsDBNull(reader.GetOrdinal("category_id")) ? null : reader.GetInt32(reader.GetOrdinal("category_id")),
+                    CategoryName = reader.IsDBNull(reader.GetOrdinal("category_name")) ? null : reader.GetString(reader.GetOrdinal("category_name")),
                     Price = reader.GetDecimal(reader.GetOrdinal("price")),
                     Stock = reader.GetInt32(reader.GetOrdinal("stock")),
                     CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at"))
@@ -59,16 +64,15 @@ namespace BookstoreManagementSystem.Repository
                 UPDATE products SET 
                     name = @name,
                     description = @description,
-                    category = @category,
+                    category_id = @category_id,
                     price = @price,
-                    stock = @stock,
-                    sku = @sku
+                    stock = @stock
                 WHERE id = @id", _connection);
 
             cmd.Parameters.AddWithValue("@id", product.Id);
             cmd.Parameters.AddWithValue("@name", product.Name);
             cmd.Parameters.AddWithValue("@description", product.Description ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@category", product.Category ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@category_id", product.Category_id.HasValue ? (object)product.Category_id.Value : DBNull.Value);
             cmd.Parameters.AddWithValue("@price", product.Price);
             cmd.Parameters.AddWithValue("@stock", product.Stock);
 
@@ -86,7 +90,10 @@ namespace BookstoreManagementSystem.Repository
         public List<Product> GetAll()
         {
             var products = new List<Product>();
-            using var cmd = new NpgsqlCommand("SELECT * FROM products", _connection);
+            using var cmd = new NpgsqlCommand(@"
+                SELECT p.*, c.name as category_name 
+                FROM products p 
+                LEFT JOIN categories c ON p.category_id = c.id", _connection);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -95,7 +102,8 @@ namespace BookstoreManagementSystem.Repository
                     Id = reader.GetInt32(reader.GetOrdinal("id")),
                     Name = reader.GetString(reader.GetOrdinal("name")),
                     Description = reader.IsDBNull(reader.GetOrdinal("description")) ? null : reader.GetString(reader.GetOrdinal("description")),
-                    Category = reader.IsDBNull(reader.GetOrdinal("category")) ? null : reader.GetString(reader.GetOrdinal("category")),
+                    Category_id = reader.IsDBNull(reader.GetOrdinal("category_id")) ? null : reader.GetInt32(reader.GetOrdinal("category_id")),
+                    CategoryName = reader.IsDBNull(reader.GetOrdinal("category_name")) ? null : reader.GetString(reader.GetOrdinal("category_name")),
                     Price = reader.GetDecimal(reader.GetOrdinal("price")),
                     Stock = reader.GetInt32(reader.GetOrdinal("stock")),
                     CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at"))

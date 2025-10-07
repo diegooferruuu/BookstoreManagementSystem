@@ -1,14 +1,39 @@
 ﻿@page "{id:int}"
 @model BookstoreManagementSystem.Pages.Clients.EditModel
+@{
+    ViewData["Title"] = "Editar Cliente";
+}
 
-<h2>Editar Cliente</h2>
+<h1>Editar Cliente</h1>
+
 <form method="post">
-    <input type="hidden" asp-for="Cliente.Id" />
-    <input asp-for="Cliente.FirstName" placeholder="Nombre" />
-    <input asp-for="Cliente.LastName" placeholder="Apellido Paterno" />
-    <input asp-for="Cliente.MiddleName" placeholder="Apellido Materno" />
-    <input asp-for="Cliente.Email" placeholder="Email" />
-    <input asp-for="Cliente.Phone" placeholder="Teléfono" />
-    <input asp-for="Cliente.Address" placeholder="Dirección" />
-    <button type="submit">Guardar Cambios</button>
+    <input type="hidden" asp-for="Client.Id" />
+    
+    <div class="mb-3">
+        <label class="form-label">First Name</label>
+        <input asp-for="Client.FirstName" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Middle Name</label>
+        <input asp-for="Client.MiddleName" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Last Name</label>
+        <input asp-for="Client.LastName" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input asp-for="Client.Email" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Teléfono</label>
+        <input asp-for="Client.Phone" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Dirección</label>
+        <input asp-for="Client.Address" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Guardar Cambios</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
 </form>

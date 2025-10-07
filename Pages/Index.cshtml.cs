@@ -15,10 +15,4 @@ public class IndexModel : PageModel
 
     public string ConnectionMessage { get; private set; }
 
-    public IActionResult OnGet()
-    {
-
-        return RedirectToPage("/Clients/Index");
-
-    }
 }

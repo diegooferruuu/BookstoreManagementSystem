@@ -1,13 +1,36 @@
 ﻿@page
 @model BookstoreManagementSystem.Pages.Clients.CreateModel
+@{
+    ViewData["Title"] = "Add Client";
+}
 
-<h2>Nuevo Cliente</h2>
+<h1>Add Client</h1>
+
 <form method="post">
-    <input asp-for="Cliente.FirstName" placeholder="Nombre" />
-    <input asp-for="Cliente.LastName" placeholder="Apellido Paterno" />
-    <input asp-for="Cliente.MiddleName" placeholder="Apellido Materno" />
-    <input asp-for="Cliente.Email" placeholder="Email" />
-    <input asp-for="Cliente.Phone" placeholder="Teléfono" />
-    <input asp-for="Cliente.Address" placeholder="Dirección" />
-    <button type="submit">Guardar</button>
+    <div class="mb-3">
+        <label class="form-label">First Name</label>
+        <input asp-for="Client.FirstName" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Last Name</label>
+        <input asp-for="Client.LastName" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Middle Name</label>
+        <input asp-for="Client.MiddleName" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input asp-for="Client.Email" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Phone</label>
+        <input asp-for="Client.Phone" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Address</label>
+        <input asp-for="Client.Address" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-success">Save</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
 </form>

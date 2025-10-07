@@ -4,18 +4,18 @@ using BookstoreManagementSystem.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace BookstoreManagementSystem.Pages.Clients
+namespace BookstoreManagementSystem.Pages.Distributors
 {
     public class CreateModel : PageModel
     {
-        private readonly IDataBase<Client> _repository;
+        private readonly IDataBase<Distributor> _repository;
 
         [BindProperty]
-        public Client Client { get; set; } = new();
+        public Distributor Distributor { get; set; } = new();
 
         public CreateModel()
         {
-            _repository = new ClientRepository();
+            _repository = new DistributorRepository();
         }
 
         public IActionResult OnPost()
@@ -33,7 +33,7 @@ namespace BookstoreManagementSystem.Pages.Clients
     return Page();
 }
 
-            _repository.Create(Client);
+            _repository.Create(Distributor);
             return RedirectToPage("Index");
         }
     }

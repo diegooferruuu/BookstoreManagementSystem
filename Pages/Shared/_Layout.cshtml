@@ -60,52 +60,43 @@
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="booksDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-book me-1"></i>Books
+                                <i class="fas fa-book me-1"></i>Products
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="booksDropdown">
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-list me-2"></i>All Books</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-plus me-2"></i>Add Book</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-tags me-2"></i>Categories</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-chart-bar me-2"></i>Book Reports</a></li>
+                                <li><a class="dropdown-item" href="/Products"><i class="fas fa-list me-2"></i>All Products</a></li>
+                                <li><a class="dropdown-item" href="/Products/Create"><i class="fas fa-plus me-2"></i>Add Product</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="customersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-users me-1"></i>Customers
+                                <i class="fas fa-users me-1"></i>Clients
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="customersDropdown">
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-list me-2"></i>All Customers</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-user-plus me-2"></i>Add Customer</a></li>
+                                <li><a class="dropdown-item" href="/Clients"><i class="fas fa-list me-2"></i>All Clients</a></li>
+                                <li><a class="dropdown-item" href="/Clients/Create"><i class="fas fa-user-plus me-2"></i>Add Client</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="salesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-shopping-cart me-1"></i>Sales
+                                <i class="fas fa-shopping-cart me-1"></i>Distributors
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="salesDropdown">
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-plus me-2"></i>New Sale</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-history me-2"></i>Sales History</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-chart-line me-2"></i>Sales Reports</a></li>
+                                <li><a class="dropdown-item" href="/Distributors"><i class="fas fa-plus me-2"></i>All Distributors</a></li>
+                                <li><a class="dropdown-item" href="/Distributors/Create"><i class="fas fa-history me-2"></i>Add Distributor</a></li>
                             </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="fas fa-warehouse me-1"></i>Inventory
-                            </a>
                         </li>
                     </ul>
                     
                     <div class="d-flex align-items-center">
                         <!-- Search Bar -->
-                        <form class="d-flex me-3" role="search">
+                        @* <form class="d-flex me-3" role="search">
                             <div class="input-group">
                                 <input class="form-control form-control-sm" type="search" placeholder="Search books..." aria-label="Search">
                                 <button class="btn btn-outline-primary btn-sm" type="submit">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
-                        </form>
+                        </form> *@
                         
                         <!-- User Profile -->
                         <div class="dropdown">

@@ -1,0 +1,31 @@
+﻿@page "{id:int}"
+@model BookstoreManagementSystem.Pages.Distributors.EditModel
+@{
+    ViewData["Title"] = "Edit Distributor";
+}
+
+<h1>Edit Distributor</h1>
+
+<form method="post">
+    <input type="hidden" asp-for="Distributor.Id" />
+
+    <div class="mb-3">
+        <label class="form-label">Name</label>
+        <input asp-for="Distributor.Name" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input asp-for="Distributor.ContactEmail" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Phone</label>
+        <input asp-for="Distributor.Phone" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Address</label>
+        <input asp-for="Distributor.Address" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Save Changes</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+</form>

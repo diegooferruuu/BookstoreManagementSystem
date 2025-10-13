@@ -5,9 +5,9 @@ namespace BookstoreManagementSystem.Validations
 {
     public static class DistributorValidation
     {
-        // Nombre: solo letras minúsculas, sin espacios, sin números, max 20
+        // Nombre: solo letras minusculas, con espacios, sin numeros, max 20
         public static bool IsValidName(string? s) =>
-            TextRules.IsLowercaseLettersNoSpaces(s) &&
+            TextRules.IsLowercaseLetters(s) &&
             TextRules.MinLen(s, 1) &&
             TextRules.MaxLen(s, 20);
 
@@ -15,7 +15,7 @@ namespace BookstoreManagementSystem.Validations
         public static bool IsValidEmail(string? s) =>
             string.IsNullOrWhiteSpace(s) ? false : TextRules.IsValidEmailNoSpacesAndCom(s);
 
-        // Telefono: solo dígitos, sin espacios, max 15
+        // Telefono: solo digitos, sin espacios, max 15
         public static bool IsValidPhone(string? s) =>
             string.IsNullOrWhiteSpace(s) ? false : (TextRules.IsDigitsOnly(s) && TextRules.MaxLen(s, 15));
 
@@ -25,7 +25,7 @@ namespace BookstoreManagementSystem.Validations
         public static IEnumerable<ValidationError> Validate(Distributor d)
         {
             if (!IsValidName(d.Name))
-                yield return new ValidationError(nameof(d.Name), "Nombre invalido (solo letras minúsculas, sin espacios, max 20).");
+                yield return new ValidationError(nameof(d.Name), "Nombre invalido (solo letras minusculas, sin espacios, max 20).");
 
             if (!string.IsNullOrWhiteSpace(d.ContactEmail) && !IsValidEmail(d.ContactEmail))
                 yield return new ValidationError(nameof(d.ContactEmail), "Email de contacto invalido (sin espacios, debe contener @ y terminar en .com).");

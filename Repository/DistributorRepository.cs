@@ -28,7 +28,7 @@ namespace BookstoreManagementSystem.Repository
 
         }
 
-        public Distributor Read(int id)
+    public Distributor? Read(int id)
         {
             using var cmd = new NpgsqlCommand("SELECT * FROM distributors WHERE id = @id", _connection);
             cmd.Parameters.AddWithValue("@id", id);

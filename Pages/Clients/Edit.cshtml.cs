@@ -48,7 +48,7 @@ namespace BookstoreManagementSystem.Pages.Clients
                 return Page();
             }
 
-            _repository.Create(Client);
+            _repository.Update(Client);
             return RedirectToPage("Index");
         }
     }

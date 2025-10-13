@@ -29,7 +29,7 @@ namespace BookstoreManagementSystem.Repository
 
         }
 
-        public Product Read(int id)
+    public Product? Read(int id)
         {
             using var cmd = new NpgsqlCommand(@"
                 SELECT p.*, c.name as category_name 

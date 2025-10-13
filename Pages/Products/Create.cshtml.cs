@@ -43,7 +43,6 @@ namespace BookstoreManagementSystem.Pages.Products
 
             if (!ModelState.IsValid)
             {
-                // Repoblar la lista de categorías antes de renderizar la página
                 LoadCategories();
                 foreach (var error in ModelState)
                 {

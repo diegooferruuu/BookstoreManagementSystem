@@ -20,7 +20,6 @@ namespace BookstoreManagementSystem.Pages.Distributors
 
         public IActionResult OnPost()
         {
-            // Ejecutar validaciones personalizadas y añadir errores a ModelState
             foreach (var err in Validations.DistributorValidation.Validate(Distributor))
                 ModelState.AddModelError($"Distributor.{err.Field}", err.Message);
 

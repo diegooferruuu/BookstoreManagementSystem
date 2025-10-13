@@ -5,41 +5,46 @@ namespace BookstoreManagementSystem.Validations
 {
     public static class ProductValidation
     {
+        // Nombre: solo letras minúsculas, sin espacios, max 20
         public static bool IsValidName(string? s) =>
             !string.IsNullOrWhiteSpace(s) &&
-            TextRules.MinLen(s, 2) &&
-            TextRules.MaxLen(s, 20) &&
-            TextRules.NotAllUppercase(s);
+            TextRules.IsLowercaseLettersNoSpaces(s) &&
+            TextRules.MinLen(s, 1) &&
+            TextRules.MaxLen(s, 20);
 
-        public static bool IsValidCategory_id(int s, CategoryRepository categoryRepository)
+        // Categoria requerida: debe existir en el repositorio
+        public static bool IsValidCategory_id(int? s, CategoryRepository categoryRepository)
         {
-            if(categoryRepository.Read(s) != null)
-                return true;
-            return false;
+            if (!s.HasValue) return false;
+            return categoryRepository.Read(s.Value) != null;
         }
 
+        // Descripcion: acepta caracteres especiales, max 80
         public static bool IsValidDescription(string? s) =>
-            string.IsNullOrWhiteSpace(s) || TextRules.MaxLen(s, 500);
+            string.IsNullOrWhiteSpace(s) || TextRules.MaxLen(s, 80);
 
-        public static bool IsValidPrice(decimal price) => TextRules.IsNonNegative(price);
-        public static bool IsValidStock(int stock) => TextRules.IsNonNegativeInt(stock);
+    // Precio: debe ser número > 0
+    public static bool IsValidPrice(decimal? price) => price.HasValue && price.Value > 0m;
+
+    // Stock: entero >= 0 (puede ser 0)
+    public static bool IsValidStock(int? stock) => stock.HasValue && stock.Value >= 0;
 
         public static IEnumerable<ValidationError> Validate(Product p, CategoryRepository categoryRepository)
         {
             if (!IsValidName(p.Name))
-                yield return new ValidationError(nameof(p.Name), "Nombre de producto invalido (2–250, no todo en MAYUSCULAS).");
+                yield return new ValidationError(nameof(p.Name), "Nombre de producto invalido (solo letras minúsculas, sin espacios, max 20).");
 
-            if (!IsValidCategory_id(p.Category_id.Value, categoryRepository))
-                yield return new ValidationError(nameof(p.Category_id), "Categoria invalida, no se encuentra entre las disponibles.");
+            if (!IsValidCategory_id(p.Category_id, categoryRepository))
+                yield return new ValidationError(nameof(p.Category_id), "Categoria invalida, debe seleccionar una categoria valida.");
 
             if (!IsValidDescription(p.Description))
-                yield return new ValidationError(nameof(p.Description), "Descripcion demasiado larga (max. 500).");
+                yield return new ValidationError(nameof(p.Description), "Descripcion demasiado larga (max. 80).");
 
             if (!IsValidPrice(p.Price))
-                yield return new ValidationError(nameof(p.Price), "El precio debe ser >= 0.");
+                yield return new ValidationError(nameof(p.Price), "El precio debe ser un numero mayor que 0.");
 
             if (!IsValidStock(p.Stock))
-                yield return new ValidationError(nameof(p.Stock), "El stock debe ser >= 0.");
+                yield return new ValidationError(nameof(p.Stock), "El stock debe ser un entero >= 0 (puede ser 0).");
         }
     }
 }

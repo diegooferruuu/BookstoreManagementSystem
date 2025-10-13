@@ -3,6 +3,7 @@ using BookstoreManagementSystem.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BookstoreManagementSystem.Services;
+using BookstoreManagementSystem.Validations;
 
 namespace BookstoreManagementSystem.Pages.Clients
 {
@@ -32,10 +33,22 @@ namespace BookstoreManagementSystem.Pages.Clients
 
         public IActionResult OnPost()
         {
-            if (!ModelState.IsValid)
-                return Page();
+            foreach (var err in ClientValidation.Validate(Client))
+                ModelState.AddModelError($"Cliente.{err.Field}", err.Message);
 
-            _repository.Update(Client);
+            if (!ModelState.IsValid)
+            {
+                foreach (var error in ModelState)
+                {
+                    foreach (var subError in error.Value.Errors)
+                    {
+                        Console.WriteLine($" Campo: {error.Key} - Error: {subError.ErrorMessage}");
+                    }
+                }
+                return Page();
+            }
+
+            _repository.Create(Client);
             return RedirectToPage("Index");
         }
     }

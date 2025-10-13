@@ -24,7 +24,7 @@ public class CategoryRepository : IDataBase<Category>
     }
 
 
-    public Category Read(int id)
+    public Category? Read(int id)
     {
         using var cmd = new NpgsqlCommand("SELECT * FROM categories WHERE id = @id", _connection);
         cmd.Parameters.AddWithValue("@id", id);

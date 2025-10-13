@@ -39,10 +39,11 @@ namespace BookstoreManagementSystem.Pages.Products
             }
 
             foreach (var err in ProductValidation.Validate(Product, _categoryRepository))
-                ModelState.AddModelError($"Cliente.{err.Field}", err.Message);
+                ModelState.AddModelError($"Product.{err.Field}", err.Message);
 
             if (!ModelState.IsValid)
             {
+                LoadCategories();
                 foreach (var error in ModelState)
                 {
                     foreach (var subError in error.Value.Errors)

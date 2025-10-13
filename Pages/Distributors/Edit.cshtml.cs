@@ -32,8 +32,20 @@ namespace BookstoreManagementSystem.Pages.Distributors
 
         public IActionResult OnPost()
         {
+            foreach (var err in Validations.DistributorValidation.Validate(Distributor))
+                ModelState.AddModelError($"Distributor.{err.Field}", err.Message);
+
             if (!ModelState.IsValid)
+            {
+                foreach (var error in ModelState)
+                {
+                    foreach (var subError in error.Value.Errors)
+                    {
+                        Console.WriteLine($" Campo: {error.Key} - Error: {subError.ErrorMessage}");
+                    }
+                }
                 return Page();
+            }
 
             _repository.Update(Distributor);
             return RedirectToPage("Index");

@@ -31,7 +31,7 @@ namespace BookstoreManagementSystem.Repository
 
         }
 
-        public Client Read(int id)
+    public Client? Read(int id)
         {
             using var cmd = new NpgsqlCommand("SELECT * FROM clients WHERE id = @id", _connection);
             cmd.Parameters.AddWithValue("@id", id);

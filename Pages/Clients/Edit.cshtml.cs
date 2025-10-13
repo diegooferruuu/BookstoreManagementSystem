@@ -34,7 +34,7 @@ namespace BookstoreManagementSystem.Pages.Clients
         public IActionResult OnPost()
         {
             foreach (var err in ClientValidation.Validate(Client))
-                ModelState.AddModelError($"Cliente.{err.Field}", err.Message);
+                ModelState.AddModelError($"Client.{err.Field}", err.Message);
 
             if (!ModelState.IsValid)
             {

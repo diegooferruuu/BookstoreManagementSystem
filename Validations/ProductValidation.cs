@@ -5,10 +5,9 @@ namespace BookstoreManagementSystem.Validations
 {
     public static class ProductValidation
     {
-        // Nombre: solo letras minúsculas, sin espacios, max 20
+        // nombre: solo letras minúsculas, con espacios, max 20
         public static bool IsValidName(string? s) =>
-            !string.IsNullOrWhiteSpace(s) &&
-            TextRules.IsLowercaseLettersNoSpaces(s) &&
+            TextRules.IsLowercaseLetters(s) &&
             TextRules.MinLen(s, 1) &&
             TextRules.MaxLen(s, 20);
 
@@ -19,11 +18,11 @@ namespace BookstoreManagementSystem.Validations
             return categoryRepository.Read(s.Value) != null;
         }
 
-        // Descripcion: acepta caracteres especiales, max 80
+        // descripcion: acepta caracteres especiales, max 80
         public static bool IsValidDescription(string? s) =>
             string.IsNullOrWhiteSpace(s) || TextRules.MaxLen(s, 80);
 
-    // Precio: debe ser número > 0
+    // precio: debe ser numero > 0
     public static bool IsValidPrice(decimal? price) => price.HasValue && price.Value > 0m;
 
     // Stock: entero >= 0 (puede ser 0)
@@ -32,7 +31,7 @@ namespace BookstoreManagementSystem.Validations
         public static IEnumerable<ValidationError> Validate(Product p, CategoryRepository categoryRepository)
         {
             if (!IsValidName(p.Name))
-                yield return new ValidationError(nameof(p.Name), "Nombre de producto invalido (solo letras minúsculas, sin espacios, max 20).");
+                yield return new ValidationError(nameof(p.Name), "Nombre de producto invalido (solo letras minusculas, sin espacios, max 20).");
 
             if (!IsValidCategory_id(p.Category_id, categoryRepository))
                 yield return new ValidationError(nameof(p.Category_id), "Categoria invalida, debe seleccionar una categoria valida.");

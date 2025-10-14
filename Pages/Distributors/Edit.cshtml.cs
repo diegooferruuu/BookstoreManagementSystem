@@ -13,21 +13,28 @@ namespace BookstoreManagementSystem.Pages.Distributors
         [BindProperty]
         public Distributor Distributor { get; set; } = new();
 
+        [TempData]
+        public int EditDistributorId { get; set; }
+
+
         public EditModel()
         {
             var creator = new DistributorCreator();
             _repository = creator.FactoryMethod();
         }
 
-        public IActionResult OnGet(int id)
+        public IActionResult OnGet()
         {
-            var distributor = _repository.Read(id);
-
-            if (distributor == null)
+            if (EditDistributorId == 0)
                 return RedirectToPage("Index");
 
-            this.Distributor = distributor;
+            Distributor = _repository.Read(EditDistributorId);
+
+            if (Distributor == null)
+                return RedirectToPage("Index");
+
             return Page();
+
         }
 
         public IActionResult OnPost()

@@ -9,35 +9,35 @@
 
 <form method="post">
     <div class="mb-3">
-        <label class="form-label">First Name</label>
+        <label class="form-label">Nombre</label>
         <input asp-for="Client.FirstName" class="form-control" />
         <span asp-validation-for="Client.FirstName" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label class="form-label">Last Name</label>
+        <label class="form-label">Apellido</label>
         <input asp-for="Client.LastName" class="form-control" />
         <span asp-validation-for="Client.LastName" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label class="form-label">Middle Name</label>
+        <label class="form-label">Segundo Nombre</label>
         <input asp-for="Client.MiddleName" class="form-control" />
         <span asp-validation-for="Client.MiddleName" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label class="form-label">Email</label>
+        <label class="form-label">Correo</label>
         <input asp-for="Client.Email" class="form-control" />
         <span asp-validation-for="Client.Email" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label class="form-label">Phone</label>
+        <label class="form-label">Telefono</label>
         <input asp-for="Client.Phone" class="form-control" />
         <span asp-validation-for="Client.Phone" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label class="form-label">Address</label>
+        <label class="form-label">Direccion</label>
         <input asp-for="Client.Address" class="form-control" />
         <span asp-validation-for="Client.Address" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-success">Save</button>
-    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
 </form>

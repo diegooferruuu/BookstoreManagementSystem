@@ -23,5 +23,17 @@ namespace BookstoreManagementSystem.Pages.Distributors
         {
             Distributors = _repository.GetAll();
         }
+
+        public IActionResult OnPostEdit(int id)
+        {
+            TempData["EditDistributorId"] = id;
+            return RedirectToPage("Edit");
+        }
+
+        public IActionResult OnPostDelete(int id)
+        {
+            _repository.Delete(id); 
+            return RedirectToPage();
+        }
     }
 }

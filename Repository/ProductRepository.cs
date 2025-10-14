@@ -82,7 +82,7 @@ namespace BookstoreManagementSystem.Repository
 
         public void Delete(int id)
         {
-            using var cmd = new NpgsqlCommand("DELETE FROM products WHERE id = @id", _connection);
+            using var cmd = new NpgsqlCommand("UPDATE products SET is_active = FALSE WHERE id = @id", _connection);
             cmd.Parameters.AddWithValue("@id", id);
             cmd.ExecuteNonQuery();
         }
@@ -93,7 +93,9 @@ namespace BookstoreManagementSystem.Repository
             using var cmd = new NpgsqlCommand(@"
                 SELECT p.*, c.name as category_name 
                 FROM products p 
-                LEFT JOIN categories c ON p.category_id = c.id", _connection);
+                LEFT JOIN categories c ON p.category_id = c.id
+                WHERE p.is_active = TRUE
+                ORDER BY p.name", _connection);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {

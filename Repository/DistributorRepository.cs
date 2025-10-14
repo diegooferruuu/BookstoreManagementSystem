@@ -72,7 +72,7 @@ namespace BookstoreManagementSystem.Repository
 
         public void Delete(int id)
         {
-            using var cmd = new NpgsqlCommand("DELETE FROM distributors WHERE id = @id", _connection);
+            using var cmd = new NpgsqlCommand("UPDATE distributors SET is_active = FALSE WHERE id = @id", _connection);
             cmd.Parameters.AddWithValue("@id", id);
             cmd.ExecuteNonQuery();
         }
@@ -80,7 +80,7 @@ namespace BookstoreManagementSystem.Repository
         public List<Distributor> GetAll()
         {
             var distributors = new List<Distributor>();
-            using var cmd = new NpgsqlCommand("SELECT * FROM distributors", _connection);
+            using var cmd = new NpgsqlCommand("SELECT * FROM distributors WHERE is_active = TRUE ORDER BY name", _connection);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {

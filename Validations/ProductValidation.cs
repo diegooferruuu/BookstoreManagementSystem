@@ -5,9 +5,9 @@ namespace BookstoreManagementSystem.Validations
 {
     public static class ProductValidation
     {
-        // nombre: solo letras minúsculas, con espacios, max 20
+        // nombre: palabras en minúscula separadas por un único espacio, max 20
         public static bool IsValidName(string? s) =>
-            TextRules.IsLowercaseLetters(s) &&
+            TextRules.IsLowercaseWordsWithSingleSpaces(s) &&
             TextRules.MinLen(s, 1) &&
             TextRules.MaxLen(s, 20);
 

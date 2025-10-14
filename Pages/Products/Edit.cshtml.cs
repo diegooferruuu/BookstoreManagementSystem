@@ -15,8 +15,11 @@ namespace BookstoreManagementSystem.Pages.Products
 
         [BindProperty]
         public Product Product { get; set; } = new();
-        
+
         public List<SelectListItem> Categories { get; set; } = new();
+
+        [TempData]
+        public int EditProductId { get; set; }
 
         public EditModel()
         {
@@ -25,15 +28,16 @@ namespace BookstoreManagementSystem.Pages.Products
             _categoryRepository = new CategoryRepository();
         }
 
-        public IActionResult OnGet(int id)
+        public IActionResult OnGet()
         {
-            var product = _repository.Read(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
+            if (EditProductId == 0)
+                return RedirectToPage("Index");
 
-            Product = product;
+            Product = _repository.Read(EditProductId);
+
+            if (Product == null)
+                return RedirectToPage("Index");
+
             LoadCategories();
             return Page();
         }

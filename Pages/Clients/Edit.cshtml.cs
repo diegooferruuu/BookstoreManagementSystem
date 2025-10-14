@@ -14,20 +14,22 @@ namespace BookstoreManagementSystem.Pages.Clients
         [BindProperty]
         public Client Client { get; set; } = new();
 
+        [TempData]
+        public int EditClientId { get; set; }
+
         public EditModel()
         {
             var creator = new ClientCreator();
             _repository = creator.FactoryMethod();
         }
 
-        public IActionResult OnGet(int id)
+        public IActionResult OnGet()
         {
-            var Client = _repository.Read(id);
-            
-            if (Client == null)
+            if (!TempData.ContainsKey("EditClientId"))
                 return RedirectToPage("Index");
 
-            this.Client = Client;
+            int id = (int)TempData["EditClientId"];
+            Client = _repository.Read(id);
             return Page();
         }
 

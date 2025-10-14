@@ -23,5 +23,19 @@ namespace BookstoreManagementSystem.Pages.Clients
         {
             Clients = _repository.GetAll();
         }
+
+        public IActionResult OnPostEdit(int id)
+        {
+            TempData["EditClientId"] = id;
+            return RedirectToPage("Edit");
+
+        }
+
+        public IActionResult OnPostDelete(int id)
+        {
+            _repository.Delete(id); 
+            return RedirectToPage(); 
+        }
+
     }
 }

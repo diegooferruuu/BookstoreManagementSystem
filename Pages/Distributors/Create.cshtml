@@ -4,16 +4,16 @@
     ViewData["Title"] = "Añadir Distribuidor";
 }
 
-<h1>Add Distribuidor</h1>
+<h1>Añadir Distribuidor</h1>
 
 <form method="post">
     <div class="mb-3">
-        <label class="form-label">First Name</label>
+        <label class="form-label">Nombre</label>
         <input asp-for="Distributor.Name" class="form-control" />
         <span asp-validation-for="Distributor.Name" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label class="form-label">Email</label>
+        <label class="form-label">Correo</label>
         <input asp-for="Distributor.ContactEmail" class="form-control" />
         <span asp-validation-for="Distributor.ContactEmail" class="text-danger"></span>
     </div>
@@ -27,6 +27,6 @@
         <input asp-for="Distributor.Address" class="form-control" />
         <span asp-validation-for="Distributor.Address" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-success">Save</button>
-    <a asp-page="Index" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
 </form>

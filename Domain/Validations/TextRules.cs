@@ -13,6 +13,11 @@ namespace BookstoreManagementSystem.Domain.Validations
         private static readonly Regex RxLowerLettersNoSpaces =
             new Regex(@"^[a-záéíóúñü]+$", RegexOptions.Compiled);
 
+        // Palabras en minúscula separadas por un único espacio,
+        // cada palabra debe tener al menos 2 letras (ej. "coca cola" válido, "c o c a" inválido)
+        private static readonly Regex RxLowercaseWords =
+            new Regex(@"^[a-záéíóúñü]{2,}(?: [a-záéíóúñü]{2,})*$", RegexOptions.Compiled);
+
         // Telefono: digitos y simbolos comunes
         private static readonly Regex RxPhone =
             new Regex(@"^[0-9\+\-\(\) ]+$", RegexOptions.Compiled);
@@ -25,7 +30,12 @@ namespace BookstoreManagementSystem.Domain.Validations
         // comprueba que la cadena solo tenga letras en minuscula y NO tenga espacios
         public static bool IsLowercaseLettersNoSpaces(string? s) =>
             !string.IsNullOrWhiteSpace(s) && RxLowerLettersNoSpaces.IsMatch(Normalize(s));
-        // comprueba que la cadena solo tenga letras en minuscula
+        // comprueba que la cadena tenga palabras en minúscula separadas por un único espacio;
+        // cada palabra debe tener al menos 2 letras
+        public static bool IsLowercaseWordsWithSingleSpaces(string? s) =>
+            !string.IsNullOrWhiteSpace(s) && RxLowercaseWords.IsMatch(Normalize(s));
+
+        // comprueba que la cadena solo tenga letras y espacios (sin forzar minúsculas)
         public static bool IsLowercaseLetters(string? s) =>
             RxLettersSpaces.IsMatch(Normalize(s));
 

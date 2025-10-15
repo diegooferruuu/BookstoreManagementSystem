@@ -68,7 +68,7 @@ namespace BookstoreManagementSystem.Pages.Products
             }).ToList();
             
             // Agregar opción por defecto
-            Categories.Insert(0, new SelectListItem { Value = "", Text = "Select category..." });
+            Categories.Insert(0, new SelectListItem { Value = "", Text = "Selecciona una categoria..." });
         }
     }
 }

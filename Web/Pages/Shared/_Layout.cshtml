@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Bookstore Management System</title>
+    <title>@ViewData["Title"] - Sistema de manejo de una Libreria</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -28,7 +28,7 @@
                     </div>
                     <div class="col-md-6 text-end">
                         <small>
-                            <i class="fas fa-clock me-2"></i>Mon - Fri: 9:00 AM - 8:00 PM
+                            <i class="fas fa-clock me-2"></i>Lun - Vie: 9:00 AM - 8:00 PM
                         </small>
                     </div>
                 </div>
@@ -41,8 +41,8 @@
                 <a class="navbar-brand d-flex align-items-center" asp-area="" asp-page="/Index">
                     <i class="fas fa-book-open text-primary me-2 fs-3"></i>
                     <div>
-                        <span class="brand-name">BookWise</span>
-                        <small class="d-block text-muted">Management System</small>
+                        <span class="brand-name">Libreria</span>
+                        <small class="d-block text-muted">Sistema De Administracion</small>
                     </div>
                 </a>
                 
@@ -55,34 +55,34 @@
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
                             <a class="nav-link active" asp-area="" asp-page="/Index">
-                                <i class="fas fa-home me-1"></i>Dashboard
+                                <i class="fas fa-home me-1"></i>Inicio
                             </a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="booksDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-book me-1"></i>Products
+                                <i class="fas fa-book me-1"></i>Productos
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="booksDropdown">
-                                <li><a class="dropdown-item" href="/Products"><i class="fas fa-list me-2"></i>All Products</a></li>
-                                <li><a class="dropdown-item" href="/Products/Create"><i class="fas fa-plus me-2"></i>Add Product</a></li>
+                                <li><a class="dropdown-item" href="/Products"><i class="fas fa-list me-2"></i>Todos Los Productos</a></li>
+                                <li><a class="dropdown-item" href="/Products/Create"><i class="fas fa-plus me-2"></i>Añadir Producto</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="customersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-users me-1"></i>Clients
+                                <i class="fas fa-users me-1"></i>Clientes
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="customersDropdown">
-                                <li><a class="dropdown-item" href="/Clients"><i class="fas fa-list me-2"></i>All Clients</a></li>
-                                <li><a class="dropdown-item" href="/Clients/Create"><i class="fas fa-user-plus me-2"></i>Add Client</a></li>
+                                <li><a class="dropdown-item" href="/Clients"><i class="fas fa-list me-2"></i>Todos Los Clientes</a></li>
+                                <li><a class="dropdown-item" href="/Clients/Create"><i class="fas fa-user-plus me-2"></i>Añadir Cliente</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="salesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-shopping-cart me-1"></i>Distributors
+                                <i class="fas fa-shopping-cart me-1"></i>Distribuidores
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="salesDropdown">
-                                <li><a class="dropdown-item" href="/Distributors"><i class="fas fa-plus me-2"></i>All Distributors</a></li>
-                                <li><a class="dropdown-item" href="/Distributors/Create"><i class="fas fa-history me-2"></i>Add Distributor</a></li>
+                                <li><a class="dropdown-item" href="/Distributors"><i class="fas fa-plus me-2"></i>Todos Los Distribuidore</a></li>
+                                <li><a class="dropdown-item" href="/Distributors/Create"><i class="fas fa-history me-2"></i>Añadir Distribuidores</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -104,13 +104,13 @@
                                 <div class="user-avatar me-2">
                                     <i class="fas fa-user-circle fs-4 text-primary"></i>
                                 </div>
-                                <span class="d-none d-lg-inline">Admin</span>
+                                <span class="d-none d-lg-inline">Administrador</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Perfil</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Configuraciones</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesion</a></li>
                             </ul>
                         </div>
                     </div>
@@ -124,7 +124,7 @@
             <div class="container">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a class="text-decoration-none" asp-area="" asp-page="/Index"><i class="fas fa-home me-1"></i>Home</a></li>
+                        <li class="breadcrumb-item"><a class="text-decoration-none" asp-area="" asp-page="/Index"><i class="fas fa-home me-1"></i>Inicio</a></li>
                         <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
                     </ol>
                 </nav>

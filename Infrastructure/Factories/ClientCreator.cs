@@ -1,11 +1,12 @@
 using BookstoreManagementSystem.Infrastructure.Repositories;
 using BookstoreManagementSystem.Domain.Models;
 using BookstoreManagementSystem.Domain.Services;
+using BookstoreManagementSystem.Application.Services;
 
-public class ClientCreator : Creator<Client>
+public class ClientCreator 
 {
-    public override IDataBase<Client> FactoryMethod()
+    public ClientService FactoryMethod()
     {
-        return new ClientRepository();
+        return new ClientService(new ClientRepository());
     }
 }

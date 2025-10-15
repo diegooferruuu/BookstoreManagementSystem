@@ -1,11 +1,10 @@
+using BookstoreManagementSystem.Application.Services;
 using BookstoreManagementSystem.Infrastructure.Repositories;
-using BookstoreManagementSystem.Domain.Models;
-using BookstoreManagementSystem.Domain.Services;
 
-public class DistributorCreator : Creator<Distributor>
+public class DistributorCreator
 {
-    public override IDataBase<Distributor> FactoryMethod()
+    public DistributorService FactoryMethod()
     {
-        return new DistributorRepository();
+        return new DistributorService(new DistributorRepository());
     }
 }

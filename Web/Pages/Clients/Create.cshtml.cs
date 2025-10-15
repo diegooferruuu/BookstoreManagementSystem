@@ -1,7 +1,7 @@
-using BookstoreManagementSystem.Domain.Models;
-using BookstoreManagementSystem.Domain.Services;
-using BookstoreManagementSystem.Domain.Validations;
+using BookstoreManagementSystem.Application.Services;
 using BookstoreManagementSystem.Infrastructure.Repositories;
+using BookstoreManagementSystem.Domain.Models;
+using BookstoreManagementSystem.Domain.Validations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -9,14 +9,14 @@ namespace BookstoreManagementSystem.Pages.Clients
 {
     public class CreateModel : PageModel
     {
-        private readonly IDataBase<Client> _repository;
+        private readonly ClientService _service;
 
         [BindProperty]
         public Client Client { get; set; } = new();
 
         public CreateModel()
         {
-            _repository = new ClientRepository();
+            _service = new ClientService(new ClientRepository());
         }
 
         public IActionResult OnPost()
@@ -25,18 +25,9 @@ namespace BookstoreManagementSystem.Pages.Clients
                 ModelState.AddModelError($"Client.{err.Field}", err.Message);
 
             if (!ModelState.IsValid)
-            {
-                foreach (var error in ModelState)
-                {
-                    foreach (var subError in error.Value.Errors)
-                    {
-                        Console.WriteLine($" Campo: {error.Key} - Error: {subError.ErrorMessage}");
-                    }
-                }
                 return Page();
-            }
 
-            _repository.Create(Client);
+            _service.Create(Client);
             return RedirectToPage("Index");
         }
     }

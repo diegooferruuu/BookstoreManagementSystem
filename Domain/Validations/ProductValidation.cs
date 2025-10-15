@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BookstoreManagementSystem.Domain.Models;
+using BookstoreManagementSystem.Application.Interfaces;
 
 namespace BookstoreManagementSystem.Domain.Validations
 {
@@ -8,14 +9,15 @@ namespace BookstoreManagementSystem.Domain.Validations
         // nombre: palabras en minúscula separadas por un único espacio, max 20
         public static bool IsValidName(string? s) =>
             TextRules.IsLowercaseWordsWithSingleSpaces(s) &&
-            TextRules.MinLen(s, 1) &&
+            TextRules.MinLen(s, 1) &&   
             TextRules.MaxLen(s, 20);
 
         // Categoria requerida: debe existir en el repositorio
-        public static bool IsValidCategory_id(int? s, CategoryRepository categoryRepository)
+        public static bool IsValidCategory_id(int? s, ICategoryRepository categoryRepository)
         {
             if (!s.HasValue) return false;
-            return categoryRepository.Read(s.Value) != null;
+            var category = categoryRepository.Read(s.Value);
+            return category != null;
         }
 
         // descripcion: acepta caracteres especiales, max 80
@@ -28,7 +30,7 @@ namespace BookstoreManagementSystem.Domain.Validations
     // Stock: entero >= 0 (puede ser 0)
     public static bool IsValidStock(int? stock) => stock.HasValue && stock.Value >= 0;
 
-        public static IEnumerable<ValidationError> Validate(Product p, CategoryRepository categoryRepository)
+        public static IEnumerable<ValidationError> Validate(Product p, ICategoryRepository categoryRepository)
         {
             if (!IsValidName(p.Name))
                 yield return new ValidationError(nameof(p.Name), "Nombre de producto invalido (solo letras minusculas, sin espacios, max 20).");
@@ -46,4 +48,4 @@ namespace BookstoreManagementSystem.Domain.Validations
                 yield return new ValidationError(nameof(p.Stock), "El stock debe ser un entero >= 0 (puede ser 0).");
         }
     }
-}
+}   

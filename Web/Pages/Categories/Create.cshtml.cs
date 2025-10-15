@@ -4,18 +4,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BookstoreManagementSystem.Domain.Models;
 
-namespace BookstoreManagementSystem.Pages.Distributors
+namespace BookstoreManagementSystem.Pages.Categories
 {
     public class CreateModel : PageModel
     {
-        private readonly DistributorService _service;
+        private readonly CategoryService _service;
 
         [BindProperty]
-        public Distributor Distributor { get; set; } = new();
+        public Category Category { get; set; } = new();
 
         public CreateModel()
         {
-            _service = new DistributorService(new DistributorRepository());
+            _service = new CategoryService(new CategoryRepository());
         }
 
         public IActionResult OnPost()
@@ -23,7 +23,7 @@ namespace BookstoreManagementSystem.Pages.Distributors
             if (!ModelState.IsValid)
                 return Page();
 
-            _service.Create(Distributor);
+            _service.Create(Category);
             return RedirectToPage("Index");
         }
     }

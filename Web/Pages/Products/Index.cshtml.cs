@@ -1,8 +1,9 @@
 using BookstoreManagementSystem.Infrastructure.Repositories;
+using BookstoreManagementSystem.Infrastructure.Factories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BookstoreManagementSystem.Domain.Models;
-using BookstoreManagementSystem.Domain.Services;
+using BookstoreManagementSystem.Application.Ports;
 
 namespace BookstoreManagementSystem.Pages.Products
 {
@@ -16,7 +17,7 @@ namespace BookstoreManagementSystem.Pages.Products
         public IndexModel()
         {
             var creator = new ProductCreator();
-            _repository = creator.FactoryMethod();
+            _repository = creator.GetRepository();
         }
 
         public void OnGet()
@@ -32,7 +33,7 @@ namespace BookstoreManagementSystem.Pages.Products
 
         public IActionResult OnPostDelete(int id)
         {
-            _repository.Delete(id); // eliminación lógica
+            _repository.Delete(id); // eliminaciï¿½n lï¿½gica
             return RedirectToPage();
         }
     }

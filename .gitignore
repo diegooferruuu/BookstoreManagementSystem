@@ -426,3 +426,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Carpeta de documentación y explicaciones (no subir al repo)
+explicacion/

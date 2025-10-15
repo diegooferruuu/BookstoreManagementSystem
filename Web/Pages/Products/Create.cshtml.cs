@@ -1,7 +1,8 @@
 using BookstoreManagementSystem.Domain.Models;
-using BookstoreManagementSystem.Domain.Services;
+using BookstoreManagementSystem.Application.Ports;
 using BookstoreManagementSystem.Domain.Validations;
 using BookstoreManagementSystem.Infrastructure.Repositories;
+using BookstoreManagementSystem.Infrastructure.Factories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,7 +12,7 @@ namespace BookstoreManagementSystem.Pages.Products
     public class CreateModel : PageModel
     {
         private readonly IDataBase<Product> _repository;
-        private readonly CategoryRepository _categoryRepository;
+        private readonly ICategoryRepository _categoryRepository;
 
         [BindProperty]
         public Product Product { get; set; } = new();
@@ -20,9 +21,11 @@ namespace BookstoreManagementSystem.Pages.Products
 
         public CreateModel()
         {
-            var creator = new ProductCreator();
-            _repository = creator.FactoryMethod();
-            _categoryRepository = new CategoryRepository();
+            var productCreator = new ProductCreator();
+            _repository = productCreator.GetRepository();
+            
+            var categoryCreator = new CategoryCreator();
+            _categoryRepository = (ICategoryRepository)categoryCreator.GetRepository();
         }
 
         public void OnGet()

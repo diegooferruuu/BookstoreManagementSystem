@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BookstoreManagementSystem.Domain.Models;
+using BookstoreManagementSystem.Application.Ports;
 
 namespace BookstoreManagementSystem.Domain.Validations
 {
@@ -12,7 +13,7 @@ namespace BookstoreManagementSystem.Domain.Validations
             TextRules.MaxLen(s, 20);
 
         // Categoria requerida: debe existir en el repositorio
-        public static bool IsValidCategory_id(int? s, CategoryRepository categoryRepository)
+        public static bool IsValidCategory_id(int? s, ICategoryRepository categoryRepository)
         {
             if (!s.HasValue) return false;
             return categoryRepository.Read(s.Value) != null;
@@ -28,7 +29,7 @@ namespace BookstoreManagementSystem.Domain.Validations
     // Stock: entero >= 0 (puede ser 0)
     public static bool IsValidStock(int? stock) => stock.HasValue && stock.Value >= 0;
 
-        public static IEnumerable<ValidationError> Validate(Product p, CategoryRepository categoryRepository)
+        public static IEnumerable<ValidationError> Validate(Product p, ICategoryRepository categoryRepository)
         {
             if (!IsValidName(p.Name))
                 yield return new ValidationError(nameof(p.Name), "Nombre de producto invalido (solo letras minusculas, sin espacios, max 20).");

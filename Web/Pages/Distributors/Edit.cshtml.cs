@@ -1,8 +1,9 @@
 using BookstoreManagementSystem.Infrastructure.Repositories;
+using BookstoreManagementSystem.Infrastructure.Factories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BookstoreManagementSystem.Domain.Models;
-using BookstoreManagementSystem.Domain.Services;
+using BookstoreManagementSystem.Application.Ports;
 using BookstoreManagementSystem.Domain.Validations;
 
 namespace BookstoreManagementSystem.Pages.Distributors
@@ -21,7 +22,7 @@ namespace BookstoreManagementSystem.Pages.Distributors
         public EditModel()
         {
             var creator = new DistributorCreator();
-            _repository = creator.FactoryMethod();
+            _repository = creator.GetRepository();
         }
 
         public IActionResult OnGet()

@@ -1,6 +1,8 @@
 using BookstoreManagementSystem.Infrastructure.Repositories;
 using BookstoreManagementSystem.Domain.Models;
-using BookstoreManagementSystem.Domain.Services;
+using BookstoreManagementSystem.Application.Ports;
+
+namespace BookstoreManagementSystem.Infrastructure.Factories;
 
 public class ProductCreator : Creator<Product>
 {

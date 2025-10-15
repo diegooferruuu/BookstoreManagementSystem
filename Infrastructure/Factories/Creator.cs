@@ -1,6 +1,6 @@
-using BookstoreManagementSystem.Domain.Models;
-using BookstoreManagementSystem.Infrastructure.Repositories;
-using BookstoreManagementSystem.Domain.Services;
+using BookstoreManagementSystem.Application.Ports;
+
+namespace BookstoreManagementSystem.Infrastructure.Factories;
 
 public abstract class Creator<T>
 {

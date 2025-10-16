@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using BookstoreManagementSystem.Domain.Models;
+using BookstoreManagementSystem.Domain.Interfaces;
 
 namespace BookstoreManagementSystem.Domain.Validations
 {
     public static class DistributorValidation
     {
-        // Nombre: varias palabras, solo letras (con tildes/ñ) y espacios simples; cada palabra >= 3; sin dígitos ni especiales; máx 20
         public static bool IsValidName(string? s)
         {
             if (string.IsNullOrWhiteSpace(s)) return false;
@@ -17,15 +17,12 @@ namespace BookstoreManagementSystem.Domain.Validations
             return TextRules.MaxLen(n, 20);
         }
 
-        // Email: validación estándar de correo
         public static bool IsValidEmail(string? s) =>
             !string.IsNullOrWhiteSpace(s) && TextRules.IsValidEmail(s) && TextRules.MaxLen(s, 100);
 
-        // Teléfono: exactamente 8 dígitos, solo números
         public static bool IsValidPhone(string? s) =>
             !string.IsNullOrWhiteSpace(s) && TextRules.IsDigitsOnly(s) && TextRules.LenEquals(s, 8);
 
-        // Dirección: igual que cliente (letras, espacios y puntos; palabras separadas por un solo espacio); máx 50
         public static bool IsValidAddress(string? s)
         {
             if (string.IsNullOrWhiteSpace(s)) return true;
@@ -59,6 +56,17 @@ namespace BookstoreManagementSystem.Domain.Validations
             if (!IsValidAddress(d.Address))
                 yield return new ValidationError(nameof(d.Address),
                     "Dirección inválida. Solo letras/espacios/puntos; 1 espacio entre palabras.");
+        }
+
+        public static BookstoreManagementSystem.Domain.Results.Result ValidateAsResult(Distributor d)
+            => BookstoreManagementSystem.Domain.Results.Result.FromValidation(Validate(d));
+
+        public static BookstoreManagementSystem.Domain.Results.Result<BookstoreManagementSystem.Domain.Models.Distributor> ValidateAndWrap(Distributor d)
+        {
+            var errors = Validate(d).ToList();
+            return errors.Count == 0
+                ? BookstoreManagementSystem.Domain.Results.Result<BookstoreManagementSystem.Domain.Models.Distributor>.Ok(d)
+                : BookstoreManagementSystem.Domain.Results.Result<BookstoreManagementSystem.Domain.Models.Distributor>.FromErrors(errors);
         }
     }
 }

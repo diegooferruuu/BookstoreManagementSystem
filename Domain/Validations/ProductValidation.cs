@@ -1,27 +1,23 @@
 using System.Collections.Generic;
 using BookstoreManagementSystem.Domain.Models;
 using BookstoreManagementSystem.Domain.Interfaces;
+using System.Linq;
 
 namespace BookstoreManagementSystem.Domain.Validations
 {
     public static class ProductValidation
     {
-        // Nombre: solo letras (con acentos) y espacios simples; cada palabra >= 3 letras; sin puntos ni caracteres especiales; máx. 20
         public static bool IsValidName(string? s)
         {
             if (string.IsNullOrWhiteSpace(s)) return false;
             var n = TextRules.NormalizeSpaces(s);
-            // No permitir puntos ni caracteres especiales
             if (!TextRules.IsLettersAndSpaces(n)) return false;
-            // Sin "c o c a" (palabras de 1 letra)
             if (!TextRules.HasNoSpacedOutLetters(n)) return false;
-            // Cada palabra debe tener longitud mínima de 3
             var parts = n.Split(' ');
             if (parts.Any(p => p.Length < 3)) return false;
             return TextRules.MinLen(n, 1) && TextRules.MaxLen(n, 20);
         }
 
-        // Categoria requerida: debe existir en el repositorio
         public static bool IsValidCategory_id(Guid s, ICategoryRepository categoryRepository)
         {
             if (s == Guid.Empty) return false;
@@ -29,7 +25,6 @@ namespace BookstoreManagementSystem.Domain.Validations
             return category != null;
         }
 
-        // Descripción: obligatoria; permite solo letras, espacios y puntos; sin otros caracteres; cada palabra >= 3; máx. 80
         public static bool IsValidDescription(string? s)
         {
             if (string.IsNullOrWhiteSpace(s)) return false;
@@ -39,21 +34,13 @@ namespace BookstoreManagementSystem.Domain.Validations
             return TextRules.MaxLen(n, 80);
         }
 
-        // Precio: obligatorio y mayor que 0
         public static bool IsValidPrice(decimal? price) => price.HasValue && price.Value > 0m;
 
-        // Stock: entero >= 0 (puede ser 0)
         public static bool IsValidStock(int? stock) => stock.HasValue && stock.Value >= 0;
 
-        /// <summary>
-        /// Normaliza campos para persistencia (Título y espacios).
-        /// Llamar antes de guardar: ProductValidation.Normalize(p);
-        /// </summary>
         public static void Normalize(Product p)
         {
-            // Nombre en formato Título (cada palabra inicia con mayúscula)
             p.Name = TextRules.CanonicalTitle(p.Name);
-            // Descripción: oración (primera letra mayúscula, resto minúscula) y colapsar espacios
             if (!string.IsNullOrWhiteSpace(p.Description))
                 p.Description = TextRules.CanonicalSentence(p.Description);
         }
@@ -79,6 +66,17 @@ namespace BookstoreManagementSystem.Domain.Validations
             if (!IsValidStock(p.Stock))
                 yield return new ValidationError(nameof(p.Stock),
                     "El stock no puede ser negativo.");
+        }
+
+        public static BookstoreManagementSystem.Domain.Results.Result ValidateAsResult(Product p, ICategoryRepository categoryRepository)
+            => BookstoreManagementSystem.Domain.Results.Result.FromValidation(Validate(p, categoryRepository));
+
+        public static BookstoreManagementSystem.Domain.Results.Result<BookstoreManagementSystem.Domain.Models.Product> ValidateAndWrap(Product p, ICategoryRepository categoryRepository)
+        {
+            var errors = Validate(p, categoryRepository).ToList();
+            return errors.Count == 0
+                ? BookstoreManagementSystem.Domain.Results.Result<BookstoreManagementSystem.Domain.Models.Product>.Ok(p)
+                : BookstoreManagementSystem.Domain.Results.Result<BookstoreManagementSystem.Domain.Models.Product>.FromErrors(errors);
         }
     }
 }

@@ -54,12 +54,18 @@ namespace BookstoreManagementSystem.Pages.Users
                 var userCreator = new UserCreator();
                 var userService = userCreator.FactoryMethod();
 
-                // 1. Generar username único desde el email
+                // 1. Generar username desde el email y validar duplicados para mostrar error visual
                 var baseUsername = _usernameGenerator.GenerateUsernameFromEmail(Email);
-                var uniqueUsername = _usernameGenerator.EnsureUniqueUsername(
-                    baseUsername,
-                    username => userService.GetAll().Any(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase))
-                );
+                var normalizedEmail = Email.Trim().ToLowerInvariant();
+                var existing = userService.GetAll();
+                if (existing.Any(u => u.Username.Equals(baseUsername, StringComparison.OrdinalIgnoreCase)) ||
+                    existing.Any(u => (u.Email ?? string.Empty).Equals(normalizedEmail, StringComparison.OrdinalIgnoreCase)))
+                {
+                    ModelState.AddModelError("Email", "No se puede registrar este usuario porque ya existe.");
+                    return Page();
+                }
+
+                var uniqueUsername = baseUsername;
 
                 // 2. Generar contraseña segura
                 var generatedPassword = _passwordGenerator.GenerateSecurePassword();

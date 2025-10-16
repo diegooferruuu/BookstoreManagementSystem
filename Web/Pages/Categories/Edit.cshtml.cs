@@ -4,30 +4,30 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BookstoreManagementSystem.Domain.Models;
 
-namespace BookstoreManagementSystem.Pages.Distributors
+namespace BookstoreManagementSystem.Pages.Categories
 {
     public class EditModel : PageModel
     {
-        private readonly DistributorService _service;
+        private readonly CategoryService _service;
 
         [BindProperty]
-        public Distributor Distributor { get; set; } = new();
+        public Category Category { get; set; } = new();
 
         [TempData]
-        public int EditDistributorId { get; set; }
+        public int EditCategoryId { get; set; }
 
         public EditModel()
         {
-            _service = new DistributorService(new DistributorRepository());
+            _service = new CategoryService(new CategoryRepository());
         }
 
         public IActionResult OnGet()
         {
-            if (!TempData.ContainsKey("EditDistributorId"))
+            if (!TempData.ContainsKey("EditCategoryId"))
                 return RedirectToPage("Index");
 
-            int id = (int)TempData["EditDistributorId"];
-            Distributor = _service.Read(id);
+            int id = (int)TempData["EditCategoryId"];
+            Category = _service.Read(id);
             return Page();
         }
 
@@ -36,7 +36,7 @@ namespace BookstoreManagementSystem.Pages.Distributors
             if (!ModelState.IsValid)
                 return Page();
 
-            _service.Update(Distributor);
+            _service.Update(Category);
             return RedirectToPage("Index");
         }
     }

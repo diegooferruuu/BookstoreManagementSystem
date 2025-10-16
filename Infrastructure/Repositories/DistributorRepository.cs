@@ -1,11 +1,12 @@
 ﻿using Npgsql;
+using BookstoreManagementSystem.Application.Interfaces;
 using BookstoreManagementSystem.Domain.Models;
-using BookstoreManagementSystem.Domain.Services;
+using System.Collections.Generic;
 using BookstoreManagementSystem.Infrastructure.DataBase;
 
 namespace BookstoreManagementSystem.Infrastructure.Repositories
 {
-    public class DistributorRepository : IDataBase<Distributor>
+    public class DistributorRepository : IDistributorRepository
     {
         private readonly NpgsqlConnection _connection;
 

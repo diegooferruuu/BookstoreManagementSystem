@@ -22,13 +22,13 @@ namespace BookstoreManagementSystem.Pages.Distributors
             Distributors = _service.GetAll();
         }
 
-        public IActionResult OnPostEdit(int id)
+        public IActionResult OnPostEdit(Guid id)
         {
             TempData["EditDistributorId"] = id;
             return RedirectToPage("Edit");
         }
 
-        public IActionResult OnPostDelete(int id)
+        public IActionResult OnPostDelete(Guid id)
         {
             _service.Delete(id);
             return RedirectToPage();

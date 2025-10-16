@@ -14,7 +14,7 @@ namespace BookstoreManagementSystem.Pages.Categories
         public Category Category { get; set; } = new();
 
         [TempData]
-        public int EditCategoryId { get; set; }
+        public Guid EditCategoryId { get; set; }
 
         public EditModel()
         {
@@ -26,7 +26,7 @@ namespace BookstoreManagementSystem.Pages.Categories
             if (!TempData.ContainsKey("EditCategoryId"))
                 return RedirectToPage("Index");
 
-            int id = (int)TempData["EditCategoryId"];
+            Guid id = (Guid)TempData["EditCategoryId"];
             Category = _service.Read(id);
             return Page();
         }

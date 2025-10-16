@@ -14,9 +14,9 @@ namespace BookstoreManagementSystem.Application.Services
         }
 
         public List<Distributor> GetAll() => _repository.GetAll();
-        public Distributor? Read(int id) => _repository.Read(id);
+        public Distributor? Read(Guid id) => _repository.Read(id);
         public void Create(Distributor distributor) => _repository.Create(distributor);
         public void Update(Distributor distributor) => _repository.Update(distributor);
-        public void Delete(int id) => _repository.Delete(id);
+        public void Delete(Guid id) => _repository.Delete(id);
     }
 }

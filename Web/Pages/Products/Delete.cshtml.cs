@@ -18,7 +18,7 @@ namespace BookstoreManagementSystem.Pages.Products
             _service = new ProductService(new ProductRepository());
         }
 
-        public IActionResult OnGet(int id)
+        public IActionResult OnGet(Guid id)
         {
             Product = _service.Read(id);
             if (Product == null)

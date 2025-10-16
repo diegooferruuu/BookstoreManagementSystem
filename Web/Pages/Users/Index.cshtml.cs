@@ -11,7 +11,7 @@ namespace BookstoreManagementSystem.Pages.Users
         private readonly UserService _service;
 
         public List<User> Users { get; set; } = new();
-        public Dictionary<int, List<string>> UserRoles { get; set; } = new();
+        public Dictionary<Guid, List<string>> UserRoles { get; set; } = new();
 
         public IndexModel()
         {
@@ -29,13 +29,13 @@ namespace BookstoreManagementSystem.Pages.Users
             }
         }
 
-        public IActionResult OnPostEdit(int id)
+        public IActionResult OnPostEdit(Guid id)
         {
             TempData["EditUserId"] = id;
             return RedirectToPage("Edit");
         }
 
-        public IActionResult OnPostDelete(int id)
+        public IActionResult OnPostDelete(Guid id)
         {
             _service.Delete(id);
             return RedirectToPage();

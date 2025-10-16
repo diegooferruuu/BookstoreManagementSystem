@@ -15,7 +15,7 @@ namespace BookstoreManagementSystem.Pages.Clients
         public Client Client { get; set; } = new();
 
         [TempData]
-        public int EditClientId { get; set; }
+        public Guid EditClientId { get; set; }
 
         public EditModel()
         {
@@ -27,7 +27,7 @@ namespace BookstoreManagementSystem.Pages.Clients
             if (!TempData.ContainsKey("EditClientId"))
                 return RedirectToPage("Index");
 
-            int id = (int)TempData["EditClientId"];
+            Guid id = (Guid)TempData["EditClientId"];
             Client = _service.Read(id);
             return Page();
         }

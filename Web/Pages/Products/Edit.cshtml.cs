@@ -18,7 +18,7 @@ namespace BookstoreManagementSystem.Pages.Products
         public List<SelectListItem> Categories { get; set; } = new();
 
         [TempData]
-        public int EditProductId { get; set; }
+        public Guid EditProductId { get; set; }
 
         public EditModel()
         {
@@ -28,7 +28,7 @@ namespace BookstoreManagementSystem.Pages.Products
 
         public IActionResult OnGet()
         {
-            if (EditProductId == 0)
+            if (EditProductId == Guid.Empty)
                 return RedirectToPage("Index");
 
             Product = _service.Read(EditProductId);

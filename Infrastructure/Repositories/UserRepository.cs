@@ -25,7 +25,7 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
             {
                 return new User
                 {
-                    Id = reader.GetInt32(0),
+                    Id = reader.GetGuid(0),
                     Username = reader.GetString(1),
                     Email = reader.GetString(2),
                     FirstName = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
@@ -38,7 +38,7 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
             return null;
         }
 
-        public async Task<List<string>> GetRolesAsync(int userId, CancellationToken ct = default)
+        public async Task<List<string>> GetRolesAsync(Guid userId, CancellationToken ct = default)
         {
             var roles = new List<string>();
             var sql = "SELECT r.name FROM roles r JOIN user_roles ur ON ur.role_id=r.id WHERE ur.user_id=@id";
@@ -91,7 +91,7 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
             {
                 users.Add(new User
                 {
-                    Id = reader.GetInt32(0),
+                    Id = reader.GetGuid(0),
                     Username = reader.GetString(1),
                     Email = reader.GetString(2),
                     FirstName = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
@@ -104,7 +104,7 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
             return users;
         }
 
-        public User? Read(int id)
+        public User? Read(Guid id)
         {
             var sql = "SELECT id, username, email, first_name, last_name, middle_name, password_hash, is_active FROM users WHERE id=@id";
             using var cmd = new NpgsqlCommand(sql, _conn);
@@ -114,7 +114,7 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
             {
                 return new User
                 {
-                    Id = reader.GetInt32(0),
+                    Id = reader.GetGuid(0),
                     Username = reader.GetString(1),
                     Email = reader.GetString(2),
                     FirstName = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
@@ -159,7 +159,7 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
             cmd.ExecuteNonQuery();
         }
 
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
             var sql = "DELETE FROM users WHERE id=@id";
             using var cmd = new NpgsqlCommand(sql, _conn);
@@ -167,7 +167,7 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
             cmd.ExecuteNonQuery();
         }
 
-        public List<string> GetUserRoles(int userId)
+        public List<string> GetUserRoles(Guid userId)
         {
             var roles = new List<string>();
             var sql = "SELECT r.name FROM roles r JOIN user_roles ur ON ur.role_id=r.id WHERE ur.user_id=@id";
@@ -179,7 +179,7 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
             return roles;
         }
 
-        public void UpdateUserRoles(int userId, List<string> roles)
+        public void UpdateUserRoles(Guid userId, List<string> roles)
         {
             // Delete existing roles
             var deleteSql = "DELETE FROM user_roles WHERE user_id=@userId";

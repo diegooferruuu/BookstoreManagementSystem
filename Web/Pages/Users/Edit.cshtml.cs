@@ -11,7 +11,7 @@ namespace BookstoreManagementSystem.Pages.Users
         private readonly UserService _service;
 
         [BindProperty]
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
 
         [BindProperty]
         public string Email { get; set; } = string.Empty;
@@ -20,7 +20,7 @@ namespace BookstoreManagementSystem.Pages.Users
         public string SelectedRole { get; set; } = string.Empty;
 
         [TempData]
-        public int EditUserId { get; set; }
+        public Guid EditUserId { get; set; }
 
         public EditModel()
         {
@@ -29,19 +29,17 @@ namespace BookstoreManagementSystem.Pages.Users
 
         public IActionResult OnGet()
         {
-            if (!TempData.ContainsKey("EditUserId"))
+            if (EditUserId == Guid.Empty)
                 return RedirectToPage("Index");
 
-            int id = (int)TempData["EditUserId"];
-            var user = _service.Read(id);
-            
+            var user = _service.Read(EditUserId);
+
             if (user == null)
                 return RedirectToPage("Index");
 
             UserId = user.Id;
             Email = user.Email;
 
-            // Get current role
             var roles = _service.GetUserRoles(user.Id);
             SelectedRole = roles.FirstOrDefault() ?? string.Empty;
 

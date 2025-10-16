@@ -20,23 +20,24 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
             throw new NotImplementedException();
         }
 
 
-        public Category? Read(int id)
+        public Category? Read(Guid id)
         {
             using var cmd = new NpgsqlCommand("SELECT * FROM categories WHERE id = @id", _connection);
-            cmd.Parameters.AddWithValue("@id", id);
+            cmd.Parameters.AddWithValue("@id",NpgsqlTypes.NpgsqlDbType.Uuid, id);
+            
 
             using var reader = cmd.ExecuteReader();
             if (reader.Read())
             {
                 return new Category
                 {
-                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                    Id = reader.GetGuid(reader.GetOrdinal("id")),
                     Name = reader.GetString(reader.GetOrdinal("name")),
                     Description = reader.GetString(reader.GetOrdinal("description")),
                 };
@@ -61,7 +62,7 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
                     {
                         categories.Add(new Category
                         {
-                            Id = reader.GetInt32(0),
+                            Id = reader.GetGuid(0),
                             Name = reader.GetString(1)
                         });
                     }

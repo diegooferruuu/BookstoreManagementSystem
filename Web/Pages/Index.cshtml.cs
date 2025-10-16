@@ -15,7 +15,7 @@ public class IndexModel : PageModel
     {
         _logger = logger;
         _clients = new ClientService(new ClientRepository());
-        _products = new ProductService(new ProductRepository());
+        _products = new ProductService(new ProductRepository(), new CategoryRepository());
         _distributors = new DistributorService(new DistributorRepository());
     }
 

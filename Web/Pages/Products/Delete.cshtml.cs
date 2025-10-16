@@ -15,7 +15,7 @@ namespace BookstoreManagementSystem.Pages.Products
 
         public DeleteModel()
         {
-            _service = new ProductService(new ProductRepository());
+            _service = new ProductService(new ProductRepository(), new Infrastructure.Repositories.CategoryRepository());
         }
 
         public IActionResult OnGet(Guid id)

@@ -1,14 +1,14 @@
 ﻿using BookstoreManagementSystem.Domain.Models;
 using System.Collections.Generic;
 
-
 namespace BookstoreManagementSystem.Domain.Validations
 {
     public static class ClientValidation
     {
-        // Nombre: solo letras minusculas, sin espacios, sin numeros, max 15
+        // Nombre / Apellido: letras y espacios simples; cada palabra >= 2; sin dígitos; máx 15
         public static bool IsValidName(string? s) =>
-            TextRules.IsLowercaseLettersNoSpaces(s) &&
+            TextRules.IsWordsLettersWithSingleSpacesMin2(s) &&
+            TextRules.HasNoDigits(s) &&
             TextRules.MinLen(s, 1) &&
             TextRules.MaxLen(s, 15);
 
@@ -22,35 +22,52 @@ namespace BookstoreManagementSystem.Domain.Validations
             TextRules.IsValidEmailNoSpacesAndCom(s) &&
             TextRules.MaxLen(s, 30);
 
-        // Teléfono: sólo numeros, sin espacios, max 15
+        // Teléfono: sólo números, sin espacios, max 15
         public static bool IsValidPhone(string? s) =>
             !string.IsNullOrWhiteSpace(s) &&
             TextRules.IsDigitsOnly(s) &&
             TextRules.MaxLen(s, 15);
 
-        // Direccion: puede tener espacios, maximo 50 caracteres
+        // Dirección: puede tener espacios, máximo 50 caracteres
         public static bool IsValidAddress(string? s) => TextRules.MaxLen(s, 50);
 
-        // Validacion de la entidad
+        public static void Normalize(Client c)
+        {
+            c.FirstName = TextRules.CanonicalTitle(c.FirstName);
+            c.LastName  = TextRules.CanonicalTitle(c.LastName);
+            if (!string.IsNullOrWhiteSpace(c.MiddleName))
+                c.MiddleName = TextRules.CanonicalTitle(c.MiddleName);
+
+            if (!string.IsNullOrWhiteSpace(c.Address))
+                c.Address = TextRules.NormalizeSpaces(c.Address);
+        }
+
+        // Validación de la entidad
         public static IEnumerable<ValidationError> Validate(Client c)
         {
             if (!IsValidName(c.FirstName))
-                yield return new ValidationError(nameof(c.FirstName), "Nombre invalido (solo letras minusculas, sin espacios, max 15).");
+                yield return new ValidationError(nameof(c.FirstName),
+                    "Nombre inválido: solo letras y espacios simples; sin palabras de 1 letra ni números. Máx. 15.");
 
             if (!IsValidName(c.LastName))
-                yield return new ValidationError(nameof(c.LastName), "Apellido invalido (solo letras minusculas, sin espacios, max 15).");
+                yield return new ValidationError(nameof(c.LastName),
+                    "Apellido inválido: solo letras y espacios simples; sin palabras de 1 letra ni números. Máx. 15.");
 
             if (!IsValidOptionalName(c.MiddleName))
-                yield return new ValidationError(nameof(c.MiddleName), "Segundo nombre invalido (solo letras minusculas, sin espacios, max 15).");
+                yield return new ValidationError(nameof(c.MiddleName),
+                    "Segundo nombre inválido (mismas reglas que nombre, máx. 15).");
 
             if (!string.IsNullOrWhiteSpace(c.Email) && !IsValidEmail(c.Email))
-                yield return new ValidationError(nameof(c.Email), "Email invalido (sin espacios, debe contener @ y terminar en .com, max 30).");
+                yield return new ValidationError(nameof(c.Email),
+                    "Email inválido (sin espacios, debe contener @ y terminar en .com, máx. 30).");
 
             if (!string.IsNullOrWhiteSpace(c.Phone) && !IsValidPhone(c.Phone))
-                yield return new ValidationError(nameof(c.Phone), "Telefono invalido (solo numeros, sin espacios, max 15).");
+                yield return new ValidationError(nameof(c.Phone),
+                    "Teléfono inválido (solo números, sin espacios, máx. 15).");
 
             if (!string.IsNullOrWhiteSpace(c.Address) && !IsValidAddress(c.Address))
-                yield return new ValidationError(nameof(c.Address), "La direccion es demasiado larga (max. 50).");
+                yield return new ValidationError(nameof(c.Address),
+                    "La dirección es demasiado larga (máx. 50).");
         }
     }
 }

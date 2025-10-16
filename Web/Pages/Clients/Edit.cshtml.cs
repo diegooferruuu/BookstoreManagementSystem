@@ -27,8 +27,23 @@ namespace BookstoreManagementSystem.Pages.Clients
             if (!TempData.ContainsKey("EditClientId"))
                 return RedirectToPage("Index");
 
-            Guid id = (Guid)TempData["EditClientId"];
-            Client = _service.Read(id);
+            var obj = TempData["EditClientId"];
+            if (obj == null)
+                return RedirectToPage("Index");
+
+            Guid id;
+            if (obj is Guid g)
+                id = g;
+            else if (obj is string s && Guid.TryParse(s, out g))
+                id = g;
+            else
+                return RedirectToPage("Index");
+
+            var client = _service.Read(id);
+            if (client == null)
+                return RedirectToPage("Index");
+
+            Client = client;
             return Page();
         }
 
@@ -40,8 +55,17 @@ namespace BookstoreManagementSystem.Pages.Clients
             if (!ModelState.IsValid)
                 return Page();
 
-            _service.Update(Client);
-            return RedirectToPage("Index");
+            try
+            {
+                _service.Update(Client);
+                return RedirectToPage("Index");
+            }
+            catch (ValidationException vex)
+            {
+                foreach (var e in vex.Errors)
+                    ModelState.AddModelError($"Client.{e.Field}", e.Message);
+                return Page();
+            }
         }
     }
 }

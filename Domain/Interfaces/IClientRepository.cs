@@ -1,7 +1,7 @@
 ﻿using BookstoreManagementSystem.Domain.Models;
 using BookstoreManagementSystem.Domain.Services;
 
-namespace BookstoreManagementSystem.Application.Interfaces
+namespace BookstoreManagementSystem.Domain.Interfaces
 {
     public interface IClientRepository : IDataBase<Client>
     {

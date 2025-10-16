@@ -33,7 +33,7 @@ namespace BookstoreManagementSystem.Pages.Auth
             if (string.IsNullOrWhiteSpace(Input.UserOrEmail))
                 ModelState.AddModelError("Input.UserOrEmail", "Ingrese su usuario o email.");
             if (string.IsNullOrWhiteSpace(Input.Password) || Input.Password.Length < 8)
-                ModelState.AddModelError("Input.Password", "La contraseña debe tener al menos 8 caracteres.");
+                ModelState.AddModelError("Input.Password", "La contraseÃ±a debe tener al menos 8 caracteres.");
 
             if (!ModelState.IsValid) return Page();
 
@@ -45,11 +45,11 @@ namespace BookstoreManagementSystem.Pages.Auth
             var result = await _authService.SignInAsync(Input, HttpContext.RequestAborted);
             if (!result.Success || result.Value is null)
             {
-                ErrorMessage = "Usuario o contraseña inválidos.";
+                ErrorMessage = "Usuario o contraseÃ±a invalidos.";
                 return Page();
             }
 
-            // Crear cookie de autenticación para Razor Pages
+            // Crear cookie de autenticaciï¿½n para Razor Pages
             var claims = new List<Claim>
             {
                 new(ClaimTypes.Name, result.Value.UserName),

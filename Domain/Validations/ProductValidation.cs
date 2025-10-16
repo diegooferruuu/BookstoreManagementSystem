@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using BookstoreManagementSystem.Domain.Models;
-using BookstoreManagementSystem.Application.Interfaces;
+using BookstoreManagementSystem.Domain.Interfaces;
 
 namespace BookstoreManagementSystem.Domain.Validations
 {

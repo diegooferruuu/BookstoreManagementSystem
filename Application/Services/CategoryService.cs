@@ -1,4 +1,4 @@
-using BookstoreManagementSystem.Application.Interfaces;
+using BookstoreManagementSystem.Domain.Interfaces;
 using BookstoreManagementSystem.Domain.Models;
 using System.Collections.Generic;
 

@@ -1,8 +1,8 @@
 ﻿using Npgsql;
-using BookstoreManagementSystem.Application.Interfaces;
 using BookstoreManagementSystem.Domain.Models;
 using BookstoreManagementSystem.Infrastructure.DataBase;
 using System.Collections.Generic;
+using BookstoreManagementSystem.Domain.Interfaces;
 
 namespace BookstoreManagementSystem.Infrastructure.Repositories
 {

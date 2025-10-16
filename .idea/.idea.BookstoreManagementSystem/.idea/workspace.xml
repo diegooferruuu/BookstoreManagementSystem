@@ -9,20 +9,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="11029b1a-7316-4544-8d3e-82d3d8098195" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BookstoreManagementSystem/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BookstoreManagementSystem/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/Validations/ClientValidation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/Validations/ClientValidation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/Validations/DistributorValidation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/Validations/DistributorValidation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/Validations/ProductValidation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/Validations/ProductValidation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/Validations/TextRules.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/Validations/TextRules.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Auth/Login.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Auth/Login.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Auth/Logout.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Auth/Logout.cshtml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Web/Pages/Distributors/Create.cshtml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Distributors/Create.cshtml.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Web/Pages/Distributors/Edit.cshtml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Distributors/Edit.cshtml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Products/Create.cshtml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Products/Create.cshtml.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Web/Pages/Products/Edit.cshtml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Products/Edit.cshtml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/_ViewImports.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/_ViewImports.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/_ViewStart.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/_ViewStart.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/appsettings.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,7 +47,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "validations3",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",

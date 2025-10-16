@@ -52,8 +52,17 @@ namespace BookstoreManagementSystem.Pages.Distributors
             // Normalizar
             DistributorValidation.Normalize(Distributor);
 
-            _service.Update(Distributor);
-            return RedirectToPage("Index");
+            try
+            {
+                _service.Update(Distributor);
+                return RedirectToPage("Index");
+            }
+            catch (ValidationException vex)
+            {
+                foreach (var e in vex.Errors)
+                    ModelState.AddModelError($"Distributor.{e.Field}", e.Message);
+                return Page();
+            }
         }
     }
 }

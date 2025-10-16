@@ -5,6 +5,6 @@ public class ProductCreator
 {
     public ProductService FactoryMethod()
     {
-        return new ProductService(new ProductRepository());
+        return new ProductService(new ProductRepository(), new CategoryRepository());
     }
 }

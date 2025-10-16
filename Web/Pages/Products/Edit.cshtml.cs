@@ -23,7 +23,7 @@ namespace BookstoreManagementSystem.Pages.Products
 
         public EditModel()
         {
-            _service = new ProductService(new ProductRepository());
+            _service = new ProductService(new ProductRepository(), new Infrastructure.Repositories.CategoryRepository());
             _categoryService = new CategoryService(new CategoryRepository());
         }
 
@@ -58,8 +58,18 @@ namespace BookstoreManagementSystem.Pages.Products
             // Normalizar
             ProductValidation.Normalize(Product);
 
-            _service.Update(Product);
-            return RedirectToPage("/Products/Index");
+            try
+            {
+                _service.Update(Product);
+                return RedirectToPage("/Products/Index");
+            }
+            catch (ValidationException vex)
+            {
+                foreach (var e in vex.Errors)
+                    ModelState.AddModelError($"Product.{e.Field}", e.Message);
+                LoadCategories();
+                return Page();
+            }
         }
 
         private void LoadCategories()

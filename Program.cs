@@ -132,4 +132,14 @@ app.MapPost("/api/auth/login", async (IJwtAuthService auth, AuthRequestDto req, 
         : Results.Unauthorized();
 }).RequireRateLimiting("login").AllowAnonymous();
 
+// Dev-only endpoint to run Auth seed on demand
+if (app.Environment.IsDevelopment())
+{
+    app.MapPost("/api/dev/seed-auth", async (CancellationToken ct) =>
+    {
+        await BookstoreManagementSystem.Infrastructure.DataBase.Scripts.AuthSeed.EnsureAuthSeedAsync(ct);
+        return Results.Ok(new { message = "Auth seed executed" });
+    }).AllowAnonymous();
+}
+
 app.Run();

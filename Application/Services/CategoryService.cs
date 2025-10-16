@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace BookstoreManagementSystem.Application.Services
 {
-    public class CategoryService : IService<Category>
+    public class CategoryService
     {
         private readonly ICategoryRepository _repository;
 
@@ -14,29 +14,9 @@ namespace BookstoreManagementSystem.Application.Services
         }
 
         public List<Category> GetAll() => _repository.GetAll();
-
         public Category? Read(int id) => _repository.Read(id);
-
-        public void Create(Category category)
-        {
-            // Validación básica: el nombre no puede estar vacío
-            if (string.IsNullOrWhiteSpace(category.Name))
-            {
-                throw new System.ArgumentException("El nombre de la categoria no puede estar vacio.");
-            }
-            _repository.Create(category);
-        }
-
-        public void Update(Category category)
-        {
-            // Validación básica: el nombre no puede estar vacío
-            if (string.IsNullOrWhiteSpace(category.Name))
-            {
-                throw new System.ArgumentException("El nombre de la categoria no puede estar vacio.");
-            }
-            _repository.Update(category);
-        }
-
+        public void Create(Category category) => _repository.Create(category);
+        public void Update(Category category) => _repository.Update(category);
         public void Delete(int id) => _repository.Delete(id);
     }
 }

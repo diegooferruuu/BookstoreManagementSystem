@@ -14,7 +14,7 @@ namespace BookstoreManagementSystem.Pages.Distributors
         public Distributor Distributor { get; set; } = new();
 
         [TempData]
-        public int EditDistributorId { get; set; }
+        public Guid EditDistributorId { get; set; }
 
         public EditModel()
         {

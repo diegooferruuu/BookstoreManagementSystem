@@ -4,7 +4,7 @@
     {
         void Create(T entity);
         void Update(T entity);
-    T? Read(Guid id);
+        T? Read(Guid id);
         void Delete(Guid id);
         List<T> GetAll();
     }

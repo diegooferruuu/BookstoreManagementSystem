@@ -15,7 +15,7 @@ namespace BookstoreManagementSystem.Pages.Clients
         public Client Client { get; set; } = new();
 
         [TempData]
-        public int EditClientId { get; set; }
+        public Guid EditClientId { get; set; }
 
         public EditModel()
         {

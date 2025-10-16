@@ -13,11 +13,11 @@ namespace BookstoreManagementSystem.Application.Services
         }
 
         public List<User> GetAll() => _repository.GetAll();
-        public User? Read(int id) => _repository.Read(id);
+        public User? Read(Guid id) => _repository.Read(id);
         public void Create(User user) => _repository.Create(user);
         public void Update(User user) => _repository.Update(user);
-        public void Delete(int id) => _repository.Delete(id);
-        public List<string> GetUserRoles(int userId) => _repository.GetUserRoles(userId);
-        public void UpdateUserRoles(int userId, List<string> roles) => _repository.UpdateUserRoles(userId, roles);
+        public void Delete(Guid id) => _repository.Delete(id);
+        public List<string> GetUserRoles(Guid userId) => _repository.GetUserRoles(userId);
+        public void UpdateUserRoles(Guid userId, List<string> roles) => _repository.UpdateUserRoles(userId, roles);
     }
 }

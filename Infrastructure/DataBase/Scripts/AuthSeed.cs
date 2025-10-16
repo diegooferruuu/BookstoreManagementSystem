@@ -37,7 +37,7 @@ namespace BookstoreManagementSystem.Infrastructure.DataBase.Scripts
             // Admin
             var email = "admin@local";
             var username = "admin";
-            int adminId;
+            Guid adminId;
             // Buscar usuario por email
             await using (var findAdmin = new NpgsqlCommand("SELECT id FROM users WHERE email=@e LIMIT 1;", conn))
             {
@@ -52,11 +52,11 @@ RETURNING id;", conn);
                     insertAdmin.Parameters.AddWithValue("@u", username);
                     insertAdmin.Parameters.AddWithValue("@e", email);
                     insertAdmin.Parameters.AddWithValue("@ph", adminHash);
-                    adminId = (int)(await insertAdmin.ExecuteScalarAsync(ct))!;
+                    adminId = (Guid)(await insertAdmin.ExecuteScalarAsync(ct))!;
                 }
                 else
                 {
-                    adminId = (int)existing;
+                    adminId = (Guid)existing;
                     // Actualizar datos y reactivar
                     await using var updateAdmin = new NpgsqlCommand(@"UPDATE users SET
 username=@u, first_name='Administrator', last_name='', password_hash=@ph, is_active=TRUE

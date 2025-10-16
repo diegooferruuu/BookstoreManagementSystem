@@ -14,7 +14,7 @@ namespace BookstoreManagementSystem.Pages.Categories
         public Category Category { get; set; } = new();
 
         [TempData]
-        public int EditCategoryId { get; set; }
+        public Guid EditCategoryId { get; set; }
 
         public EditModel()
         {

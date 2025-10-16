@@ -8,15 +8,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="11029b1a-7316-4544-8d3e-82d3d8098195" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BookstoreManagementSystem/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BookstoreManagementSystem/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/Models/Client.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/Models/Client.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/Models/Distributor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/Models/Distributor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/Models/Product.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/Models/Product.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Auth/Login.cshtml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Auth/Login.cshtml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Shared/_ValidationScriptsPartial.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Shared/_ValidationScriptsPartial.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Users/Create.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Users/Create.cshtml" afterDir="false" />
-    </list>
+    <list default="true" id="11029b1a-7316-4544-8d3e-82d3d8098195" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -115,7 +107,7 @@
       <workItem from="1760561790101" duration="749000" />
       <workItem from="1760562633584" duration="1019000" />
       <workItem from="1760625319471" duration="4216000" />
-      <workItem from="1760630538824" duration="2084000" />
+      <workItem from="1760630538824" duration="2433000" />
     </task>
     <servers />
   </component>

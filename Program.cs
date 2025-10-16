@@ -26,6 +26,7 @@ builder.Services.AddRazorPages()
         options.Conventions.AuthorizePage("/Auth/Profile");
         options.Conventions.AuthorizeFolder("/Clients", "RequireAdmin");
         options.Conventions.AuthorizeFolder("/Distributors", "RequireAdmin");
+        options.Conventions.AuthorizeFolder("/Users", "RequireAdmin");
         options.Conventions.AllowAnonymousToPage("/Auth/Login");
         options.Conventions.AllowAnonymousToPage("/Auth/Logout");
     });
@@ -35,10 +36,18 @@ var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtOptions = jwtSection.Get<JwtOptions>() ?? new JwtOptions();
 builder.Services.AddSingleton(jwtOptions);
 
+var sendGridSection = builder.Configuration.GetSection("SendGrid");
+var sendGridOptions = sendGridSection.Get<BookstoreManagementSystem.Infrastructure.Email.SendGridOptions>() 
+    ?? new BookstoreManagementSystem.Infrastructure.Email.SendGridOptions();
+builder.Services.AddSingleton(sendGridOptions);
+
 // DI
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<ITokenGenerator, JwtTokenGenerator>();
 builder.Services.AddSingleton<IJwtAuthService, JwtAuthService>();
+builder.Services.AddSingleton<IEmailService, BookstoreManagementSystem.Infrastructure.Email.SendGridEmailService>();
+builder.Services.AddSingleton<IPasswordGenerator, BookstoreManagementSystem.Infrastructure.Security.SecurePasswordGenerator>();
+builder.Services.AddSingleton<IUsernameGenerator, BookstoreManagementSystem.Infrastructure.Security.UsernameGenerator>();
 
 // Authentication schemes
 builder.Services.AddAuthentication(options =>

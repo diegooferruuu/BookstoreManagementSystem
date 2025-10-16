@@ -1,0 +1,59 @@
+@page
+@model BookstoreManagementSystem.Pages.Auth.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="auth-wrapper d-flex align-items-center justify-content-center py-5">
+    <div class="auth-card card shadow-custom overflow-hidden">
+        <div class="row g-0">
+            <div class="col-lg-5 d-none d-lg-flex bg-gradient-blue text-white align-items-center justify-content-center p-4">
+                <div class="text-center">
+                    <i class="fas fa-book-open" style="font-size:4rem;"></i>
+                    <h2 class="mt-3 mb-1">Librería</h2>
+                    <p class="mb-0 opacity-75">Sistema de Administración</p>
+                </div>
+            </div>
+            <div class="col-lg-7 p-4 p-md-5 bg-white">
+                <h4 class="mb-3 text-primary">Iniciar sesión</h4>
+                <p class="text-muted mb-4">Accede con tu usuario o correo electrónico.</p>
+
+                <form method="post" novalidate>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Usuario o Email</label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light text-primary"><i class="fas fa-user"></i></span>
+                            <input asp-for="Input.UserOrEmail" class="form-control" placeholder="usuario o correo" />
+                        </div>
+                        <span asp-validation-for="Input.UserOrEmail" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña</label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light text-primary"><i class="fas fa-lock"></i></span>
+                            <input asp-for="Input.Password" class="form-control" type="password" placeholder="••••••••" autocomplete="current-password" />
+                        </div>
+                        <small class="text-muted">Mínimo 8 caracteres.</small>
+                        <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                    </div>
+
+                    <input type="hidden" asp-for="ReturnUrl" />
+                    <button type="submit" class="btn btn-primary btn-lg w-100">Entrar</button>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger mt-3 mb-0" role="alert">@Model.ErrorMessage</div>
+                    }
+                </form>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+@section Scripts{
+    <partial name="Shared/_ValidationScriptsPartial" />
+}

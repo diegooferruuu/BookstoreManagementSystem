@@ -4,42 +4,49 @@
     ViewData["Title"] = "Editar Cliente";
 }
 
-<h1>Editar Cliente</h1>
+<div class="card shadow-custom">
+    <div class="card-header card-header-blue d-flex align-items-center">
+        <h5 class="mb-0"><i class="fas fa-user-edit me-2"></i>Editar Cliente</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <input type="hidden" asp-for="Client.Id" />
+            
+            <div class="mb-3">
+                <label class="form-label">Nombre</label>
+                <input asp-for="Client.FirstName" class="form-control" />
+                <span asp-validation-for="Client.FirstName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Segundo Nombre</label>
+                <input asp-for="Client.MiddleName" class="form-control" />
+                <span asp-validation-for="Client.MiddleName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Apellido</label>
+                <input asp-for="Client.LastName" class="form-control" />
+                <span asp-validation-for="Client.LastName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Correo</label>
+                <input asp-for="Client.Email" class="form-control" />
+                <span asp-validation-for="Client.Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Teléfono</label>
+                <input asp-for="Client.Phone" class="form-control" />
+                <span asp-validation-for="Client.Phone" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Dirección</label>
+                <input asp-for="Client.Address" class="form-control" />
+                <span asp-validation-for="Client.Address" class="text-danger"></span>
+            </div>
 
-<form method="post">
-    <input type="hidden" asp-for="Client.Id" />
-    
-    <div class="mb-3">
-        <label class="form-label">Nombre</label>
-        <input asp-for="Client.FirstName" class="form-control" />
-        <span asp-validation-for="Client.FirstName" class="text-danger"></span>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Guardar</button>
+                <a asp-page="Index" class="btn btn-secondary"><i class="fas fa-times me-1"></i>Cancelar</a>
+            </div>
+        </form>
     </div>
-    <div class="mb-3">
-        <label class="form-label">Segundo Nombre</label>
-        <input asp-for="Client.MiddleName" class="form-control" />
-        <span asp-validation-for="Client.MiddleName" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Apellido</label>
-        <input asp-for="Client.LastName" class="form-control" />
-        <span asp-validation-for="Client.LastName" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Correo</label>
-        <input asp-for="Client.Email" class="form-control" />
-        <span asp-validation-for="Client.Email" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Teléfono</label>
-        <input asp-for="Client.Phone" class="form-control" />
-        <span asp-validation-for="Client.Phone" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Dirección</label>
-        <input asp-for="Client.Address" class="form-control" />
-        <span asp-validation-for="Client.Address" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-success">Guardar Cambios</button>
-    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
-</form>
+</div>

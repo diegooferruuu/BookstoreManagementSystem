@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace BookstoreManagementSystem.Application.Services
 {
-    public class ClientService
+    public class ClientService : IClientService
     {
         private readonly IClientRepository _repository;
 

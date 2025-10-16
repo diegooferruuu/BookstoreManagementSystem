@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace BookstoreManagementSystem.Application.Services
 {
-    public class DistributorService
+    public class DistributorService: IDistributorService
     {
         private readonly IDistributorRepository _repository;
 

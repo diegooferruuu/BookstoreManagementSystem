@@ -1,6 +1,6 @@
 using BookstoreManagementSystem.Application.DTOs;
 
-namespace BookstoreManagementSystem.Application.Interfaces
+namespace BookstoreManagementSystem.Domain.Interfaces
 {
     public interface IJwtAuthService
     {

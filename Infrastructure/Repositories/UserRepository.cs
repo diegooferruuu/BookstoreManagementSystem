@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using BookstoreManagementSystem.Application.Interfaces;
+using BookstoreManagementSystem.Domain.Interfaces;
 using BookstoreManagementSystem.Domain.Models;
 using BookstoreManagementSystem.Infrastructure.DataBase;
 using Npgsql;

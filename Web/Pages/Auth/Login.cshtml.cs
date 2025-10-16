@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using BookstoreManagementSystem.Application.DTOs;
-using BookstoreManagementSystem.Application.Interfaces;
+using BookstoreManagementSystem.Domain.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;

@@ -1,10 +1,17 @@
 using BookstoreManagementSystem.Application.Services;
+using BookstoreManagementSystem.Domain.Interfaces;
 using BookstoreManagementSystem.Infrastructure.Repositories;
 
 public class ProductCreator
 {
-    public ProductService FactoryMethod()
+    private readonly IProductRepository _productRepository;
+
+    public ProductCreator(IProductRepository productRepository)
     {
-        return new ProductService(new ProductRepository(), new CategoryRepository());
+        _productRepository = productRepository;
+    }
+    public IProductService FactoryMethod()
+    {
+        return new ProductService(_productRepository);
     }
 }

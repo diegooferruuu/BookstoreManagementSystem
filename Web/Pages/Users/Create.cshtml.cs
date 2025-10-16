@@ -1,4 +1,3 @@
-using BookstoreManagementSystem.Application.Interfaces;
 using BookstoreManagementSystem.Application.Services;
 using BookstoreManagementSystem.Infrastructure.Repositories;
 using BookstoreManagementSystem.Infrastructure.Factories;
@@ -6,6 +5,7 @@ using BookstoreManagementSystem.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Identity;
+using BookstoreManagementSystem.Domain.Interfaces;
 
 namespace BookstoreManagementSystem.Pages.Users
 {
@@ -14,6 +14,7 @@ namespace BookstoreManagementSystem.Pages.Users
         private readonly IEmailService _emailService;
         private readonly IPasswordGenerator _passwordGenerator;
         private readonly IUsernameGenerator _usernameGenerator;
+        private readonly IUserService _userService;
         private readonly PasswordHasher<User> _passwordHasher;
 
         [BindProperty]
@@ -25,11 +26,13 @@ namespace BookstoreManagementSystem.Pages.Users
         public CreateModel(
             IEmailService emailService,
             IPasswordGenerator passwordGenerator,
-            IUsernameGenerator usernameGenerator)
+            IUsernameGenerator usernameGenerator,
+            IUserService userService)
         {
             _emailService = emailService;
             _passwordGenerator = passwordGenerator;
             _usernameGenerator = usernameGenerator;
+            _userService = userService;
             _passwordHasher = new PasswordHasher<User>();
         }
 
@@ -50,22 +53,13 @@ namespace BookstoreManagementSystem.Pages.Users
 
             try
             {
-                // Usar Factory Method para crear el servicio
-                var userCreator = new UserCreator();
-                var userService = userCreator.FactoryMethod();
-
-                // 1. Generar username desde el email y validar duplicados para mostrar error visual
+                
+                // 1. Generar username único desde el email
                 var baseUsername = _usernameGenerator.GenerateUsernameFromEmail(Email);
-                var normalizedEmail = Email.Trim().ToLowerInvariant();
-                var existing = userService.GetAll();
-                if (existing.Any(u => u.Username.Equals(baseUsername, StringComparison.OrdinalIgnoreCase)) ||
-                    existing.Any(u => (u.Email ?? string.Empty).Equals(normalizedEmail, StringComparison.OrdinalIgnoreCase)))
-                {
-                    ModelState.AddModelError("Email", "No se puede registrar este usuario porque ya existe.");
-                    return Page();
-                }
-
-                var uniqueUsername = baseUsername;
+                var uniqueUsername = _usernameGenerator.EnsureUniqueUsername(
+                    baseUsername,
+                    username => _userService.GetAll().Any(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase))
+                );
 
                 // 2. Generar contraseña segura
                 var generatedPassword = _passwordGenerator.GenerateSecurePassword();
@@ -85,15 +79,15 @@ namespace BookstoreManagementSystem.Pages.Users
                     IsActive = true
                 };
 
-                userService.Create(user);
+                _userService.Create(user);
 
                 // 5. Asignar rol
-                var createdUser = userService.GetAll()
+                var createdUser = _userService.GetAll()
                     .FirstOrDefault(u => u.Username.Equals(uniqueUsername, StringComparison.OrdinalIgnoreCase));
                 
                 if (createdUser != null)
                 {
-                    userService.UpdateUserRoles(createdUser.Id, new List<string> { SelectedRole });
+                    _userService.UpdateUserRoles(createdUser.Id, new List<string> { SelectedRole });
                 }
 
                 // 6. Enviar email con la contraseña en texto plano (antes de hashear)

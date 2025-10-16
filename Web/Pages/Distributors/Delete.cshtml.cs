@@ -18,7 +18,7 @@ namespace BookstoreManagementSystem.Pages.Distributors
             _service = service;
         }
 
-        public IActionResult OnGet(int id)
+        public IActionResult OnGet(Guid id)
         {
             Distributor = _service.Read(id);
             if (Distributor == null)

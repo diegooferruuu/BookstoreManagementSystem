@@ -33,17 +33,17 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 
         }
 
-    public Client? Read(int id)
+    public Client? Read(Guid id)
         {
             using var cmd = new NpgsqlCommand("SELECT * FROM clients WHERE id = @id", _connection);
-            cmd.Parameters.AddWithValue("@id", id);
+            cmd.Parameters.AddWithValue("@id",NpgsqlTypes.NpgsqlDbType.Uuid, id);
 
             using var reader = cmd.ExecuteReader();
             if (reader.Read())
             {
                 return new Client
                 {
-                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                    Id = reader.GetGuid(reader.GetOrdinal("id")),
                     FirstName = reader.GetString(reader.GetOrdinal("first_name")),
                     LastName = reader.GetString(reader.GetOrdinal("last_name")),
                     MiddleName = reader.IsDBNull(reader.GetOrdinal("middle_name")) ? null : reader.GetString(reader.GetOrdinal("middle_name")),
@@ -82,10 +82,10 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 
         }
 
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
             using var cmd = new NpgsqlCommand("UPDATE clients SET is_active = FALSE WHERE id = @id", _connection);
-            cmd.Parameters.AddWithValue("@id", id);
+            cmd.Parameters.AddWithValue("@id",NpgsqlTypes.NpgsqlDbType.Uuid, id);
             cmd.ExecuteNonQuery();
         }
 
@@ -98,7 +98,7 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
             {
                 clients.Add(new Client
                 {
-                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                    Id = reader.GetGuid(reader.GetOrdinal("id")),
                     FirstName = reader.GetString(reader.GetOrdinal("first_name")),
                     LastName = reader.GetString(reader.GetOrdinal("last_name")),
                     MiddleName = reader.IsDBNull(reader.GetOrdinal("middle_name")) ? null : reader.GetString(reader.GetOrdinal("middle_name")),

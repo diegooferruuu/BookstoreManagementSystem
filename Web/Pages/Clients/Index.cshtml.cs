@@ -22,13 +22,13 @@ namespace BookstoreManagementSystem.Pages.Clients
             Clients = _service.GetAll();
         }
 
-        public IActionResult OnPostEdit(int id)
+        public IActionResult OnPostEdit(Guid id)
         {
             TempData["EditClientId"] = id;
             return RedirectToPage("Edit");
         }
 
-        public IActionResult OnPostDelete(int id)
+        public IActionResult OnPostDelete(Guid id)
         {
             _service.Delete(id);
             return RedirectToPage();

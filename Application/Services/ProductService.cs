@@ -14,9 +14,9 @@ namespace BookstoreManagementSystem.Application.Services
         }
 
         public List<Product> GetAll() => _repository.GetAll();
-        public Product? Read(int id) => _repository.Read(id);
+        public Product? Read(Guid id) => _repository.Read(id);
         public void Create(Product product) => _repository.Create(product);
         public void Update(Product product) => _repository.Update(product);
-        public void Delete(int id) => _repository.Delete(id);
+        public void Delete(Guid id) => _repository.Delete(id);
     }
 }

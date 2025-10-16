@@ -26,7 +26,7 @@ namespace BookstoreManagementSystem.Pages.Distributors
             if (!TempData.ContainsKey("EditDistributorId"))
                 return RedirectToPage("Index");
 
-            int id = (int)TempData["EditDistributorId"];
+            Guid id = (Guid)TempData["EditDistributorId"];
             Distributor = _service.Read(id);
             return Page();
         }

@@ -2,13 +2,13 @@ namespace BookstoreManagementSystem.Domain.Models
 {
     public class Category
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; } 
         public string? Description { get; set; } 
 
         public Category() { }
 
-        public Category(int id, string name, string? description = null)
+        public Category(Guid id, string name, string? description = null)
         {
             Id = id;
             Name = name;

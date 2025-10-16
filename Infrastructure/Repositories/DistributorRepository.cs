@@ -30,17 +30,17 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 
         }
 
-    public Distributor? Read(int id)
+    public Distributor? Read(Guid id)
         {
             using var cmd = new NpgsqlCommand("SELECT * FROM distributors WHERE id = @id", _connection);
-            cmd.Parameters.AddWithValue("@id", id);
+            cmd.Parameters.AddWithValue("@id",NpgsqlTypes.NpgsqlDbType.Uuid, id);
 
             using var reader = cmd.ExecuteReader();
             if (reader.Read())
             {
                 return new Distributor
                 {
-                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                    Id = reader.GetGuid(reader.GetOrdinal("id")),
                     Name = reader.GetString(reader.GetOrdinal("name")),
                     ContactEmail = reader.IsDBNull(reader.GetOrdinal("contact_email")) ? null : reader.GetString(reader.GetOrdinal("contact_email")),
                     Phone = reader.IsDBNull(reader.GetOrdinal("phone")) ? null : reader.GetString(reader.GetOrdinal("phone")),
@@ -72,10 +72,10 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
             cmd.ExecuteNonQuery();
         }
 
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
             using var cmd = new NpgsqlCommand("UPDATE distributors SET is_active = FALSE WHERE id = @id", _connection);
-            cmd.Parameters.AddWithValue("@id", id);
+            cmd.Parameters.AddWithValue("@id",NpgsqlTypes.NpgsqlDbType.Uuid, id);
             cmd.ExecuteNonQuery();
         }
 
@@ -88,7 +88,7 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
             {
                 distributors.Add(new Distributor
                 {
-                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                    Id = reader.GetGuid(reader.GetOrdinal("id")),
                     Name = reader.GetString(reader.GetOrdinal("name")),
                     ContactEmail = reader.IsDBNull(reader.GetOrdinal("contact_email")) ? null : reader.GetString(reader.GetOrdinal("contact_email")),
                     Phone = reader.IsDBNull(reader.GetOrdinal("phone")) ? null : reader.GetString(reader.GetOrdinal("phone")),

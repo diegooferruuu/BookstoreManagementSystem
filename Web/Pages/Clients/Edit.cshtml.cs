@@ -27,7 +27,7 @@ namespace BookstoreManagementSystem.Pages.Clients
             if (!TempData.ContainsKey("EditClientId"))
                 return RedirectToPage("Index");
 
-            int id = (int)TempData["EditClientId"];
+            Guid id = (Guid)TempData["EditClientId"];
             Client = _service.Read(id);
             return Page();
         }

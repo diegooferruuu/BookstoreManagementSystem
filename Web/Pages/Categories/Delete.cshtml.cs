@@ -18,7 +18,7 @@ namespace BookstoreManagementSystem.Pages.Categories
             _service = new CategoryService(new CategoryRepository());
         }
 
-        public IActionResult OnGet(int id)
+        public IActionResult OnGet(Guid id)
         {
             Category = _service.Read(id);
             if (Category == null)

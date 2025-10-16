@@ -26,7 +26,7 @@ namespace BookstoreManagementSystem.Pages.Categories
             if (!TempData.ContainsKey("EditCategoryId"))
                 return RedirectToPage("Index");
 
-            int id = (int)TempData["EditCategoryId"];
+            Guid id = (Guid)TempData["EditCategoryId"];
             Category = _service.Read(id);
             return Page();
         }

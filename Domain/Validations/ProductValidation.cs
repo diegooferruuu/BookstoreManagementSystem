@@ -13,10 +13,10 @@ namespace BookstoreManagementSystem.Domain.Validations
             TextRules.MaxLen(s, 20);
 
         // Categoria requerida: debe existir en el repositorio
-        public static bool IsValidCategory_id(int? s, ICategoryRepository categoryRepository)
+        public static bool IsValidCategory_id(Guid? id, ICategoryRepository categoryRepository)
         {
-            if (!s.HasValue) return false;
-            var category = categoryRepository.Read(s.Value);
+            if (!id.HasValue) return false;
+            var category = categoryRepository.Read(id.Value);
             return category != null;
         }
 

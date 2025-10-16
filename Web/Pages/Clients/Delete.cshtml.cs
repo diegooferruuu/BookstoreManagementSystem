@@ -18,7 +18,7 @@ namespace BookstoreManagementSystem.Pages.Clients
             _service = new ClientService(new ClientRepository());
         }
 
-        public IActionResult OnGet(int id)
+        public IActionResult OnGet(Guid id)
         {
             Client = _service.Read(id);
 

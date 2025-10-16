@@ -4,43 +4,63 @@
     ViewData["Title"] = "Productos";
 }
 
-<h1>Productos</h1>
-
-<div class="mb-3">
-    <a asp-page="Create" class="btn btn-primary">Añadir Producto</a>
-</div>
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Descripcion</th>
-            <th>Categoria</th>
-            <th>Precio</th>
-            <th>Inventario</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var product in Model.Products)
+<div class="card shadow-custom">
+    <div class="card-header card-header-blue d-flex align-items-center justify-content-between">
+        <h5 class="mb-0"><i class="fas fa-box me-2"></i>Productos</h5>
+        @if (User.IsInRole("Admin"))
         {
-            <tr>
-                <td>@product.Name</td>
-                <td>@product.Description</td>
-                <td>@product.CategoryName</td>
-                <td>@product.Price.ToString("C")</td>
-                <td>@product.Stock</td>
-                <td>
-                    <form method="post" asp-page-handler="Edit" asp-antiforgery="true" class="d-inline">
-                        <input type="hidden" name="id" value="@product.Id" />
-                        <button type="submit" class="btn btn-warning btn-sm">Editar</button>
-                    </form>
-                    <a type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteProductModal" data-product-id="@product.Id">Eliminar</a>
-                </td>
-            </tr>
+            <a asp-page="Create" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>Añadir Producto</a>
         }
-    </tbody>
-</table>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th class="th-blue">Nombre</th>
+                        <th class="th-blue">Descripcion</th>
+                        <th class="th-blue">Categoria</th>
+                        <th class="th-blue">Precio</th>
+                        <th class="th-blue">Inventario</th>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <th class="th-blue text-center">Acciones</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model.Products)
+                    {
+                        <tr>
+                            <td>@product.Name</td>
+                            <td>@product.Description</td>
+                            <td>@product.CategoryName</td>
+                            <td>@product.Price.ToString("C")</td>
+                            <td>@product.Stock</td>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <td class="text-center table-actions">
+                                    <form method="post" asp-page-handler="Edit" asp-antiforgery="true" class="d-inline">
+                                        <input type="hidden" name="id" value="@product.Id" />
+                                        <button type="submit" class="btn btn-warning btn-sm btn-icon"><i class="fas fa-edit"></i> Editar</button>
+                                    </form>
+                                    <button type="button" class="btn btn-danger btn-sm btn-icon" data-bs-toggle="modal" data-bs-target="#confirmDeleteProductModal" data-product-id="@product.Id">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Products.Any())
+        {
+            <div class="alert alert-info mb-0">No tienes productos registrados.</div>
+        }
+    </div>
+</div>
 
 @if (!Model.Products.Any())
 {

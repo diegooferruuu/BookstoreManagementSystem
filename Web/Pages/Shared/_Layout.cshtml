@@ -58,33 +58,54 @@
                                 <i class="fas fa-home me-1"></i>Inicio
                             </a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="booksDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-book me-1"></i>Productos
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="booksDropdown">
-                                <li><a class="dropdown-item" href="/Products"><i class="fas fa-list me-2"></i>Todos Los Productos</a></li>
-                                <li><a class="dropdown-item" href="/Products/Create"><i class="fas fa-plus me-2"></i>Añadir Producto</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="customersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-users me-1"></i>Clientes
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="customersDropdown">
-                                <li><a class="dropdown-item" href="/Clients"><i class="fas fa-list me-2"></i>Todos Los Clientes</a></li>
-                                <li><a class="dropdown-item" href="/Clients/Create"><i class="fas fa-user-plus me-2"></i>Añadir Cliente</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="salesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-shopping-cart me-1"></i>Distribuidores
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="salesDropdown">
-                                <li><a class="dropdown-item" href="/Distributors"><i class="fas fa-plus me-2"></i>Todos Los Distribuidore</a></li>
-                                <li><a class="dropdown-item" href="/Distributors/Create"><i class="fas fa-history me-2"></i>Añadir Distribuidores</a></li>
-                            </ul>
-                        </li>
+                        @if (User?.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" id="booksDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-book me-1"></i>Productos
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="booksDropdown">
+                                    <li><a class="dropdown-item" href="/Products"><i class="fas fa-list me-2"></i>Todos Los Productos</a></li>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li><a class="dropdown-item" href="/Products/Create"><i class="fas fa-plus me-2"></i>Añadir Producto</a></li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" id="usersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-user-shield me-1"></i>Usuarios
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="usersDropdown">
+                                        <li><a class="dropdown-item" href="/Users"><i class="fas fa-list me-2"></i>Todos los Usuarios</a></li>
+                                        <li><a class="dropdown-item" href="/Users/Create"><i class="fas fa-user-plus me-2"></i>Añadir Usuario</a></li>
+                                    </ul>
+                                </li>
+                            }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" id="customersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-users me-1"></i>Clientes
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="customersDropdown">
+                                    <li><a class="dropdown-item" href="/Clients"><i class="fas fa-list me-2"></i>Todos Los Clientes</a></li>
+                                    <li><a class="dropdown-item" href="/Clients/Create"><i class="fas fa-user-plus me-2"></i>Añadir Cliente</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" id="salesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-shopping-cart me-1"></i>Distribuidores
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="salesDropdown">
+                                    <li><a class="dropdown-item" href="/Distributors"><i class="fas fa-plus me-2"></i>Todos Los Distribuidore</a></li>
+                                    <li><a class="dropdown-item" href="/Distributors/Create"><i class="fas fa-history me-2"></i>Añadir Distribuidores</a></li>
+                                </ul>
+                            </li>
+                        }
                     </ul>
                     
                     <div class="d-flex align-items-center">
@@ -99,19 +120,43 @@
                         </form> *@
                         
                         <!-- User Profile -->
-                        <div class="dropdown">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <div class="user-avatar me-2">
-                                    <i class="fas fa-user-circle fs-4 text-primary"></i>
+                        <div>
+                            @if (User?.Identity?.IsAuthenticated == true)
+                            {
+                                <div class="dropdown">
+                                    <a class="nav-link dropdown-toggle d-flex align-items-center" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <div class="user-avatar me-2">
+                                            <i class="fas fa-user-circle fs-4 text-primary"></i>
+                                        </div>
+                                        <span class="d-none d-lg-inline">
+                                            @{ 
+                                                var gn = User?.Claims?.FirstOrDefault(c => c.Type == "given_name")?.Value;
+                                                var fn = User?.Claims?.FirstOrDefault(c => c.Type == "family_name")?.Value;
+                                                var display = !string.IsNullOrWhiteSpace(gn) || !string.IsNullOrWhiteSpace(fn)
+                                                    ? ($"{gn} {fn}").Trim()
+                                                    : (User?.Identity?.Name ?? string.Empty);
+                                                string ToTitle(string s) => System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase((s ?? string.Empty).ToLower());
+                                            }
+                                            @ToTitle(display)
+                                        </span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                        <li><a class="dropdown-item" asp-page="/Auth/Profile"><i class="fas fa-user me-2"></i>Perfil</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form method="post" asp-page="/Auth/Logout" class="px-3 py-1">
+                                                <button type="submit" class="dropdown-item">
+                                                    <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesion
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
                                 </div>
-                                <span class="d-none d-lg-inline">Administrador</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Perfil</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Configuraciones</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesion</a></li>
-                            </ul>
+                            }
+                            else
+                            {
+                                <a class="btn btn-primary" asp-page="/Auth/Login"><i class="fas fa-sign-in-alt me-2"></i>Iniciar sesión</a>
+                            }
                         </div>
                     </div>
                 </div>

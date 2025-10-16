@@ -380,3 +380,43 @@ main {
 .rounded-custom {
   border-radius: var(--border-radius) !important;
 }
+
+/* ===== Auth (Login) Blue Theme Enhancements ===== */
+.bg-gradient-blue {
+  background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 50%, #084298 100%);
+}
+
+.auth-wrapper {
+  min-height: calc(100vh - 140px);
+}
+
+.auth-card {
+  max-width: 980px;
+  width: 100%;
+  border: 0;
+  border-radius: 1rem;
+}
+
+.input-group-lg > .form-control,
+.input-group-lg > .input-group-text {
+  border-radius: .5rem;
+}
+
+/* Make alerts and validation blend with blue tone */
+.alert-danger {
+  border: 1px solid rgba(220,53,69,.25);
+  box-shadow: 0 0.25rem 0.75rem rgba(220,53,69,.08);
+}
+
+/* ===== Shared Blue Header for Cards/Sections ===== */
+.card-header-blue {
+  background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+  color: #fff;
+}
+
+.table thead th.th-blue {
+  background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%) !important;
+}
+
+.btn-icon i { pointer-events: none; }
+.table-actions .btn { margin-right: .25rem; }

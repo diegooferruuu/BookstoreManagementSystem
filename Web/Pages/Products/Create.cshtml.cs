@@ -19,7 +19,7 @@ namespace BookstoreManagementSystem.Pages.Products
 
         public CreateModel()
         {
-            _service = new ProductService(new ProductRepository());
+            _service = new ProductService(new ProductRepository(), new CategoryRepository());
             _categoryService = new CategoryService(new CategoryRepository());
         }
 

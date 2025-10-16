@@ -22,7 +22,7 @@ namespace BookstoreManagementSystem.Pages.Products
 
         public EditModel()
         {
-            _service = new ProductService(new ProductRepository());
+            _service = new ProductService(new ProductRepository(), new CategoryRepository());
             _categoryService = new CategoryService(new CategoryRepository());
         }
 

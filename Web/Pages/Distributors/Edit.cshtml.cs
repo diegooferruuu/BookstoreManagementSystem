@@ -23,11 +23,23 @@ namespace BookstoreManagementSystem.Pages.Distributors
 
         public IActionResult OnGet()
         {
-            if (!TempData.ContainsKey("EditDistributorId"))
+            var obj = TempData["EditDistributorId"];
+            if (obj == null)
                 return RedirectToPage("Index");
 
-            Guid id = (Guid)TempData["EditDistributorId"];
-            Distributor = _service.Read(id);
+            Guid id;
+            if (obj is Guid g)
+                id = g;
+            else if (obj is string s && Guid.TryParse(s, out g))
+                id = g;
+            else
+                return RedirectToPage("Index");
+
+            var distributor = _service.Read(id);
+            if (distributor == null)
+                return RedirectToPage("Index");
+
+            Distributor = distributor;
             return Page();
         }
 
@@ -36,8 +48,17 @@ namespace BookstoreManagementSystem.Pages.Distributors
             if (!ModelState.IsValid)
                 return Page();
 
-            _service.Update(Distributor);
-            return RedirectToPage("Index");
+            try
+            {
+                _service.Update(Distributor);
+                return RedirectToPage("Index");
+            }
+            catch (ValidationException vex)
+            {
+                foreach (var e in vex.Errors)
+                    ModelState.AddModelError($"Distributor.{e.Field}", e.Message);
+                return Page();
+            }
         }
     }
 }

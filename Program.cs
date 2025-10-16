@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.RateLimiting;
+using System.Linq;
+using BookstoreManagementSystem.Application.Services;
+using Microsoft.AspNetCore.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -121,6 +124,31 @@ if (!app.Environment.IsDevelopment())
 await BookstoreManagementSystem.Infrastructure.DataBase.Scripts.AuthSeed.EnsureAuthSeedAsync();
 
 app.UseHttpsRedirection();
+// Middleware global para convertir ValidationException en 400 JSON para llamadas API/Postman
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (ValidationException vex)
+    {
+        var wantsJson = context.Request.Path.StartsWithSegments("/api")
+                        || (context.Request.Headers.TryGetValue("Accept", out var a) && a.ToString().Contains("application/json"));
+
+        if (wantsJson)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            context.Response.ContentType = "application/json";
+            var errors = vex.Errors.Select(e => new { field = e.Field, message = e.Message });
+            await context.Response.WriteAsJsonAsync(new { errors });
+            return;
+        }
+
+        // No es una petición API/JSON: rethrow para que Razor Pages o el handler predeterminado puedan procesarla
+        throw;
+    }
+});
 app.UseRateLimiter();
 
 app.UseRouting();

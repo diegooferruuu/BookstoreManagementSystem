@@ -22,20 +22,29 @@ namespace BookstoreManagementSystem.Pages.Products
 
         public EditModel()
         {
-            _service = new ProductService(new ProductRepository());
+            _service = new ProductService(new ProductRepository(), new Infrastructure.Repositories.CategoryRepository());
             _categoryService = new CategoryService(new CategoryRepository());
         }
 
         public IActionResult OnGet()
         {
-            if (EditProductId == Guid.Empty)
+            var obj = TempData["EditProductId"];
+            if (obj == null)
                 return RedirectToPage("Index");
 
-            Product = _service.Read(EditProductId);
-
-            if (Product == null)
+            Guid id;
+            if (obj is Guid g)
+                id = g;
+            else if (obj is string s && Guid.TryParse(s, out g))
+                id = g;
+            else
                 return RedirectToPage("Index");
 
+            var product = _service.Read(id);
+            if (product == null)
+                return RedirectToPage("Index");
+
+            Product = product;
             LoadCategories();
             return Page();
         }
@@ -48,14 +57,21 @@ namespace BookstoreManagementSystem.Pages.Products
                 return Page();
             }
 
-            if (!ModelState.IsValid)
+            // Normalizar según validaciones del dominio
+            BookstoreManagementSystem.Domain.Validations.ProductValidation.Normalize(Product);
+
+            try
             {
+                _service.Update(Product);
+                return RedirectToPage("/Products/Index");
+            }
+            catch (ValidationException vex)
+            {
+                foreach (var e in vex.Errors)
+                    ModelState.AddModelError($"Product.{e.Field}", e.Message);
                 LoadCategories();
                 return Page();
             }
-
-            _service.Update(Product);
-            return RedirectToPage("/Products/Index");
         }
 
         private void LoadCategories()

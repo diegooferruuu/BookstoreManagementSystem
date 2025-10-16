@@ -27,8 +27,17 @@ namespace BookstoreManagementSystem.Pages.Clients
             if (!ModelState.IsValid)
                 return Page();
 
-            _service.Create(Client);
-            return RedirectToPage("Index");
+            try
+            {
+                _service.Create(Client);
+                return RedirectToPage("Index");
+            }
+            catch (ValidationException vex)
+            {
+                foreach (var e in vex.Errors)
+                    ModelState.AddModelError($"Client.{e.Field}", e.Message);
+                return Page();
+            }
         }
     }
 }

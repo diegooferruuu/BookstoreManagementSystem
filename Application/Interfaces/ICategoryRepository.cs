@@ -1,14 +1,10 @@
 using BookstoreManagementSystem.Domain.Models;
-using System.Collections.Generic;
+using BookstoreManagementSystem.Domain.Services;
 
 namespace BookstoreManagementSystem.Application.Interfaces
 {
-    public interface ICategoryRepository
+    public interface ICategoryRepository : IDataBase<Category>
     {
-        void Create(Category category);
-        Category? Read(int id);
-        void Update(Category category);
-        void Delete(int id);
-        List<Category> GetAll();
+        // Métodos adicionales específicos de Category si los necesitas
     }
 }

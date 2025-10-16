@@ -1,14 +1,10 @@
 using BookstoreManagementSystem.Domain.Models;
-using System.Collections.Generic;
+using BookstoreManagementSystem.Domain.Services;
 
 namespace BookstoreManagementSystem.Application.Interfaces
 {
-    public interface IDistributorRepository
+    public interface IDistributorRepository : IDataBase<Distributor>
     {
-        void Create(Distributor distributor);
-        Distributor? Read(int id);
-        void Update(Distributor distributor);
-        void Delete(int id);
-        List<Distributor> GetAll();
+        // Métodos adicionales específicos de Distributor si los necesitas
     }
 }

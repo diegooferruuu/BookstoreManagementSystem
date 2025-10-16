@@ -1,15 +1,10 @@
 ﻿using BookstoreManagementSystem.Domain.Models;
-
+using BookstoreManagementSystem.Domain.Services;
 
 namespace BookstoreManagementSystem.Application.Interfaces
 {
-    public interface IClientRepository
+    public interface IClientRepository : IDataBase<Client>
     {
-        void Create(Client client);
-        Client? Read(int id);
-        void Update(Client client);
-        void Delete(int id);
-        List<Client> GetAll();
-
+        // Métodos adicionales específicos de Client si los necesitas
     }
 }

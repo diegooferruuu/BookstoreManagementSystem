@@ -108,8 +108,8 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-// Seed roles/admin/backfill clients on startup (fire and forget)
-_ = Task.Run(() => BookstoreManagementSystem.Infrastructure.DataBase.Scripts.AuthSeed.EnsureAuthSeedAsync());
+// Seed roles/admin on startup (await to ensure availability)
+await BookstoreManagementSystem.Infrastructure.DataBase.Scripts.AuthSeed.EnsureAuthSeedAsync();
 
 app.UseHttpsRedirection();
 app.UseRateLimiter();

@@ -14,30 +14,70 @@ namespace BookstoreManagementSystem.Infrastructure.DataBase.Scripts
             var hasher = new PasswordHasher<object>();
             var adminHash = hasher.HashPassword(null, "admin123456");
 
-            // Roles: Admin y Employee
-            await using (var addRole = new NpgsqlCommand("INSERT INTO roles(name) VALUES('Admin') ON CONFLICT DO NOTHING;", conn))
-                await addRole.ExecuteNonQueryAsync(ct);
-            await using (var addRole2 = new NpgsqlCommand("INSERT INTO roles(name) VALUES('Employee') ON CONFLICT DO NOTHING;", conn))
-                await addRole2.ExecuteNonQueryAsync(ct);
+            // Roles: Admin y Employee (asegurar existencia sin depender de unique indexes)
+            await using (var checkAdminRole = new NpgsqlCommand("SELECT id FROM roles WHERE name='Admin' LIMIT 1;", conn))
+            {
+                var exists = await checkAdminRole.ExecuteScalarAsync(ct);
+                if (exists is null)
+                {
+                    await using var insertAdmin = new NpgsqlCommand("INSERT INTO roles(name) VALUES('Admin');", conn);
+                    await insertAdmin.ExecuteNonQueryAsync(ct);
+                }
+            }
+            await using (var checkEmpRole = new NpgsqlCommand("SELECT id FROM roles WHERE name='Employee' LIMIT 1;", conn))
+            {
+                var exists = await checkEmpRole.ExecuteScalarAsync(ct);
+                if (exists is null)
+                {
+                    await using var insertEmp = new NpgsqlCommand("INSERT INTO roles(name) VALUES('Employee');", conn);
+                    await insertEmp.ExecuteNonQueryAsync(ct);
+                }
+            }
 
             // Admin
             var email = "admin@local";
             var username = "admin";
-            await using (var upsert = new NpgsqlCommand(@"INSERT INTO users(username,email,first_name,last_name,password_hash,is_active)
-VALUES(@u,@e,'Administrator','',@ph,TRUE)
-ON CONFLICT(email) DO UPDATE SET username=EXCLUDED.username, first_name=EXCLUDED.first_name, last_name=EXCLUDED.last_name, password_hash=EXCLUDED.password_hash, is_active=TRUE
-RETURNING id;", conn))
+            int adminId;
+            // Buscar usuario por email
+            await using (var findAdmin = new NpgsqlCommand("SELECT id FROM users WHERE email=@e LIMIT 1;", conn))
             {
-                upsert.Parameters.AddWithValue("@u", username);
-                upsert.Parameters.AddWithValue("@e", email);
-                upsert.Parameters.AddWithValue("@ph", adminHash);
-                var adminId = (int)(await upsert.ExecuteScalarAsync(ct))!;
+                findAdmin.Parameters.AddWithValue("@e", email);
+                var existing = await findAdmin.ExecuteScalarAsync(ct);
+                if (existing is null)
+                {
+                    // Insertar admin
+                    await using var insertAdmin = new NpgsqlCommand(@"INSERT INTO users(username,email,first_name,last_name,password_hash,is_active)
+VALUES(@u,@e,'Administrator','',@ph,TRUE)
+RETURNING id;", conn);
+                    insertAdmin.Parameters.AddWithValue("@u", username);
+                    insertAdmin.Parameters.AddWithValue("@e", email);
+                    insertAdmin.Parameters.AddWithValue("@ph", adminHash);
+                    adminId = (int)(await insertAdmin.ExecuteScalarAsync(ct))!;
+                }
+                else
+                {
+                    adminId = (int)existing;
+                    // Actualizar datos y reactivar
+                    await using var updateAdmin = new NpgsqlCommand(@"UPDATE users SET
+username=@u, first_name='Administrator', last_name='', password_hash=@ph, is_active=TRUE
+WHERE id=@id;", conn);
+                    updateAdmin.Parameters.AddWithValue("@u", username);
+                    updateAdmin.Parameters.AddWithValue("@ph", adminHash);
+                    updateAdmin.Parameters.AddWithValue("@id", adminId);
+                    await updateAdmin.ExecuteNonQueryAsync(ct);
+                }
+            }
 
-                await using var addAdminRole = new NpgsqlCommand(@"INSERT INTO user_roles(user_id, role_id)
-SELECT @uid, r.id FROM roles r WHERE r.name='Admin'
-ON CONFLICT DO NOTHING;", conn);
-                addAdminRole.Parameters.AddWithValue("@uid", adminId);
-                await addAdminRole.ExecuteNonQueryAsync(ct);
+            // Asegurar asignación del rol Admin al usuario admin
+            await using (var ensureAdminRole = new NpgsqlCommand(@"INSERT INTO user_roles(user_id, role_id)
+SELECT @uid, r.id FROM roles r
+WHERE r.name='Admin'
+AND NOT EXISTS (
+    SELECT 1 FROM user_roles ur WHERE ur.user_id=@uid AND ur.role_id=r.id
+);", conn))
+            {
+                ensureAdminRole.Parameters.AddWithValue("@uid", adminId);
+                await ensureAdminRole.ExecuteNonQueryAsync(ct);
             }
 
             // Asignar rol Employee a todos los usuarios activos que no sean admin y no lo tengan aún

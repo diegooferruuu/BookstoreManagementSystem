@@ -1,7 +1,7 @@
 ﻿using Npgsql;
-using BookstoreManagementSystem.Application.Interfaces;
 using BookstoreManagementSystem.Domain.Models;
 using BookstoreManagementSystem.Infrastructure.DataBase;
+using BookstoreManagementSystem.Domain.Interfaces;
 using NpgsqlTypes;
 using System.Collections.Generic;
 

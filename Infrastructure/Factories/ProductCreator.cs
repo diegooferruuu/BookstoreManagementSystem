@@ -1,11 +1,10 @@
+using BookstoreManagementSystem.Application.Services;
 using BookstoreManagementSystem.Infrastructure.Repositories;
-using BookstoreManagementSystem.Domain.Models;
-using BookstoreManagementSystem.Domain.Services;
 
-public class ProductCreator : Creator<Product>
+public class ProductCreator
 {
-    public override IDataBase<Product> FactoryMethod()
+    public ProductService FactoryMethod()
     {
-        return new ProductRepository();
+        return new ProductService(new ProductRepository());
     }
 }

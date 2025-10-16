@@ -4,31 +4,31 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BookstoreManagementSystem.Domain.Models;
 
-namespace BookstoreManagementSystem.Pages.Distributors
+namespace BookstoreManagementSystem.Pages.Categories
 {
     public class DeleteModel : PageModel
     {
-        private readonly DistributorService _service;
+        private readonly CategoryService _service;
 
         [BindProperty]
-        public Distributor Distributor { get; set; } = new();
+        public Category Category { get; set; } = new();
 
-        public DeleteModel(DistributorService service)
+        public DeleteModel()
         {
-            _service = service;
+            _service = new CategoryService(new CategoryRepository());
         }
 
         public IActionResult OnGet(int id)
         {
-            Distributor = _service.Read(id);
-            if (Distributor == null)
+            Category = _service.Read(id);
+            if (Category == null)
                 return RedirectToPage("Index");
             return Page();
         }
 
         public IActionResult OnPost()
         {
-            _service.Delete(Distributor.Id);
+            _service.Delete(Category.Id);
             return RedirectToPage("Index");
         }
     }

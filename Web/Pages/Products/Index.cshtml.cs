@@ -1,27 +1,25 @@
+using BookstoreManagementSystem.Application.Services;
 using BookstoreManagementSystem.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BookstoreManagementSystem.Domain.Models;
-using BookstoreManagementSystem.Domain.Services;
 
 namespace BookstoreManagementSystem.Pages.Products
 {
     public class IndexModel : PageModel
     {
-        private readonly IDataBase<Product> _repository;
+        private readonly ProductService _service;
 
         public List<Product> Products { get; set; } = new();
 
-
         public IndexModel()
         {
-            var creator = new ProductCreator();
-            _repository = creator.FactoryMethod();
+            _service = new ProductService(new ProductRepository());
         }
 
         public void OnGet()
         {
-            Products = _repository.GetAll();
+            Products = _service.GetAll();
         }
 
         public IActionResult OnPostEdit(int id)
@@ -32,7 +30,7 @@ namespace BookstoreManagementSystem.Pages.Products
 
         public IActionResult OnPostDelete(int id)
         {
-            _repository.Delete(id); // eliminación lógica
+            _service.Delete(id);
             return RedirectToPage();
         }
     }

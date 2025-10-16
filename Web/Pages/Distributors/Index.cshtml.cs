@@ -1,27 +1,25 @@
+using BookstoreManagementSystem.Application.Services;
 using BookstoreManagementSystem.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BookstoreManagementSystem.Domain.Models;
-using BookstoreManagementSystem.Domain.Services;
-
 
 namespace BookstoreManagementSystem.Pages.Distributors
 {
     public class IndexModel : PageModel
     {
-        private readonly IDataBase<Distributor> _repository;
+        private readonly DistributorService _service;
 
         public List<Distributor> Distributors { get; set; } = new();
 
-        public IndexModel()
+        public IndexModel() // Cambia el constructor para que no requiera inyección
         {
-            var creator = new DistributorCreator();
-            _repository = creator.FactoryMethod();
+            _service = new DistributorService(new DistributorRepository());
         }
 
         public void OnGet()
         {
-            Distributors = _repository.GetAll();
+            Distributors = _service.GetAll();
         }
 
         public IActionResult OnPostEdit(int id)
@@ -32,7 +30,7 @@ namespace BookstoreManagementSystem.Pages.Distributors
 
         public IActionResult OnPostDelete(int id)
         {
-            _repository.Delete(id); 
+            _service.Delete(id);
             return RedirectToPage();
         }
     }

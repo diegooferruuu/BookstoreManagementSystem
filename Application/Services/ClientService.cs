@@ -1,7 +1,7 @@
-﻿using BookstoreManagementSystem.Domain.Interfaces;
-using BookstoreManagementSystem.Domain.Models;
+﻿using BookstoreManagementSystem.Domain.Models;
 using BookstoreManagementSystem.Domain.Validations;
 using System.Linq;
+using BookstoreManagementSystem.Domain.Interfaces;
 
 namespace BookstoreManagementSystem.Application.Services
 {
@@ -26,6 +26,20 @@ namespace BookstoreManagementSystem.Application.Services
             _repository.Create(client);
         }
 
+        // Opcional: exposición del patrón Result sin cambiar la firma existente
+        public Result<bool> CreateResult(Client client)
+        {
+            var list = ClientValidation.Validate(client).ToList();
+            if (list.Any())
+            {
+                var summary = string.Join("; ", list.Select(e => $"{e.Field}: {e.Message}"));
+                return Result<bool>.Fail(summary);
+            }
+            ClientValidation.Normalize(client);
+            _repository.Create(client);
+            return Result<bool>.Ok(true);
+        }
+
         public void Update(Client client)
         {
             var errors = ClientValidation.Validate(client);
@@ -34,6 +48,19 @@ namespace BookstoreManagementSystem.Application.Services
 
             ClientValidation.Normalize(client);
             _repository.Update(client);
+        }
+
+        public Result<bool> UpdateResult(Client client)
+        {
+            var list = ClientValidation.Validate(client).ToList();
+            if (list.Any())
+            {
+                var summary = string.Join("; ", list.Select(e => $"{e.Field}: {e.Message}"));
+                return Result<bool>.Fail(summary);
+            }
+            ClientValidation.Normalize(client);
+            _repository.Update(client);
+            return Result<bool>.Ok(true);
         }
         public void Delete(Guid id) => _repository.Delete(id);
     }

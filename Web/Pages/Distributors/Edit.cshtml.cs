@@ -45,6 +45,9 @@ namespace BookstoreManagementSystem.Pages.Distributors
 
         public IActionResult OnPost()
         {
+            foreach (var err in BookstoreManagementSystem.Domain.Validations.DistributorValidation.Validate(Distributor))
+                ModelState.AddModelError($"Distributor.{err.Field}", err.Message);
+
             if (!ModelState.IsValid)
                 return Page();
 

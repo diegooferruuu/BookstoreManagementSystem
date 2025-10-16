@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Identity;
 using BookstoreManagementSystem.Domain.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace BookstoreManagementSystem.Pages.Users
 {
@@ -18,9 +19,12 @@ namespace BookstoreManagementSystem.Pages.Users
         private readonly PasswordHasher<User> _passwordHasher;
 
         [BindProperty]
+        [Required(ErrorMessage = "El correo electrónico es obligatorio.")]
+        [EmailAddress(ErrorMessage = "Correo electrónico inválido.")]
         public string Email { get; set; } = string.Empty;
 
         [BindProperty]
+        [Required(ErrorMessage = "El rol es obligatorio.")]
         public string SelectedRole { get; set; } = string.Empty;
 
         public CreateModel(
@@ -38,15 +42,20 @@ namespace BookstoreManagementSystem.Pages.Users
 
         public IActionResult OnPost()
         {
-            if (string.IsNullOrWhiteSpace(Email))
-            {
-                ModelState.AddModelError("Email", "El correo electrónico es requerido");
-            }
+            // Normalización previa
+            Email = (Email ?? string.Empty).Trim().ToLowerInvariant();
+            SelectedRole = (SelectedRole ?? string.Empty).Trim();
 
-            if (string.IsNullOrWhiteSpace(SelectedRole))
-            {
-                ModelState.AddModelError("SelectedRole", "El rol es requerido");
-            }
+            // Validaciones adicionales del servidor
+            var allowedRoles = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Admin", "Employee" };
+            if (!allowedRoles.Contains(SelectedRole))
+                ModelState.AddModelError("SelectedRole", "Debe seleccionar un rol válido.");
+
+            // Duplicados de correo
+            var emailExists = _userService.GetAll()
+                .Any(u => !string.IsNullOrEmpty(u.Email) && u.Email.Equals(Email, StringComparison.OrdinalIgnoreCase));
+            if (emailExists)
+                ModelState.AddModelError("Email", "El correo ya está registrado.");
 
             if (!ModelState.IsValid)
                 return Page();
@@ -61,6 +70,14 @@ namespace BookstoreManagementSystem.Pages.Users
                     username => _userService.GetAll().Any(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase))
                 );
 
+                // Duplicados de usuario por si el generador no cubre un caso extremo
+                var usernameExists = _userService.GetAll().Any(u => u.Username.Equals(uniqueUsername, StringComparison.OrdinalIgnoreCase));
+                if (usernameExists)
+                {
+                    ModelState.AddModelError("Email", "No fue posible generar un usuario único. Intente con otro correo.");
+                    return Page();
+                }
+
                 // 2. Generar contraseña segura
                 var generatedPassword = _passwordGenerator.GenerateSecurePassword();
 
@@ -71,7 +88,7 @@ namespace BookstoreManagementSystem.Pages.Users
                 // 4. Crear el usuario
                 var user = new User
                 {
-                    Email = Email.Trim().ToLowerInvariant(),
+                    Email = Email,
                     Username = uniqueUsername,
                     FirstName = string.Empty,
                     LastName = string.Empty,

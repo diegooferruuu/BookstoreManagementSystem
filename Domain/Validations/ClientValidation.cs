@@ -5,31 +5,32 @@ namespace BookstoreManagementSystem.Domain.Validations
 {
     public static class ClientValidation
     {
-        // Nombre / Apellido: letras y espacios simples; cada palabra >= 2; sin dígitos; máx 15
-        public static bool IsValidName(string? s) =>
-            TextRules.IsWordsLettersWithSingleSpacesMin2(s) &&
-            TextRules.HasNoDigits(s) &&
-            TextRules.MinLen(s, 1) &&
-            TextRules.MaxLen(s, 15);
+        // Nombre / Apellido: una sola palabra, solo letras (con tildes/ñ), no puntos ni especiales
+        public static bool IsValidSingleWordName(string? s) =>
+            TextRules.IsSingleWordLettersOnly(s) && TextRules.MinLen(s, 3) && TextRules.MaxLen(s, 15);
 
-        // Segundo nombre opcional con las mismas reglas que nombre
-        public static bool IsValidOptionalName(string? s) =>
-            string.IsNullOrWhiteSpace(s) || IsValidName(s);
+        // Segundo nombre opcional con la misma regla
+        public static bool IsValidOptionalSingleWord(string? s) =>
+            string.IsNullOrWhiteSpace(s) || IsValidSingleWordName(s);
 
-        // Email: sin espacios, debe contener '@' y terminar en .com, max 30
+        // Email: validación estándar de EmailAddress (se usa en UI), aquí solo límite de largo/normalización
         public static bool IsValidEmail(string? s) =>
-            !string.IsNullOrWhiteSpace(s) &&
-            TextRules.IsValidEmailNoSpacesAndCom(s) &&
-            TextRules.MaxLen(s, 30);
+            !string.IsNullOrWhiteSpace(s) && TextRules.MaxLen(s, 100);
 
-        // Teléfono: sólo números, sin espacios, max 15
+        // Teléfono: exactamente 8 dígitos, solo números
         public static bool IsValidPhone(string? s) =>
-            !string.IsNullOrWhiteSpace(s) &&
-            TextRules.IsDigitsOnly(s) &&
-            TextRules.MaxLen(s, 15);
+            !string.IsNullOrWhiteSpace(s) && TextRules.IsDigitsOnly(s) && TextRules.LenEquals(s, 8);
 
-        // Dirección: puede tener espacios, máximo 50 caracteres
-        public static bool IsValidAddress(string? s) => TextRules.MaxLen(s, 50);
+        // Dirección: palabras con una separación, se permiten puntos, sin otros especiales; largo máx 50
+        public static bool IsValidAddress(string? s)
+        {
+            if (string.IsNullOrWhiteSpace(s)) return true; // opcional
+            var n = TextRules.NormalizeSpaces(s);
+            if (!TextRules.IsLettersSpacesAndDotsOnly(n)) return false;
+            // No letras sueltas (>=2)
+            if (!TextRules.IsWordsMin2SingleSpacesAllowTrailingDot(n)) return false;
+            return TextRules.MaxLen(n, 50);
+        }
 
         public static void Normalize(Client c)
         {
@@ -39,35 +40,34 @@ namespace BookstoreManagementSystem.Domain.Validations
                 c.MiddleName = TextRules.CanonicalTitle(c.MiddleName);
 
             if (!string.IsNullOrWhiteSpace(c.Address))
-                c.Address = TextRules.NormalizeSpaces(c.Address);
+                c.Address = TextRules.CanonicalTitle(c.Address);
         }
 
-        // Validación de la entidad
         public static IEnumerable<ValidationError> Validate(Client c)
         {
-            if (!IsValidName(c.FirstName))
+            if (!IsValidSingleWordName(c.FirstName))
                 yield return new ValidationError(nameof(c.FirstName),
-                    "Nombre inválido: solo letras y espacios simples; sin palabras de 1 letra ni números. Máx. 15.");
+                    "Nombre inválido. Solo letras, 1 palabra, mín. 3.");
 
-            if (!IsValidName(c.LastName))
+            if (!IsValidSingleWordName(c.LastName))
                 yield return new ValidationError(nameof(c.LastName),
-                    "Apellido inválido: solo letras y espacios simples; sin palabras de 1 letra ni números. Máx. 15.");
+                    "Apellido inválido. Solo letras, 1 palabra, mín. 3.");
 
-            if (!IsValidOptionalName(c.MiddleName))
+            if (!IsValidOptionalSingleWord(c.MiddleName))
                 yield return new ValidationError(nameof(c.MiddleName),
-                    "Segundo nombre inválido (mismas reglas que nombre, máx. 15).");
+                    "Segundo nombre inválido. Solo letras, 1 palabra, mín. 3.");
 
             if (!string.IsNullOrWhiteSpace(c.Email) && !IsValidEmail(c.Email))
                 yield return new ValidationError(nameof(c.Email),
-                    "Email inválido (sin espacios, debe contener @ y terminar en .com, máx. 30).");
+                    "Correo inválido.");
 
             if (!string.IsNullOrWhiteSpace(c.Phone) && !IsValidPhone(c.Phone))
                 yield return new ValidationError(nameof(c.Phone),
-                    "Teléfono inválido (solo números, sin espacios, máx. 15).");
+                    "Teléfono inválido. Debe tener 8 dígitos.");
 
             if (!string.IsNullOrWhiteSpace(c.Address) && !IsValidAddress(c.Address))
                 yield return new ValidationError(nameof(c.Address),
-                    "La dirección es demasiado larga (máx. 50).");
+                    "Dirección inválida. Solo letras/espacios/puntos; 1 espacio entre palabras.");
         }
     }
 }

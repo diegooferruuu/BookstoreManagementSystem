@@ -30,11 +30,13 @@ namespace BookstoreManagementSystem.Pages.Products
 
         public IActionResult OnPost()
         {
-            if (!ModelState.IsValid)
-            {
-                LoadCategories();
-                return Page();
-            }
+            // Ejecutar validaciones de dominio para que se muestren aunque falten otros campos
+            var domainErrors = BookstoreManagementSystem.Domain.Validations.ProductValidation
+                .Validate(Product, new Infrastructure.Repositories.CategoryRepository())
+                .ToList();
+            foreach (var e in domainErrors)
+                ModelState.AddModelError($"Product.{e.Field}", e.Message);
+
             if (!ModelState.IsValid)
             {
                 LoadCategories();

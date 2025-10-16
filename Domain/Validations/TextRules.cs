@@ -11,6 +11,10 @@ namespace BookstoreManagementSystem.Domain.Validations
         private static readonly Regex RxLettersSpaces =
             new Regex(@"^[A-Za-zÁÉÍÓÚÑáéíóúÜü' ]+$", RegexOptions.Compiled);
 
+        // Solo letras (incluye tildes/ñ) sin espacios
+        private static readonly Regex RxLettersOnly =
+            new Regex(@"^[A-Za-zÁÉÍÓÚÑáéíóúÜü]+$", RegexOptions.Compiled);
+
         // Telefono: digitos y simbolos comunes
         private static readonly Regex RxPhone =
             new Regex(@"^[0-9\+\-\(\) ]+$", RegexOptions.Compiled);
@@ -21,6 +25,10 @@ namespace BookstoreManagementSystem.Domain.Validations
                 RegexOptions.Compiled);
 
         private static readonly Regex RxCollapseSpaces = new Regex(@"\s+", RegexOptions.Compiled);
+
+        // Letras (con acentos), espacios y puntos
+        private static readonly Regex RxLettersSpacesDotsOnly =
+            new Regex(@"^[A-Za-zÁÉÍÓÚÑáéíóúÜü. ]+$", RegexOptions.Compiled);
 
         public static string Normalize(string? s) => (s ?? string.Empty).Trim();
 
@@ -45,6 +53,31 @@ namespace BookstoreManagementSystem.Domain.Validations
         }
 
         /// <summary>
+        /// Convierte a "Sentence case": primera letra en mayúscula y el resto en minúscula.
+        /// Respeta puntos y colapsa espacios.
+        /// </summary>
+        public static string CanonicalSentence(string? s)
+        {
+            var culture = new CultureInfo("es-ES");
+            var n = NormalizeSpaces(s).ToLower(culture);
+            if (string.IsNullOrEmpty(n)) return n;
+            // Primera letra alfabética en mayúscula
+            var chars = n.ToCharArray();
+            for (int i = 0; i < chars.Length; i++)
+            {
+                if (char.IsLetter(chars[i]))
+                {
+                    chars[i] = char.ToUpper(chars[i], culture);
+                    break;
+                }
+            }
+            // Quitar espacios antes de punto: " ." -> "."
+            var result = new string(chars);
+            result = Regex.Replace(result, @"\s+\.", ".");
+            return result;
+        }
+
+        /// <summary>
         /// Solo letras (con acentos) y espacios únicos, sin palabras de 1 letra.
         /// </summary>
         public static bool IsWordsLettersWithSingleSpacesMin2(string? s) =>
@@ -63,6 +96,12 @@ namespace BookstoreManagementSystem.Domain.Validations
 
         public static bool IsLettersAndSpaces(string? s) =>
             !string.IsNullOrWhiteSpace(s) && RxLettersSpaces.IsMatch(NormalizeSpaces(s));
+
+        /// <summary>
+        /// Solo letras, espacios y puntos. Sin caracteres especiales distintos a '.'
+        /// </summary>
+        public static bool IsLettersSpacesAndDotsOnly(string? s) =>
+            !string.IsNullOrWhiteSpace(s) && RxLettersSpacesDotsOnly.IsMatch(NormalizeSpaces(s));
 
         public static bool NotAllUppercase(string? s)
         {
@@ -112,5 +151,52 @@ namespace BookstoreManagementSystem.Domain.Validations
         public static bool IsNonNegativeInt(int value) => value >= 0;
         public static bool MinLen(string? s, int len) => NormalizeSpaces(s).Length >= len;
         public static bool MaxLen(string? s, int len) => NormalizeSpaces(s).Length <= len;
+
+        public static bool LenEquals(string? s, int len) => Normalize(s).Length == len;
+
+        public static bool IsSingleWordLettersOnly(string? s) =>
+            !string.IsNullOrWhiteSpace(s) && RxLettersOnly.IsMatch(Normalize(s));
+
+        /// <summary>
+        /// Valida palabras separadas por un solo espacio, cada palabra con >= 2 letras.
+        /// Permite un punto '.' al final de las palabras (no dentro) y no otros caracteres.
+        /// </summary>
+        public static bool IsWordsMin2SingleSpacesAllowTrailingDot(string? s)
+        {
+            var n = NormalizeSpaces(s);
+            if (string.IsNullOrWhiteSpace(n)) return false;
+            if (!IsLettersSpacesAndDotsOnly(n)) return false;
+
+            var parts = n.Split(' ');
+            foreach (var raw in parts)
+            {
+                var word = raw;
+                if (word.EndsWith('.')) word = word.Substring(0, word.Length - 1);
+                if (word.Length < 2) return false;
+                // Debe contener solo letras
+                if (!word.All(char.IsLetter)) return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Igual que la anterior pero exige >= 3 letras por palabra.
+        /// </summary>
+        public static bool IsWordsMin3SingleSpacesAllowTrailingDot(string? s)
+        {
+            var n = NormalizeSpaces(s);
+            if (string.IsNullOrWhiteSpace(n)) return false;
+            if (!IsLettersSpacesAndDotsOnly(n)) return false;
+
+            var parts = n.Split(' ');
+            foreach (var raw in parts)
+            {
+                var word = raw;
+                if (word.EndsWith('.')) word = word[..^1];
+                if (word.Length < 3) return false;
+                if (!word.All(char.IsLetter)) return false;
+            }
+            return true;
+        }
     }
 }

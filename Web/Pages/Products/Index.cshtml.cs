@@ -14,7 +14,7 @@ namespace BookstoreManagementSystem.Pages.Products
 
         public IndexModel()
         {
-            _service = new ProductService(new ProductRepository(), new CategoryRepository());
+            _service = new ProductService(new ProductRepository());
         }
 
         public void OnGet()

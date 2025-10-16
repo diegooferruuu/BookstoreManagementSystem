@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using BookstoreManagementSystem.Domain.Models;
+using BookstoreManagementSystem.Domain.Validations;
 
 namespace BookstoreManagementSystem.Pages.Products
 {
@@ -31,10 +32,12 @@ namespace BookstoreManagementSystem.Pages.Products
             if (EditProductId == 0)
                 return RedirectToPage("Index");
 
-            Product = _service.Read(EditProductId);
+            var product = _service.Read(EditProductId);
 
-            if (Product == null)
+            if (product == null)
                 return RedirectToPage("Index");
+
+            Product = product;
 
             LoadCategories();
             return Page();
@@ -42,17 +45,18 @@ namespace BookstoreManagementSystem.Pages.Products
 
         public IActionResult OnPost()
         {
-            if (!ModelState.IsValid)
-            {
-                LoadCategories();
-                return Page();
-            }
+            // Ejecutar validaciones del Domain
+            foreach (var err in ProductValidation.Validate(Product, new Infrastructure.Repositories.CategoryRepository()))
+                ModelState.AddModelError($"Product.{err.Field}", err.Message);
 
             if (!ModelState.IsValid)
             {
                 LoadCategories();
                 return Page();
             }
+
+            // Normalizar
+            ProductValidation.Normalize(Product);
 
             _service.Update(Product);
             return RedirectToPage("/Products/Index");

@@ -3,6 +3,7 @@ using BookstoreManagementSystem.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BookstoreManagementSystem.Domain.Models;
+using BookstoreManagementSystem.Domain.Validations;
 
 namespace BookstoreManagementSystem.Pages.Distributors
 {
@@ -26,15 +27,30 @@ namespace BookstoreManagementSystem.Pages.Distributors
             if (!TempData.ContainsKey("EditDistributorId"))
                 return RedirectToPage("Index");
 
-            int id = (int)TempData["EditDistributorId"];
-            Distributor = _service.Read(id);
+            var obj = TempData["EditDistributorId"];
+            if (obj == null)
+                return RedirectToPage("Index");
+
+            int id = (int)obj;
+            var distributor = _service.Read(id);
+            if (distributor == null)
+                return RedirectToPage("Index");
+
+            Distributor = distributor;
             return Page();
         }
 
         public IActionResult OnPost()
         {
+            // Ejecutar validaciones del Domain
+            foreach (var err in DistributorValidation.Validate(Distributor))
+                ModelState.AddModelError($"Distributor.{err.Field}", err.Message);
+
             if (!ModelState.IsValid)
                 return Page();
+
+            // Normalizar
+            DistributorValidation.Normalize(Distributor);
 
             _service.Update(Distributor);
             return RedirectToPage("Index");

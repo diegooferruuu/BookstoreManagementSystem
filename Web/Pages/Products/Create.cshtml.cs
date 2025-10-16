@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using BookstoreManagementSystem.Domain.Models;
+using BookstoreManagementSystem.Domain.Validations;
 
 namespace BookstoreManagementSystem.Pages.Products
 {
@@ -19,7 +20,7 @@ namespace BookstoreManagementSystem.Pages.Products
 
         public CreateModel()
         {
-            _service = new ProductService(new ProductRepository());
+            _service = new ProductService(new ProductRepository(), new Infrastructure.Repositories.CategoryRepository());
             _categoryService = new CategoryService(new CategoryRepository());
         }
 
@@ -35,10 +36,9 @@ namespace BookstoreManagementSystem.Pages.Products
                 LoadCategories();
                 return Page();
             }
-
-            // Validación personalizada si la tienes
-            // foreach (var err in ProductValidation.Validate(Product, _categoryService))
-            //     ModelState.AddModelError($"Product.{err.Field}", err.Message);
+            // Ejecutar validaciones del Domain
+            foreach (var err in ProductValidation.Validate(Product, new Infrastructure.Repositories.CategoryRepository()))
+                ModelState.AddModelError($"Product.{err.Field}", err.Message);
 
             if (!ModelState.IsValid)
             {
@@ -46,8 +46,21 @@ namespace BookstoreManagementSystem.Pages.Products
                 return Page();
             }
 
-            _service.Create(Product);
-            return RedirectToPage("/Products/Index");
+            // Normalizar antes de persistir según contrato del Domain
+            ProductValidation.Normalize(Product);
+
+            try
+            {
+                _service.Create(Product);
+                return RedirectToPage("/Products/Index");
+            }
+            catch (ValidationException vex)
+            {
+                foreach (var e in vex.Errors)
+                    ModelState.AddModelError($"Product.{e.Field}", e.Message);
+                LoadCategories();
+                return Page();
+            }
         }
 
         private void LoadCategories()

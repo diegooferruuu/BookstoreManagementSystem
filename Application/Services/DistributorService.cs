@@ -15,8 +15,25 @@ namespace BookstoreManagementSystem.Application.Services
 
         public List<Distributor> GetAll() => _repository.GetAll();
         public Distributor? Read(int id) => _repository.Read(id);
-        public void Create(Distributor distributor) => _repository.Create(distributor);
-        public void Update(Distributor distributor) => _repository.Update(distributor);
+        public void Create(Distributor distributor)
+        {
+            var errors = BookstoreManagementSystem.Domain.Validations.DistributorValidation.Validate(distributor);
+            if (errors != null && System.Linq.Enumerable.Any(errors))
+                throw new ValidationException(errors);
+
+            BookstoreManagementSystem.Domain.Validations.DistributorValidation.Normalize(distributor);
+            _repository.Create(distributor);
+        }
+
+        public void Update(Distributor distributor)
+        {
+            var errors = BookstoreManagementSystem.Domain.Validations.DistributorValidation.Validate(distributor);
+            if (errors != null && System.Linq.Enumerable.Any(errors))
+                throw new ValidationException(errors);
+
+            BookstoreManagementSystem.Domain.Validations.DistributorValidation.Normalize(distributor);
+            _repository.Update(distributor);
+        }
         public void Delete(int id) => _repository.Delete(id);
     }
 }

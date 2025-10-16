@@ -8,19 +8,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="11029b1a-7316-4544-8d3e-82d3d8098195" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BookstoreManagementSystem/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BookstoreManagementSystem/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Clients/Create.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Clients/Create.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Clients/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Clients/Index.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Distributors/Edit.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Distributors/Edit.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Distributors/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Distributors/Index.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Index.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Products/Create.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Products/Create.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Products/Create.cshtml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Products/Create.cshtml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Products/Delete.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Products/Delete.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Products/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Products/Index.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Shared/_Layout.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Shared/_Layout.cshtml" afterDir="false" />
-    </list>
+    <list default="true" id="11029b1a-7316-4544-8d3e-82d3d8098195" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -34,6 +22,9 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ea93d582c2debe8d7c89f3f4285f5130809d8b22e1f4c4d9634818087635/RazorPageOfT.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="SWEA" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -52,7 +43,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;fixesFirstRelase&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;validations4&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
@@ -115,6 +106,8 @@
       <workItem from="1760558860357" duration="39000" />
       <workItem from="1760561790101" duration="749000" />
       <workItem from="1760562633584" duration="1019000" />
+      <workItem from="1760625319471" duration="4216000" />
+      <workItem from="1760630538824" duration="2433000" />
     </task>
     <servers />
   </component>

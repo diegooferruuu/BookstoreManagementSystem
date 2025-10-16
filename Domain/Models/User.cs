@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace BookstoreManagementSystem.Domain.Models
 {
     public class User

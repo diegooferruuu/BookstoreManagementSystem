@@ -12,10 +12,10 @@ namespace BookstoreManagementSystem.Pages.Products
 
         public List<Product> Products { get; set; } = new();
 
-        public IndexModel()
-        {
-            _service = new ProductService(new ProductRepository());
-        }
+            public IndexModel()
+            {
+                _service = new ProductService(new ProductRepository(), new Infrastructure.Repositories.CategoryRepository());
+            }
 
         public void OnGet()
         {

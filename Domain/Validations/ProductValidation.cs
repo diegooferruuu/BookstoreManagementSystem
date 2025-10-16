@@ -6,17 +6,18 @@ namespace BookstoreManagementSystem.Domain.Validations
 {
     public static class ProductValidation
     {
-        // nombre: palabras en minúscula separadas por un único espacio, max 20
+        // Nombre: solo letras (con acentos) y espacios simples; cada palabra >= 2 letras; max 20
         public static bool IsValidName(string? s) =>
-            TextRules.IsLowercaseWordsWithSingleSpaces(s) &&
-            TextRules.MinLen(s, 1) &&   
+            TextRules.IsWordsLettersWithSingleSpacesMin2(s) &&
+            TextRules.HasNoDigits(s) &&
+            TextRules.MinLen(s, 1) &&
             TextRules.MaxLen(s, 20);
 
         // Categoria requerida: debe existir en el repositorio
-        public static bool IsValidCategory_id(Guid? id, ICategoryRepository categoryRepository)
+        public static bool IsValidCategory_id(Guid s, ICategoryRepository categoryRepository)
         {
-            if (!id.HasValue) return false;
-            var category = categoryRepository.Read(id.Value);
+            if (s == Guid.Empty) return false;
+            var category = categoryRepository.Read(s);
             return category != null;
         }
 
@@ -24,28 +25,44 @@ namespace BookstoreManagementSystem.Domain.Validations
         public static bool IsValidDescription(string? s) =>
             string.IsNullOrWhiteSpace(s) || TextRules.MaxLen(s, 80);
 
-    // precio: debe ser numero > 0
-    public static bool IsValidPrice(decimal? price) => price.HasValue && price.Value > 0m;
+        // precio: > 0
+        public static bool IsValidPrice(decimal? price) => price.HasValue && price.Value > 0m;
 
-    // Stock: entero >= 0 (puede ser 0)
-    public static bool IsValidStock(int? stock) => stock.HasValue && stock.Value >= 0;
+        // Stock: entero >= 0 (puede ser 0)
+        public static bool IsValidStock(int? stock) => stock.HasValue && stock.Value >= 0;
+
+        /// <summary>
+        /// Normaliza campos para persistencia (Título y espacios).
+        /// Llamar antes de guardar: ProductValidation.Normalize(p);
+        /// </summary>
+        public static void Normalize(Product p)
+        {
+            p.Name = TextRules.CanonicalTitle(p.Name);
+            if (!string.IsNullOrWhiteSpace(p.Description))
+                p.Description = TextRules.NormalizeSpaces(p.Description);
+        }
 
         public static IEnumerable<ValidationError> Validate(Product p, ICategoryRepository categoryRepository)
         {
             if (!IsValidName(p.Name))
-                yield return new ValidationError(nameof(p.Name), "Nombre de producto invalido (solo letras minusculas, sin espacios, max 20).");
+                yield return new ValidationError(nameof(p.Name),
+                    "Nombre inválido: use solo letras (tildes/ñ) con espacios simples; nada de 'c o c a'. Máx. 20 caracteres.");
 
             if (!IsValidCategory_id(p.Category_id, categoryRepository))
-                yield return new ValidationError(nameof(p.Category_id), "Categoria invalida, debe seleccionar una categoria valida.");
+                yield return new ValidationError(nameof(p.Category_id),
+                    "Categoría inválida, seleccione una categoría válida.");
 
             if (!IsValidDescription(p.Description))
-                yield return new ValidationError(nameof(p.Description), "Descripcion demasiado larga (max. 80).");
+                yield return new ValidationError(nameof(p.Description),
+                    "Descripción demasiado larga (máx. 80).");
 
             if (!IsValidPrice(p.Price))
-                yield return new ValidationError(nameof(p.Price), "El precio debe ser un numero mayor que 0.");
+                yield return new ValidationError(nameof(p.Price),
+                    "El precio debe ser un número mayor que 0.");
 
             if (!IsValidStock(p.Stock))
-                yield return new ValidationError(nameof(p.Stock), "El stock debe ser un entero >= 0 (puede ser 0).");
+                yield return new ValidationError(nameof(p.Stock),
+                    "El stock debe ser un entero >= 0 (puede ser 0).");
         }
     }
-}   
+}

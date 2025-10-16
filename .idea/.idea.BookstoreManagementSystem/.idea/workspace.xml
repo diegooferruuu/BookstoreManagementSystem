@@ -9,9 +9,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="11029b1a-7316-4544-8d3e-82d3d8098195" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Distributors/Create.cshtml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Distributors/Create.cshtml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Distributors/Edit.cshtml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Distributors/Edit.cshtml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web/Pages/Products/Edit.cshtml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Web/Pages/Products/Edit.cshtml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.BookstoreManagementSystem/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BookstoreManagementSystem/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/appsettings.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

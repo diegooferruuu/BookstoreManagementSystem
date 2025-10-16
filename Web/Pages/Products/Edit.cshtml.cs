@@ -51,6 +51,12 @@ namespace BookstoreManagementSystem.Pages.Products
 
         public IActionResult OnPost()
         {
+            var domainErrors = BookstoreManagementSystem.Domain.Validations.ProductValidation
+                .Validate(Product, new Infrastructure.Repositories.CategoryRepository())
+                .ToList();
+            foreach (var e in domainErrors)
+                ModelState.AddModelError($"Product.{e.Field}", e.Message);
+
             if (!ModelState.IsValid)
             {
                 LoadCategories();

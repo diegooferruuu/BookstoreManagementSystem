@@ -1,52 +1,72 @@
 using System.Collections.Generic;
+using System.Linq;
 using BookstoreManagementSystem.Domain.Models;
+using BookstoreManagementSystem.Domain.Interfaces;
 
 namespace BookstoreManagementSystem.Domain.Validations
 {
     public static class DistributorValidation
     {
-        // Nombre: letras y espacios simples; cada palabra >= 2; sin dígitos; máx 20
-        public static bool IsValidName(string? s) =>
-            TextRules.IsWordsLettersWithSingleSpacesMin2(s) &&
-            TextRules.HasNoDigits(s) &&
-            TextRules.MinLen(s, 1) &&
-            TextRules.MaxLen(s, 20);
+        public static bool IsValidName(string? s)
+        {
+            if (string.IsNullOrWhiteSpace(s)) return false;
+            var n = TextRules.NormalizeSpaces(s);
+            if (!TextRules.IsLettersAndSpaces(n)) return false;
+            var parts = n.Split(' ');
+            if (parts.Any(p => p.Length < 3)) return false;
+            return TextRules.MaxLen(n, 20);
+        }
 
-        // Email: obligatorio si provisto, sin espacios, debe contener @ y terminar en .com
         public static bool IsValidEmail(string? s) =>
-            string.IsNullOrWhiteSpace(s) ? false : TextRules.IsValidEmailNoSpacesAndCom(s);
+            !string.IsNullOrWhiteSpace(s) && TextRules.IsValidEmail(s) && TextRules.MaxLen(s, 100);
 
-        // Teléfono: solo dígitos, sin espacios, máx 15
         public static bool IsValidPhone(string? s) =>
-            string.IsNullOrWhiteSpace(s) ? false : TextRules.IsDigitsOnly(s) && TextRules.MaxLen(s, 15);
+            !string.IsNullOrWhiteSpace(s) && TextRules.IsDigitsOnly(s) && TextRules.LenEquals(s, 8);
 
-        // Dirección: puede tener caracteres especiales, máximo 50
-        public static bool IsValidAddress(string? s) => string.IsNullOrWhiteSpace(s) || TextRules.MaxLen(s, 50);
+        public static bool IsValidAddress(string? s)
+        {
+            if (string.IsNullOrWhiteSpace(s)) return true;
+            var n = TextRules.NormalizeSpaces(s);
+            if (!TextRules.IsLettersSpacesAndDotsOnly(n)) return false;
+            if (!TextRules.IsWordsMin2SingleSpacesAllowTrailingDot(n)) return false;
+            return TextRules.MaxLen(n, 50);
+        }
 
         public static void Normalize(Distributor d)
         {
             d.Name = TextRules.CanonicalTitle(d.Name);
             if (!string.IsNullOrWhiteSpace(d.Address))
-                d.Address = TextRules.NormalizeSpaces(d.Address);
+                d.Address = TextRules.CanonicalTitle(d.Address);
         }
 
         public static IEnumerable<ValidationError> Validate(Distributor d)
         {
             if (!IsValidName(d.Name))
                 yield return new ValidationError(nameof(d.Name),
-                    "Nombre inválido: solo letras y espacios simples; sin palabras de 1 letra ni números. Máx. 20.");
+                    "Nombre inválido. Solo letras y espacios; 3+ letras por palabra.");
 
-            if (!string.IsNullOrWhiteSpace(d.ContactEmail) && !IsValidEmail(d.ContactEmail))
+            if (!IsValidEmail(d.ContactEmail))
                 yield return new ValidationError(nameof(d.ContactEmail),
-                    "Email de contacto inválido (sin espacios, debe contener @ y terminar en .com).");
+                    "Correo inválido.");
 
-            if (!string.IsNullOrWhiteSpace(d.Phone) && !IsValidPhone(d.Phone))
+            if (!IsValidPhone(d.Phone))
                 yield return new ValidationError(nameof(d.Phone),
-                    "Teléfono inválido (solo números, sin espacios, máx. 15).");
+                    "Teléfono inválido. Debe tener 8 dígitos.");
 
             if (!IsValidAddress(d.Address))
                 yield return new ValidationError(nameof(d.Address),
-                    "Dirección demasiado larga (máx. 50).");
+                    "Dirección inválida. Solo letras/espacios/puntos; 1 espacio entre palabras.");
+        }
+
+        public static BookstoreManagementSystem.Domain.Results.Result ValidateAsResult(Distributor d)
+            => BookstoreManagementSystem.Domain.Results.Result.FromValidation(Validate(d));
+
+        public static BookstoreManagementSystem.Domain.Results.Result<BookstoreManagementSystem.Domain.Models.Distributor> ValidateAndWrap(Distributor d)
+        {
+            var errors = Validate(d).ToList();
+            return errors.Count == 0
+                ? BookstoreManagementSystem.Domain.Results.Result<BookstoreManagementSystem.Domain.Models.Distributor>.Ok(d)
+                : BookstoreManagementSystem.Domain.Results.Result<BookstoreManagementSystem.Domain.Models.Distributor>.FromErrors(errors);
         }
     }
 }

@@ -37,6 +37,19 @@ builder.Services.AddRazorPages()
         options.Conventions.AuthorizeFolder("/Users", "RequireAdmin");
         options.Conventions.AllowAnonymousToPage("/Auth/Login");
         options.Conventions.AllowAnonymousToPage("/Auth/Logout");
+    })
+    .AddMvcOptions(options =>
+    {
+        // Mensajes de enlace y validación del modelo en español
+        options.ModelBindingMessageProvider.SetValueMustBeANumberAccessor(fieldName => $"El campo {fieldName} debe ser un número.");
+        options.ModelBindingMessageProvider.SetNonPropertyValueMustBeANumberAccessor(() => "Este campo debe ser un número.");
+        options.ModelBindingMessageProvider.SetMissingBindRequiredValueAccessor(name => $"Se requiere un valor para '{name}'.");
+        options.ModelBindingMessageProvider.SetValueIsInvalidAccessor(value => $"El valor '{value}' no es válido.");
+        options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((value, fieldName) => $"El valor '{value}' no es válido para {fieldName}.");
+        options.ModelBindingMessageProvider.SetMissingKeyOrValueAccessor(() => "Este valor es obligatorio.");
+        options.ModelBindingMessageProvider.SetUnknownValueIsInvalidAccessor(value => "El valor especificado no es válido.");
+        options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(fieldName => $"El campo {fieldName} no puede ser nulo.");
+        options.ModelBindingMessageProvider.SetMissingRequestBodyRequiredValueAccessor(() => "El cuerpo de la solicitud es obligatorio.");
     });
 
 // Options
@@ -53,6 +66,7 @@ builder.Services.AddSingleton(sendGridOptions);
 builder.Services.AddSingleton<IProductRepository, ProductRepository>();
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IDistributorRepository, DistributorRepository>();
+builder.Services.AddSingleton<IUserService, UserService>();
 builder.Services.AddSingleton<ITokenGenerator, JwtTokenGenerator>();
 builder.Services.AddSingleton<IJwtAuthService, JwtAuthService>();
 builder.Services.AddSingleton<IEmailService, BookstoreManagementSystem.Infrastructure.Email.SendGridEmailService>();

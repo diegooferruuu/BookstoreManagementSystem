@@ -90,9 +90,9 @@ namespace BookstoreManagementSystem.Pages.Users
                     userService.UpdateUserRoles(createdUser.Id, new List<string> { SelectedRole });
                 }
 
-                // 6. Enviar email con las credenciales
-                var emailSubject = "Bienvenido - Tus credenciales de acceso";
-                var emailBody = GenerateWelcomeEmailHtml(uniqueUsername, generatedPassword);
+                // 6. Enviar email sin contraseña en texto plano (solo hash si es necesario mostrar algo)
+                var emailSubject = "Bienvenido - Tu cuenta ha sido creada";
+                var emailBody = GenerateWelcomeEmailHtml(uniqueUsername, passwordHash);
                 
                 _ = _emailService.SendEmailAsync(Email, emailSubject, emailBody);
                 // Note: Fire and forget - en producción considera manejar fallos
@@ -107,7 +107,7 @@ namespace BookstoreManagementSystem.Pages.Users
             }
         }
 
-        private string GenerateWelcomeEmailHtml(string username, string password)
+        private string GenerateWelcomeEmailHtml(string username, string hashedPassword)
         {
             return $@"
                 <!DOCTYPE html>
@@ -133,7 +133,7 @@ namespace BookstoreManagementSystem.Pages.Users
                         </div>
                         <div class='content'>
                             <h2>¡Bienvenido!</h2>
-                            <p>Tu cuenta ha sido creada exitosamente. A continuación encontrarás tus credenciales de acceso:</p>
+                            <p>Tu cuenta ha sido creada exitosamente. Por seguridad no compartimos contraseñas en texto plano.</p>
                             
                             <div class='credentials'>
                                 <div class='credential-item'>
@@ -141,13 +141,14 @@ namespace BookstoreManagementSystem.Pages.Users
                                     <span class='credential-value'>{username}</span>
                                 </div>
                                 <div class='credential-item'>
-                                    <span class='credential-label'>Contraseña:</span><br/>
-                                    <span class='credential-value'>{password}</span>
+                                    <span class='credential-label'>Hash de contraseña:</span><br/>
+                                    <span class='credential-value'>{hashedPassword}</span>
                                 </div>
                             </div>
-
-
-                            <p>Puedes acceder al sistema usando estas credenciales en la página de inicio de sesión.</p>
+                            <div class='warning'>
+                                Por favor, solicita al usuario establecer su contraseña desde el sistema (flujo de restablecimiento) al primer inicio de sesión.
+                            </div>
+                            <p>Accede al sistema con tu usuario. La contraseña inicial debe ser configurada mediante el proceso de restablecimiento.</p>
                         </div>
                         <div class='footer'>
                             <p>Este es un correo automático, por favor no respondas a este mensaje.</p>

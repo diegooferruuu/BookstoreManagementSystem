@@ -24,8 +24,13 @@ builder.Services.AddRazorPages()
         options.Conventions.AuthorizePage("/Products/Edit", "RequireAdmin");
         options.Conventions.AuthorizePage("/Products/Delete", "RequireAdmin");
         options.Conventions.AuthorizePage("/Auth/Profile");
-        options.Conventions.AuthorizeFolder("/Clients", "RequireAdmin");
-        options.Conventions.AuthorizeFolder("/Distributors", "RequireAdmin");
+        // Clients: full CRUD for Employee/Admin
+        options.Conventions.AuthorizeFolder("/Clients", "RequireEmployeeOrAdmin");
+        // Distributors: list visible to Employee/Admin; CRUD only for Admin
+        options.Conventions.AuthorizePage("/Distributors/Index", "RequireEmployeeOrAdmin");
+        options.Conventions.AuthorizePage("/Distributors/Create", "RequireAdmin");
+        options.Conventions.AuthorizePage("/Distributors/Edit", "RequireAdmin");
+        options.Conventions.AuthorizePage("/Distributors/Delete", "RequireAdmin");
         options.Conventions.AuthorizeFolder("/Users", "RequireAdmin");
         options.Conventions.AllowAnonymousToPage("/Auth/Login");
         options.Conventions.AllowAnonymousToPage("/Auth/Logout");

@@ -5,6 +5,6 @@ namespace BookstoreManagementSystem.Domain.Interfaces
 {
     public interface ICategoryRepository : IDataBase<Category>
     {
-        // Métodos adicionales específicos de Category si los necesitas
+        // Métodos adicionales específicos de Category
     }
 }

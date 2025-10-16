@@ -8,18 +8,12 @@ namespace BookstoreManagementSystem.Pages.Auth
     {
         public string UserName { get; private set; } = string.Empty;
         public string Email { get; private set; } = string.Empty;
-        public string FirstName { get; private set; } = string.Empty;
-        public string LastName { get; private set; } = string.Empty;
-        public string? MiddleName { get; private set; }
 
         public void OnGet()
         {
             UserName = User.Identity?.Name ?? string.Empty;
             Email = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value ?? string.Empty;
-            FirstName = User.Claims.FirstOrDefault(c => c.Type == "given_name")?.Value ?? string.Empty;
-            LastName = User.Claims.FirstOrDefault(c => c.Type == "family_name")?.Value ?? string.Empty;
-            MiddleName = User.Claims.FirstOrDefault(c => c.Type == "middle_name")?.Value;
-            // Roles no se muestran por requerimiento
+            // Solo mostrar usuario y correo por requerimiento
         }
     }
 }

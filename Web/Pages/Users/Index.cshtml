@@ -16,9 +16,7 @@
                     <tr>
                         <th class="th-blue">Nombre de Usuario</th>
                         <th class="th-blue">Correo Electrónico</th>
-                        <th class="th-blue">Nombre Completo</th>
                         <th class="th-blue">Roles</th>
-                        <th class="th-blue">Estado</th>
                         <th class="th-blue text-center">Acciones</th>
                     </tr>
                 </thead>
@@ -26,15 +24,9 @@
                     @foreach (var user in Model.Users)
                     {
                         var roles = Model.UserRoles.ContainsKey(user.Id) ? string.Join(", ", Model.UserRoles[user.Id]) : "Sin rol";
-                        var fullName = $"{user.FirstName} {user.MiddleName} {user.LastName}".Trim();
-                        if (string.IsNullOrWhiteSpace(fullName))
-                        {
-                            fullName = "-";
-                        }
                         <tr>
                             <td>@user.Username</td>
                             <td>@user.Email</td>
-                            <td>@fullName</td>
                             <td>
                                 @foreach (var role in (Model.UserRoles.ContainsKey(user.Id) ? Model.UserRoles[user.Id] : new List<string>()))
                                 {
@@ -45,21 +37,7 @@
                                     <span class="badge bg-secondary">Sin rol</span>
                                 }
                             </td>
-                            <td>
-                                @if (user.IsActive)
-                                {
-                                    <span class="badge bg-success">Activo</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-danger">Inactivo</span>
-                                }
-                            </td>
                             <td class="text-center table-actions">
-                                <form method="post" asp-page-handler="Edit" asp-antiforgery="true" class="d-inline">
-                                    <input type="hidden" name="id" value="@user.Id" />
-                                    <button type="submit" class="btn btn-warning btn-sm btn-icon"><i class="fas fa-edit"></i> Editar</button>
-                                </form>
                                 <button type="button" class="btn btn-danger btn-sm btn-icon" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-user-id="@user.Id">
                                     <i class="fas fa-trash"></i> Eliminar
                                 </button>

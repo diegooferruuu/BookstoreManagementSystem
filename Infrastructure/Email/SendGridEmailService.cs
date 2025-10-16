@@ -25,12 +25,10 @@ namespace BookstoreManagementSystem.Infrastructure.Email
                 
                 var response = await _client.SendEmailAsync(msg, ct);
                 
-                // SendGrid returns 2xx for success
                 return response.IsSuccessStatusCode;
             }
             catch (Exception)
             {
-                // Log the exception in production
                 return false;
             }
         }

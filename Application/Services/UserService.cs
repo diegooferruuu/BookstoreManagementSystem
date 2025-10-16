@@ -1,9 +1,9 @@
-using BookstoreManagementSystem.Application.Interfaces;
+using BookstoreManagementSystem.Domain.Interfaces;
 using BookstoreManagementSystem.Domain.Models;
 
 namespace BookstoreManagementSystem.Application.Services
 {
-    public class UserService
+    public class UserService : IUserService 
     {
         private readonly IUserRepository _repository;
 

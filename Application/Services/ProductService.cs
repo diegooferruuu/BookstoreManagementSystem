@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace BookstoreManagementSystem.Application.Services
 {
-    public class ProductService
+    public class ProductService : IProductService
     {
         private readonly IProductRepository _repository;
 

@@ -1,13 +1,21 @@
 using BookstoreManagementSystem.Application.Services;
+using BookstoreManagementSystem.Domain.Interfaces;
 using BookstoreManagementSystem.Infrastructure.Repositories;
 
 namespace BookstoreManagementSystem.Infrastructure.Factories
 {
     public class UserCreator
     {
-        public UserService FactoryMethod()
+
+        private readonly IUserRepository _userRepository;
+
+        public UserCreator(IUserRepository userRepository)
         {
-            return new UserService(new UserRepository());
+            _userRepository = userRepository;
+        }
+        public IUserService FactoryMethod()
+        {
+            return new UserService(_userRepository);
         }
     }
 }

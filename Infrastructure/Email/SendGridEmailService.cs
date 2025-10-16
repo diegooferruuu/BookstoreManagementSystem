@@ -1,4 +1,4 @@
-using BookstoreManagementSystem.Application.Interfaces;
+using BookstoreManagementSystem.Domain.Interfaces;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
@@ -24,12 +24,16 @@ namespace BookstoreManagementSystem.Infrastructure.Email
                 var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent: null, htmlContent);
                 
                 var response = await _client.SendEmailAsync(msg, ct);
-                
+
                 // SendGrid returns 2xx for success
+                Console.WriteLine("hola");
+                Console.WriteLine(response.ToString());
                 return response.IsSuccessStatusCode;
             }
             catch (Exception)
             {
+                Console.WriteLine("hola2");
+
                 // Log the exception in production
                 return false;
             }

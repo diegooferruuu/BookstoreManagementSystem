@@ -1,10 +1,17 @@
 using BookstoreManagementSystem.Application.Services;
+using BookstoreManagementSystem.Domain.Interfaces;
 using BookstoreManagementSystem.Infrastructure.Repositories;
 
 public class DistributorCreator
 {
-    public DistributorService FactoryMethod()
+    private readonly IDistributorRepository _distributorRepository;
+
+    public DistributorCreator(IDistributorRepository distributorRepository)
     {
-        return new DistributorService(new DistributorRepository());
+        _distributorRepository = distributorRepository;
+    }
+    public IDistributorService FactoryMethod()
+    {
+        return new DistributorService(_distributorRepository);
     }
 }

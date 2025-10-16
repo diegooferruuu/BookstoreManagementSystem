@@ -1,4 +1,4 @@
-using BookstoreManagementSystem.Application.Interfaces;
+using BookstoreManagementSystem.Domain.Interfaces;
 
 namespace BookstoreManagementSystem.Infrastructure.Security
 {

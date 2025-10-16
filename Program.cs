@@ -1,6 +1,5 @@
 using System.Text;
 using BookstoreManagementSystem.Application.DTOs;
-using BookstoreManagementSystem.Application.Interfaces;
 using BookstoreManagementSystem.Infrastructure.Auth;
 using BookstoreManagementSystem.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication;
@@ -9,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.RateLimiting;
+using BookstoreManagementSystem.Domain.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,7 +42,9 @@ var sendGridOptions = sendGridSection.Get<BookstoreManagementSystem.Infrastructu
 builder.Services.AddSingleton(sendGridOptions);
 
 // DI
+builder.Services.AddSingleton<IProductRepository, ProductRepository>();
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddSingleton<IDistributorRepository, DistributorRepository>();
 builder.Services.AddSingleton<ITokenGenerator, JwtTokenGenerator>();
 builder.Services.AddSingleton<IJwtAuthService, JwtAuthService>();
 builder.Services.AddSingleton<IEmailService, BookstoreManagementSystem.Infrastructure.Email.SendGridEmailService>();

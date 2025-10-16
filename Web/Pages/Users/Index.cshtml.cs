@@ -29,12 +29,6 @@ namespace BookstoreManagementSystem.Pages.Users
             }
         }
 
-        public IActionResult OnPostEdit(Guid id)
-        {
-            TempData["EditUserId"] = id;
-            return RedirectToPage("Edit");
-        }
-
         public IActionResult OnPostDelete(Guid id)
         {
             _service.Delete(id);

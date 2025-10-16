@@ -64,7 +64,7 @@ namespace BookstoreManagementSystem.Pages.Users
                 // 2. Generar contraseña segura
                 var generatedPassword = _passwordGenerator.GenerateSecurePassword();
 
-                // 3. Hashear la contraseña
+                // 3. Hashear la contraseña para guardarla en la BD
                 var tempUser = new User(); // temporal para el hasher
                 var passwordHash = _passwordHasher.HashPassword(tempUser, generatedPassword);
 
@@ -90,8 +90,8 @@ namespace BookstoreManagementSystem.Pages.Users
                     _userService.UpdateUserRoles(createdUser.Id, new List<string> { SelectedRole });
                 }
 
-                // 6. Enviar email con las credenciales
-                var emailSubject = "Bienvenido - Tus credenciales de acceso";
+                // 6. Enviar email con la contraseña en texto plano (antes de hashear)
+                var emailSubject = "Bienvenido - Tu cuenta ha sido creada";
                 var emailBody = GenerateWelcomeEmailHtml(uniqueUsername, generatedPassword);
                 
                 _ = _emailService.SendEmailAsync(Email, emailSubject, emailBody);
@@ -145,9 +145,12 @@ namespace BookstoreManagementSystem.Pages.Users
                                     <span class='credential-value'>{password}</span>
                                 </div>
                             </div>
-
-
-                            <p>Puedes acceder al sistema usando estas credenciales en la página de inicio de sesión.</p>
+                            
+                            <div class='warning'>
+                                <strong>⚠️ Importante:</strong> Por favor, guarda estas credenciales en un lugar seguro.
+                            </div>
+                            
+                            <p>Puedes acceder al sistema utilizando estas credenciales.</p>
                         </div>
                         <div class='footer'>
                             <p>Este es un correo automático, por favor no respondas a este mensaje.</p>

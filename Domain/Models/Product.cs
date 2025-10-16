@@ -10,7 +10,6 @@
         public int Stock { get; set; }
         public DateTime CreatedAt { get; set; }
         
-        // Propiedad adicional para mostrar el nombre de la categoría en las vistas
         public string? CategoryName { get; set; }
     }
 }

@@ -9,12 +9,10 @@ namespace BookstoreManagementSystem.Infrastructure.DataBase.Scripts
         public static async Task EnsureAuthSeedAsync(CancellationToken ct = default)
         {
             var conn = DataBaseConnection.Instance.GetConnection();
-            // Schema creation removed: DB schema is managed externally now.
 
             var hasher = new PasswordHasher<object>();
             var adminHash = hasher.HashPassword(null, "admin123456");
 
-            // Roles: Admin y Employee (asegurar existencia sin depender de unique indexes)
             await using (var checkAdminRole = new NpgsqlCommand("SELECT id FROM roles WHERE name='Admin' LIMIT 1;", conn))
             {
                 var exists = await checkAdminRole.ExecuteScalarAsync(ct);

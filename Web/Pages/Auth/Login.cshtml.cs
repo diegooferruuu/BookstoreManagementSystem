@@ -23,6 +23,8 @@ namespace BookstoreManagementSystem.Pages.Auth
 
         public void OnGet()
         {
+            // Nunca prellenar el password
+            Input.Password = string.Empty;
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -35,7 +37,13 @@ namespace BookstoreManagementSystem.Pages.Auth
             if (string.IsNullOrWhiteSpace(Input.Password) || Input.Password.Length < 8)
                 ModelState.AddModelError("Input.Password", "La contraseña debe tener al menos 8 caracteres.");
 
-            if (!ModelState.IsValid) return Page();
+            if (!ModelState.IsValid)
+            {
+                // No re-mostrar la contraseña en el input
+                ModelState.Remove("Input.Password");
+                Input.Password = string.Empty;
+                return Page();
+            }
 
             if (!string.IsNullOrEmpty(ReturnUrl) && !Url.IsLocalUrl(ReturnUrl))
             {

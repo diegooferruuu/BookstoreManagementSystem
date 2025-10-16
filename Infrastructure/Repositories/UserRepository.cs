@@ -84,7 +84,7 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
         public List<User> GetAll()
         {
             var users = new List<User>();
-            var sql = "SELECT id, username, email, first_name, last_name, middle_name, password_hash, is_active FROM users ORDER BY id";
+            var sql = "SELECT id, username, email, first_name, last_name, middle_name, password_hash, is_active FROM users WHERE is_active = TRUE ORDER BY id";
             using var cmd = new NpgsqlCommand(sql, _conn);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
@@ -161,7 +161,7 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 
         public void Delete(Guid id)
         {
-            var sql = "DELETE FROM users WHERE id=@id";
+            var sql = "UPDATE users SET is_active = FALSE WHERE id=@id";
             using var cmd = new NpgsqlCommand(sql, _conn);
             cmd.Parameters.AddWithValue("@id", id);
             cmd.ExecuteNonQuery();

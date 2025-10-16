@@ -5,6 +5,6 @@ namespace BookstoreManagementSystem.Domain.Interfaces
 {
     public interface IDistributorRepository : IDataBase<Distributor>
     {
-        // Métodos adicionales específicos de Distributor si los necesitas
+        // Métodos adicionales específicos de Distributor
     }
 }

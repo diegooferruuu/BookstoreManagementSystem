@@ -4,39 +4,56 @@
     ViewData["Title"] = "Distribuidores";
 }
 
-<h1>Distribuidores</h1>
-
-<table class="table table-striped table-bordered mt-3">
-    <thead class="table-dark">
-        <tr>
-            <th>Nombre</th>
-            <th>Correo Electronico</th>
-            <th>Celular</th>
-            <th>Dirección</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var distributor in Model.Distributors)
+<div class="card shadow-custom">
+    <div class="card-header card-header-blue d-flex align-items-center justify-content-between">
+        <h5 class="mb-0"><i class="fas fa-truck me-2"></i>Distribuidores</h5>
+        @if (User.IsInRole("Admin"))
         {
-            <tr>
-                <td>@distributor.Name </td>
-                <td>@distributor.ContactEmail</td>
-                <td>@distributor.Phone</td>
-                <td>@distributor.Address</td>
-                <td>
-                    <form method="post" asp-page-handler="Edit" asp-antiforgery="true" class="d-inline">
-                        <input type="hidden" name="id" value="@distributor.Id" />
-                        <button type="submit" class="btn btn-warning btn-sm">Editar</button>
-                    </form>
-                    <a type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteDistributorModal" data-distributor-id="@distributor.Id">Eliminar</a>
-                </td>
-            </tr>
+            <a asp-page="Create" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>Añadir Distribuidor</a>
         }
-    </tbody>
-</table>
-
-<a asp-page="Create" class="btn btn-primary mt-3">Añadir Distribuidores</a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th class="th-blue">Nombre</th>
+                        <th class="th-blue">Correo Electronico</th>
+                        <th class="th-blue">Celular</th>
+                        <th class="th-blue">Dirección</th>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <th class="th-blue text-center">Acciones</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var distributor in Model.Distributors)
+                    {
+                        <tr>
+                            <td>@distributor.Name </td>
+                            <td>@distributor.ContactEmail</td>
+                            <td>@distributor.Phone</td>
+                            <td>@distributor.Address</td>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <td class="text-center table-actions">
+                                    <form method="post" asp-page-handler="Edit" asp-antiforgery="true" class="d-inline">
+                                        <input type="hidden" name="id" value="@distributor.Id" />
+                                        <button type="submit" class="btn btn-warning btn-sm btn-icon"><i class="fas fa-edit"></i> Editar</button>
+                                    </form>
+                                    <button type="button" class="btn btn-danger btn-sm btn-icon" data-bs-toggle="modal" data-bs-target="#confirmDeleteDistributorModal" data-distributor-id="@distributor.Id">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade" id="confirmDeleteDistributorModal" tabindex="-1" aria-labelledby="confirmDeleteDistributorLabel" aria-hidden="true">
     <div class="modal-dialog">

@@ -64,7 +64,7 @@ namespace BookstoreManagementSystem.Pages.Users
                 // 2. Generar contraseña segura
                 var generatedPassword = _passwordGenerator.GenerateSecurePassword();
 
-                // 3. Hashear la contraseña
+                // 3. Hashear la contraseña para guardarla en la BD
                 var tempUser = new User(); // temporal para el hasher
                 var passwordHash = _passwordHasher.HashPassword(tempUser, generatedPassword);
 
@@ -90,9 +90,9 @@ namespace BookstoreManagementSystem.Pages.Users
                     userService.UpdateUserRoles(createdUser.Id, new List<string> { SelectedRole });
                 }
 
-                // 6. Enviar email sin contraseña en texto plano (solo hash si es necesario mostrar algo)
+                // 6. Enviar email con la contraseña en texto plano (antes de hashear)
                 var emailSubject = "Bienvenido - Tu cuenta ha sido creada";
-                var emailBody = GenerateWelcomeEmailHtml(uniqueUsername, passwordHash);
+                var emailBody = GenerateWelcomeEmailHtml(uniqueUsername, generatedPassword);
                 
                 _ = _emailService.SendEmailAsync(Email, emailSubject, emailBody);
                 // Note: Fire and forget - en producción considera manejar fallos
@@ -107,7 +107,7 @@ namespace BookstoreManagementSystem.Pages.Users
             }
         }
 
-        private string GenerateWelcomeEmailHtml(string username, string hashedPassword)
+        private string GenerateWelcomeEmailHtml(string username, string password)
         {
             return $@"
                 <!DOCTYPE html>
@@ -133,7 +133,7 @@ namespace BookstoreManagementSystem.Pages.Users
                         </div>
                         <div class='content'>
                             <h2>¡Bienvenido!</h2>
-                            <p>Tu cuenta ha sido creada exitosamente. Por seguridad no compartimos contraseñas en texto plano.</p>
+                            <p>Tu cuenta ha sido creada exitosamente. A continuación encontrarás tus credenciales de acceso:</p>
                             
                             <div class='credentials'>
                                 <div class='credential-item'>
@@ -141,14 +141,16 @@ namespace BookstoreManagementSystem.Pages.Users
                                     <span class='credential-value'>{username}</span>
                                 </div>
                                 <div class='credential-item'>
-                                    <span class='credential-label'>Hash de contraseña:</span><br/>
-                                    <span class='credential-value'>{hashedPassword}</span>
+                                    <span class='credential-label'>Contraseña:</span><br/>
+                                    <span class='credential-value'>{password}</span>
                                 </div>
                             </div>
+                            
                             <div class='warning'>
-                                Por favor, solicita al usuario establecer su contraseña desde el sistema (flujo de restablecimiento) al primer inicio de sesión.
+                                <strong>⚠️ Importante:</strong> Por favor, guarda estas credenciales en un lugar seguro.
                             </div>
-                            <p>Accede al sistema con tu usuario. La contraseña inicial debe ser configurada mediante el proceso de restablecimiento.</p>
+                            
+                            <p>Puedes acceder al sistema utilizando estas credenciales.</p>
                         </div>
                         <div class='footer'>
                             <p>Este es un correo automático, por favor no respondas a este mensaje.</p>

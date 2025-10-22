@@ -18,7 +18,7 @@
                 <thead>
                     <tr>
                         <th class="th-blue">Nombre</th>
-                        <th class="th-blue">Correo Electronico</th>
+                        <th class="th-blue">Correo electrónico</th>
                         <th class="th-blue">Celular</th>
                         <th class="th-blue">Dirección</th>
                         @if (User.IsInRole("Admin"))
@@ -52,6 +52,11 @@
                 </tbody>
             </table>
         </div>
+
+        @if (!Model.Distributors.Any())
+        {
+            <div class="alert alert-info mb-0">No tienes distribuidores registrados.</div>
+        }
     </div>
 </div>
 

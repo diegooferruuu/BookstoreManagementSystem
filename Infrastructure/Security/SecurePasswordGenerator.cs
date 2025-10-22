@@ -21,19 +21,12 @@ namespace BookstoreManagementSystem.Infrastructure.Security
 
         public string GenerateSecurePassword()
         {
-            // Generar contraseña: palabra + número + palabra + número
-            // Ejemplo: sol42casa89 o luna15paz73
-            
             var word1 = WordsDictionary[_random.Next(WordsDictionary.Length)];
-            var num1 = _random.Next(10, 100); // número de 2 dígitos
-            
+            var num1 = _random.Next(10, 100);
             var word2 = WordsDictionary[_random.Next(WordsDictionary.Length)];
-            var num2 = _random.Next(10, 100); // número de 2 dígitos
-            
-            // Capitalizar primera letra de cada palabra para mayor seguridad
+            var num2 = _random.Next(10, 100);
             word1 = CapitalizeFirst(word1);
             word2 = CapitalizeFirst(word2);
-            
             return $"{word1}{num1}{word2}{num2}";
         }
 
@@ -41,7 +34,6 @@ namespace BookstoreManagementSystem.Infrastructure.Security
         {
             if (string.IsNullOrEmpty(word))
                 return word;
-            
             return char.ToUpper(word[0]) + word.Substring(1);
         }
     }

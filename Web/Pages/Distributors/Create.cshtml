@@ -27,7 +27,12 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">Dirección</label>
-                <input asp-for="Distributor.Address" class="form-control" />
+                <input asp-for="Distributor.Address" class="form-control"
+                       data-val="true"
+                       data-val-length="La dirección no debe superar 60 caracteres."
+                       data-val-length-max="60"
+                       data-val-addresscbba="true"
+                       data-val-addresscbba-msg="Dirección inválida. Ej.: 'Av. América Este N1759', 'Calle Corrales S/N', 'No. 1234'." />
                 <span asp-validation-for="Distributor.Address" class="text-danger"></span>
             </div>
             <div class="d-flex gap-2">
@@ -37,3 +42,7 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

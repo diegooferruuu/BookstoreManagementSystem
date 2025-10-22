@@ -9,7 +9,7 @@ namespace BookstoreManagementSystem.Application.Services
         public IEnumerable<ValidationError> Errors { get; }
 
         public ValidationException(IEnumerable<ValidationError> errors)
-            : base("Validation failed")
+            : base("Validación fallida")
         {
             Errors = errors;
         }

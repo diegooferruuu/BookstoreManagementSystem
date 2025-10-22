@@ -12,6 +12,7 @@ using System.Linq;
 using BookstoreManagementSystem.Application.Services;
 using Microsoft.AspNetCore.Http;
 using BookstoreManagementSystem.Domain.Interfaces;
+using BookstoreManagementSystem.Domain.Validations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,16 +21,12 @@ builder.Services.AddRazorPages()
     .AddRazorPagesOptions(options =>
     {
         options.RootDirectory = "/Web/Pages";
-        // Razor Pages conventions for authorization
-        // Products: list visible to Employee/Admin; CRUD only for Admin
         options.Conventions.AuthorizePage("/Products/Index", "RequireEmployeeOrAdmin");
         options.Conventions.AuthorizePage("/Products/Create", "RequireAdmin");
         options.Conventions.AuthorizePage("/Products/Edit", "RequireAdmin");
         options.Conventions.AuthorizePage("/Products/Delete", "RequireAdmin");
         options.Conventions.AuthorizePage("/Auth/Profile");
-        // Clients: full CRUD for Employee/Admin
         options.Conventions.AuthorizeFolder("/Clients", "RequireEmployeeOrAdmin");
-        // Distributors: list visible to Employee/Admin; CRUD only for Admin
         options.Conventions.AuthorizePage("/Distributors/Index", "RequireEmployeeOrAdmin");
         options.Conventions.AuthorizePage("/Distributors/Create", "RequireAdmin");
         options.Conventions.AuthorizePage("/Distributors/Edit", "RequireAdmin");
@@ -40,19 +37,24 @@ builder.Services.AddRazorPages()
     })
     .AddMvcOptions(options =>
     {
-        // Mensajes de enlace y validación del modelo en español
         options.ModelBindingMessageProvider.SetValueMustBeANumberAccessor(fieldName => $"El campo {fieldName} debe ser un número.");
         options.ModelBindingMessageProvider.SetNonPropertyValueMustBeANumberAccessor(() => "Este campo debe ser un número.");
         options.ModelBindingMessageProvider.SetMissingBindRequiredValueAccessor(name => $"Se requiere un valor para '{name}'.");
         options.ModelBindingMessageProvider.SetValueIsInvalidAccessor(value => $"El valor '{value}' no es válido.");
-        options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((value, fieldName) => $"El valor '{value}' no es válido para {fieldName}.");
+        options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((value, fieldName) =>
+        {
+            if (!string.IsNullOrEmpty(fieldName) && (fieldName.EndsWith(".Price") || fieldName.Equals("Price", StringComparison.OrdinalIgnoreCase)))
+            {
+                return $"El precio no debe superar {ProductValidation.MaxPrice}.";
+            }
+            return $"El valor '{value}' no es válido para {fieldName}.";
+        });
         options.ModelBindingMessageProvider.SetMissingKeyOrValueAccessor(() => "Este valor es obligatorio.");
         options.ModelBindingMessageProvider.SetUnknownValueIsInvalidAccessor(value => "El valor especificado no es válido.");
         options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(fieldName => $"El campo {fieldName} no puede ser nulo.");
         options.ModelBindingMessageProvider.SetMissingRequestBodyRequiredValueAccessor(() => "El cuerpo de la solicitud es obligatorio.");
     });
 
-// Options
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtOptions = jwtSection.Get<JwtOptions>() ?? new JwtOptions();
 builder.Services.AddSingleton(jwtOptions);
@@ -62,7 +64,6 @@ var sendGridOptions = sendGridSection.Get<BookstoreManagementSystem.Infrastructu
     ?? new BookstoreManagementSystem.Infrastructure.Email.SendGridOptions();
 builder.Services.AddSingleton(sendGridOptions);
 
-// DI
 builder.Services.AddSingleton<IProductRepository, ProductRepository>();
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IDistributorRepository, DistributorRepository>();
@@ -73,7 +74,6 @@ builder.Services.AddSingleton<IEmailService, BookstoreManagementSystem.Infrastru
 builder.Services.AddSingleton<IPasswordGenerator, BookstoreManagementSystem.Infrastructure.Security.SecurePasswordGenerator>();
 builder.Services.AddSingleton<IUsernameGenerator, BookstoreManagementSystem.Infrastructure.Security.UsernameGenerator>();
 
-// Authentication schemes
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = "AppScheme";
@@ -101,25 +101,21 @@ builder.Services.AddAuthentication(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateIssuerSigningKey = true,
-        ValidateLifetime = true,
         ValidIssuer = jwtOptions.Issuer,
         ValidAudience = jwtOptions.Audience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key)),
+        ValidateIssuerSigningKey = true,
+        ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero
     };
 });
 
-// Authorization policies
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("RequireAdmin", p => p.RequireRole("Admin"));
     options.AddPolicy("RequireEmployeeOrAdmin", p => p.RequireRole("Admin", "Employee"));
 });
 
-// Rate limiting for login endpoint
 builder.Services.AddRateLimiter(_ => _.AddPolicy("login", httpContext =>
     RateLimitPartition.GetFixedWindowLimiter(
         partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
@@ -137,7 +133,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

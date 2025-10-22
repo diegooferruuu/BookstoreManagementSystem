@@ -23,9 +23,8 @@ namespace BookstoreManagementSystem.Domain.Validations
         {
             if (string.IsNullOrWhiteSpace(s)) return true;
             var n = TextRules.NormalizeSpaces(s);
-            if (!TextRules.IsLettersSpacesAndDotsOnly(n)) return false;
-            if (!TextRules.IsWordsMin2SingleSpacesAllowTrailingDot(n)) return false;
-            return TextRules.MaxLen(n, 50);
+            if (!TextRules.IsValidCbbaAddress(n)) return false;
+            return TextRules.MaxLen(n, 60);
         }
 
         public static void Normalize(Client c)
@@ -43,15 +42,15 @@ namespace BookstoreManagementSystem.Domain.Validations
         {
             if (!IsValidSingleWordName(c.FirstName))
                 yield return new ValidationError(nameof(c.FirstName),
-                    "Nombre inválido. Solo letras, 1 palabra, mín. 3.");
+                    "Nombre inválido. Solo letras. Una palabra. Mínimo 3 letras.");
 
-            if (!IsValidSingleWordName(c.LastName))
+            if (!(TextRules.IsCompoundLastName(c.LastName) || IsValidSingleWordName(c.LastName)))
                 yield return new ValidationError(nameof(c.LastName),
-                    "Apellido inválido. Solo letras, 1 palabra, mín. 3.");
+                    "Apellido inválido. Solo letras. Acepta compuesto con partículas. Mínimo 3 en partes principales.");
 
             if (!IsValidOptionalSingleWord(c.MiddleName))
                 yield return new ValidationError(nameof(c.MiddleName),
-                    "Segundo nombre inválido. Solo letras, 1 palabra, mín. 3.");
+                    "Segundo nombre inválido. Solo letras. Una palabra. Mínimo 3 letras.");
 
             if (!string.IsNullOrWhiteSpace(c.Email) && !IsValidEmail(c.Email))
                 yield return new ValidationError(nameof(c.Email),
@@ -63,7 +62,7 @@ namespace BookstoreManagementSystem.Domain.Validations
 
             if (!string.IsNullOrWhiteSpace(c.Address) && !IsValidAddress(c.Address))
                 yield return new ValidationError(nameof(c.Address),
-                    "Dirección inválida. Solo letras/espacios/puntos; 1 espacio entre palabras.");
+                    "Dirección inválida. Solo letras, números, espacios, punto y '/'.");
         }
 
         public static Results.Result ValidateAsResult(Client c)

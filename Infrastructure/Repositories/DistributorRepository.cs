@@ -8,18 +8,12 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 {
     public class DistributorRepository : IDistributorRepository
     {
-        private readonly NpgsqlConnection _connection;
-
-        public DistributorRepository()
-        {
-            _connection = DataBaseConnection.Instance.GetConnection();
-        }
-
         public void Create(Distributor distributor)
         {
+            using var conn = DataBaseConnection.Instance.GetConnection();
             using var cmd = new NpgsqlCommand(@"
                 INSERT INTO distributors (name, contact_email, phone, address)
-                VALUES (@name, @contact_email, @phone, @address)", _connection);
+                VALUES (@name, @contact_email, @phone, @address)", conn);
 
             cmd.Parameters.AddWithValue("@name", distributor.Name);
             cmd.Parameters.AddWithValue("@contact_email", distributor.ContactEmail ?? (object)DBNull.Value);
@@ -30,9 +24,10 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 
         }
 
-    public Distributor? Read(Guid id)
+        public Distributor? Read(Guid id)
         {
-            using var cmd = new NpgsqlCommand("SELECT * FROM distributors WHERE id = @id", _connection);
+            using var conn = DataBaseConnection.Instance.GetConnection();
+            using var cmd = new NpgsqlCommand("SELECT * FROM distributors WHERE id = @id", conn);
             cmd.Parameters.AddWithValue("@id",NpgsqlTypes.NpgsqlDbType.Uuid, id);
 
             using var reader = cmd.ExecuteReader();
@@ -55,13 +50,14 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 
         public void Update(Distributor distributor)
         {
+            using var conn = DataBaseConnection.Instance.GetConnection();
             using var cmd = new NpgsqlCommand(@"
                 UPDATE distributors SET 
                     name = @name,
                     contact_email = @contact_email,
                     phone = @phone,
                     address = @address
-                WHERE id = @id", _connection);
+                WHERE id = @id", conn);
 
             cmd.Parameters.AddWithValue("@id", distributor.Id);
             cmd.Parameters.AddWithValue("@name", distributor.Name);
@@ -74,7 +70,8 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 
         public void Delete(Guid id)
         {
-            using var cmd = new NpgsqlCommand("UPDATE distributors SET is_active = FALSE WHERE id = @id", _connection);
+            using var conn = DataBaseConnection.Instance.GetConnection();
+            using var cmd = new NpgsqlCommand("UPDATE distributors SET is_active = FALSE WHERE id = @id", conn);
             cmd.Parameters.AddWithValue("@id",NpgsqlTypes.NpgsqlDbType.Uuid, id);
             cmd.ExecuteNonQuery();
         }
@@ -82,7 +79,8 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
         public List<Distributor> GetAll()
         {
             var distributors = new List<Distributor>();
-            using var cmd = new NpgsqlCommand("SELECT * FROM distributors WHERE is_active = TRUE ORDER BY name", _connection);
+            using var conn = DataBaseConnection.Instance.GetConnection();
+            using var cmd = new NpgsqlCommand("SELECT * FROM distributors WHERE is_active = TRUE ORDER BY name", conn);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {

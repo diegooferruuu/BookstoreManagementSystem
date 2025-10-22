@@ -8,18 +8,12 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 {
     public class ClientRepository : IClientRepository
     {
-         private readonly NpgsqlConnection _connection;
-
-        public ClientRepository()
-        {
-            _connection = DataBaseConnection.Instance.GetConnection();
-        }
-
         public void Create(Client client)
         {
+            using var conn = DataBaseConnection.Instance.GetConnection();
             using var cmd = new NpgsqlCommand(@"
                 INSERT INTO clients (first_name, last_name, middle_name, email, phone, address)
-                VALUES (@first_name, @last_name, @middle_name, @email, @phone, @address)", _connection);
+                VALUES (@first_name, @last_name, @middle_name, @email, @phone, @address)", conn);
 
 
             cmd.Parameters.AddWithValue("@first_name", client.FirstName);
@@ -33,9 +27,10 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 
         }
 
-    public Client? Read(Guid id)
+        public Client? Read(Guid id)
         {
-            using var cmd = new NpgsqlCommand("SELECT * FROM clients WHERE id = @id", _connection);
+            using var conn = DataBaseConnection.Instance.GetConnection();
+            using var cmd = new NpgsqlCommand("SELECT * FROM clients WHERE id = @id", conn);
             cmd.Parameters.AddWithValue("@id",NpgsqlTypes.NpgsqlDbType.Uuid, id);
 
             using var reader = cmd.ExecuteReader();
@@ -60,6 +55,7 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 
         public void Update(Client client)
         {
+            using var conn = DataBaseConnection.Instance.GetConnection();
             using var cmd = new NpgsqlCommand(@"
                 UPDATE clients SET 
                     first_name = @first_name,
@@ -68,7 +64,7 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
                     email = @email,
                     phone = @phone,
                     address = @address
-                WHERE id = @id", _connection);
+                WHERE id = @id", conn);
 
             cmd.Parameters.AddWithValue("@id", client.Id);
             cmd.Parameters.AddWithValue("@first_name", client.FirstName);
@@ -84,7 +80,8 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 
         public void Delete(Guid id)
         {
-            using var cmd = new NpgsqlCommand("UPDATE clients SET is_active = FALSE WHERE id = @id", _connection);
+            using var conn = DataBaseConnection.Instance.GetConnection();
+            using var cmd = new NpgsqlCommand("UPDATE clients SET is_active = FALSE WHERE id = @id", conn);
             cmd.Parameters.AddWithValue("@id",NpgsqlTypes.NpgsqlDbType.Uuid, id);
             cmd.ExecuteNonQuery();
         }
@@ -92,7 +89,8 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
         public List<Client> GetAll()
         {
             var clients = new List<Client>();
-            using var cmd = new NpgsqlCommand("SELECT * FROM clients WHERE is_active = TRUE  ORDER BY last_name, first_name, middle_name", _connection);
+            using var conn = DataBaseConnection.Instance.GetConnection();
+            using var cmd = new NpgsqlCommand("SELECT * FROM clients WHERE is_active = TRUE  ORDER BY last_name, first_name, middle_name", conn);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {

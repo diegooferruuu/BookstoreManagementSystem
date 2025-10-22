@@ -8,17 +8,14 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly NpgsqlConnection _conn;
-        public UserRepository()
-        {
-            _conn = DataBaseConnection.Instance.GetConnection();
-        }
+        public UserRepository() { }
 
         public async Task<User?> GetByUserOrEmailAsync(string userOrEmail, CancellationToken ct = default)
         {
             var input = (userOrEmail ?? string.Empty).Trim().ToLowerInvariant();
             var sql = "SELECT id, username, email, first_name, last_name, middle_name, password_hash, is_active FROM users WHERE (LOWER(username)=@ue OR LOWER(email)=@ue) LIMIT 1";
-            await using var cmd = new NpgsqlCommand(sql, _conn);
+            await using var conn = DataBaseConnection.Instance.GetConnection();
+            await using var cmd = new NpgsqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@ue", input);
             await using var reader = await cmd.ExecuteReaderAsync(ct);
             if (await reader.ReadAsync(ct))
@@ -42,7 +39,8 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
         {
             var roles = new List<string>();
             var sql = "SELECT r.name FROM roles r JOIN user_roles ur ON ur.role_id=r.id WHERE ur.user_id=@id";
-            await using var cmd = new NpgsqlCommand(sql, _conn);
+            await using var conn = DataBaseConnection.Instance.GetConnection();
+            await using var cmd = new NpgsqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@id", userId);
             await using var reader = await cmd.ExecuteReaderAsync(ct);
             while (await reader.ReadAsync(ct))
@@ -53,29 +51,30 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 
         public async Task SeedAdminAndRolesAsync(string adminEmail, string adminPasswordHash, CancellationToken ct = default)
         {
-            await EnsureRoleExistsAsync("Admin", ct);
-            await EnsureRoleExistsAsync("Client", ct);
+            await using var conn = DataBaseConnection.Instance.GetConnection();
+            await EnsureRoleExistsAsync("Admin", conn, ct);
+            await EnsureRoleExistsAsync("Client", conn, ct);
 
             var email = adminEmail.Trim().ToLowerInvariant();
             var username = email.Split('@')[0];
             var sql = "SELECT id FROM users WHERE email=@e LIMIT 1";
-            await using (var check = new NpgsqlCommand(sql, _conn))
+            await using (var check = new NpgsqlCommand(sql, conn))
             {
                 check.Parameters.AddWithValue("@e", email);
                 var existing = await check.ExecuteScalarAsync(ct);
                 if (existing is null)
                 {
-                    var insert = new NpgsqlCommand("INSERT INTO users (username,email,full_name,password_hash,is_active) VALUES (@u,@e,@fn,@ph,TRUE) RETURNING id", _conn);
+                    var insert = new NpgsqlCommand("INSERT INTO users (username,email,full_name,password_hash,is_active) VALUES (@u,@e,@fn,@ph,TRUE) RETURNING id", conn);
                     insert.Parameters.AddWithValue("@u", username);
                     insert.Parameters.AddWithValue("@e", email);
                     insert.Parameters.AddWithValue("@fn", "Administrator");
                     insert.Parameters.AddWithValue("@ph", adminPasswordHash);
                     var newId = (int)(await insert.ExecuteScalarAsync(ct))!;
-                    await AddUserRoleAsync(newId, "Admin", ct);
+                    await AddUserRoleAsync(newId, "Admin", conn, ct);
                 }
                 else
                 {
-                    await AddUserRoleByEmailAsync(email, "Admin", ct);
+                    await AddUserRoleByEmailAsync(email, "Admin", conn, ct);
                 }
             }
         }
@@ -85,7 +84,8 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
         {
             var users = new List<User>();
             var sql = "SELECT id, username, email, first_name, last_name, middle_name, password_hash, is_active FROM users WHERE is_active = TRUE ORDER BY id";
-            using var cmd = new NpgsqlCommand(sql, _conn);
+            using var conn = DataBaseConnection.Instance.GetConnection();
+            using var cmd = new NpgsqlCommand(sql, conn);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -107,7 +107,8 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
         public User? Read(Guid id)
         {
             var sql = "SELECT id, username, email, first_name, last_name, middle_name, password_hash, is_active FROM users WHERE id=@id";
-            using var cmd = new NpgsqlCommand(sql, _conn);
+            using var conn = DataBaseConnection.Instance.GetConnection();
+            using var cmd = new NpgsqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@id", id);
             using var reader = cmd.ExecuteReader();
             if (reader.Read())
@@ -131,7 +132,8 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
         {
             var sql = @"INSERT INTO users (username, email, first_name, last_name, middle_name, password_hash, is_active) 
                         VALUES (@username, @email, @firstName, @lastName, @middleName, @passwordHash, @isActive)";
-            using var cmd = new NpgsqlCommand(sql, _conn);
+            using var conn = DataBaseConnection.Instance.GetConnection();
+            using var cmd = new NpgsqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@username", user.Username);
             cmd.Parameters.AddWithValue("@email", user.Email);
             cmd.Parameters.AddWithValue("@firstName", user.FirstName);
@@ -147,7 +149,8 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
             var sql = @"UPDATE users SET username=@username, email=@email, first_name=@firstName, 
                         last_name=@lastName, middle_name=@middleName, password_hash=@passwordHash, 
                         is_active=@isActive WHERE id=@id";
-            using var cmd = new NpgsqlCommand(sql, _conn);
+            using var conn = DataBaseConnection.Instance.GetConnection();
+            using var cmd = new NpgsqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@id", user.Id);
             cmd.Parameters.AddWithValue("@username", user.Username);
             cmd.Parameters.AddWithValue("@email", user.Email);
@@ -162,7 +165,8 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
         public void Delete(Guid id)
         {
             var sql = "UPDATE users SET is_active = FALSE WHERE id=@id";
-            using var cmd = new NpgsqlCommand(sql, _conn);
+            using var conn = DataBaseConnection.Instance.GetConnection();
+            using var cmd = new NpgsqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@id", id);
             cmd.ExecuteNonQuery();
         }
@@ -171,7 +175,8 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
         {
             var roles = new List<string>();
             var sql = "SELECT r.name FROM roles r JOIN user_roles ur ON ur.role_id=r.id WHERE ur.user_id=@id";
-            using var cmd = new NpgsqlCommand(sql, _conn);
+            using var conn = DataBaseConnection.Instance.GetConnection();
+            using var cmd = new NpgsqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@id", userId);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
@@ -181,9 +186,10 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 
         public void UpdateUserRoles(Guid userId, List<string> roles)
         {
+            using var conn = DataBaseConnection.Instance.GetConnection();
             // Delete existing roles
             var deleteSql = "DELETE FROM user_roles WHERE user_id=@userId";
-            using (var deleteCmd = new NpgsqlCommand(deleteSql, _conn))
+            using (var deleteCmd = new NpgsqlCommand(deleteSql, conn))
             {
                 deleteCmd.Parameters.AddWithValue("@userId", userId);
                 deleteCmd.ExecuteNonQuery();
@@ -194,43 +200,39 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
             {
                 var insertSql = @"INSERT INTO user_roles(user_id, role_id) 
                                   SELECT @userId, r.id FROM roles r WHERE r.name=@roleName";
-                using var insertCmd = new NpgsqlCommand(insertSql, _conn);
+                using var insertCmd = new NpgsqlCommand(insertSql, conn);
                 insertCmd.Parameters.AddWithValue("@userId", userId);
                 insertCmd.Parameters.AddWithValue("@roleName", roleName);
                 insertCmd.ExecuteNonQuery();
             }
         }
 
-        // Eliminado: backfill y creaci�n de usuarios desde clientes
-
-        private async Task EnsureRoleExistsAsync(string roleName, CancellationToken ct)
+        private static async Task EnsureRoleExistsAsync(string roleName, NpgsqlConnection conn, CancellationToken ct)
         {
             var sql = "INSERT INTO roles(name) VALUES(@n) ON CONFLICT(name) DO NOTHING";
-            await using var cmd = new NpgsqlCommand(sql, _conn);
+            await using var cmd = new NpgsqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@n", roleName);
             await cmd.ExecuteNonQueryAsync(ct);
         }
 
-        private async Task AddUserRoleAsync(int userId, string roleName, CancellationToken ct)
+        private static async Task AddUserRoleAsync(int userId, string roleName, NpgsqlConnection conn, CancellationToken ct)
         {
             var sql = "INSERT INTO user_roles(user_id, role_id) SELECT @u, r.id FROM roles r WHERE r.name=@n ON CONFLICT DO NOTHING";
-            await using var cmd = new NpgsqlCommand(sql, _conn);
+            await using var cmd = new NpgsqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@u", userId);
             cmd.Parameters.AddWithValue("@n", roleName);
             await cmd.ExecuteNonQueryAsync(ct);
         }
 
-        private async Task AddUserRoleByEmailAsync(string email, string roleName, CancellationToken ct)
+        private static async Task AddUserRoleByEmailAsync(string email, string roleName, NpgsqlConnection conn, CancellationToken ct)
         {
             var sql = @"INSERT INTO user_roles(user_id, role_id)
 SELECT u.id, r.id FROM users u, roles r WHERE u.email=@e AND r.name=@n
 ON CONFLICT DO NOTHING";
-            await using var cmd = new NpgsqlCommand(sql, _conn);
+            await using var cmd = new NpgsqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@e", email);
             cmd.Parameters.AddWithValue("@n", roleName);
             await cmd.ExecuteNonQueryAsync(ct);
         }
-
-        // Nota: No se generan sufijos; se espera unicidad del local-part por datos.
     }
 }

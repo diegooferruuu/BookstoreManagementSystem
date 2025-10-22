@@ -28,7 +28,8 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 
         public Category? Read(Guid id)
         {
-            using var cmd = new NpgsqlCommand("SELECT * FROM categories WHERE id = @id", _connection);
+            using var conn = DataBaseConnection.Instance.GetConnection();
+            using var cmd = new NpgsqlCommand("SELECT * FROM categories WHERE id = @id", conn);
             cmd.Parameters.AddWithValue("@id",NpgsqlTypes.NpgsqlDbType.Uuid, id);
             
 
@@ -53,19 +54,17 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
         public List<Category> GetAll()
         {
             var categories = new List<Category>();
-
-            using (var cmd = new NpgsqlCommand("SELECT id, name FROM categories", _connection))
+            using var conn = DataBaseConnection.Instance.GetConnection();
+            using (var cmd = new NpgsqlCommand("SELECT id, name FROM categories", conn))
+            using (var reader = cmd.ExecuteReader())
             {
-                using (var reader = cmd.ExecuteReader())
+                while (reader.Read())
                 {
-                    while (reader.Read())
+                    categories.Add(new Category
                     {
-                        categories.Add(new Category
-                        {
-                            Id = reader.GetGuid(0),
-                            Name = reader.GetString(1)
-                        });
-                    }
+                        Id = reader.GetGuid(0),
+                        Name = reader.GetString(1)
+                    });
                 }
             }
             return categories;

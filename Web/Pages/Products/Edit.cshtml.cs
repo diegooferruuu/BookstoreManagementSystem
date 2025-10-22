@@ -63,7 +63,6 @@ namespace BookstoreManagementSystem.Pages.Products
                 return Page();
             }
 
-            // Normalizar según validaciones del dominio
             BookstoreManagementSystem.Domain.Validations.ProductValidation.Normalize(Product);
 
             try

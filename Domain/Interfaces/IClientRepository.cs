@@ -5,6 +5,5 @@ namespace BookstoreManagementSystem.Domain.Interfaces
 {
     public interface IClientRepository : IDataBase<Client>
     {
-        // Métodos adicionales específicos de Client
     }
 }

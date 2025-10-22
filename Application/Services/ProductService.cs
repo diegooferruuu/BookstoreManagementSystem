@@ -20,7 +20,6 @@ namespace BookstoreManagementSystem.Application.Services
         public List<Product> GetAll() => _repository.GetAll();
         public Product? Read(Guid id) => _repository.Read(id);
 
-        // Nuevo: patrón Result sin cambiar la firma pública existente
         public BookstoreManagementSystem.Domain.Interfaces.Result<bool> CreateResult(Product product)
         {
             var errors = ProductValidation.Validate(product, _categoryRepository).ToList();

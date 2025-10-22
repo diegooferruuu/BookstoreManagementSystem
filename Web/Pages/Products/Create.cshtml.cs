@@ -30,7 +30,6 @@ namespace BookstoreManagementSystem.Pages.Products
 
         public IActionResult OnPost()
         {
-            // Ejecutar validaciones de dominio para que se muestren aunque falten otros campos
             var domainErrors = BookstoreManagementSystem.Domain.Validations.ProductValidation
                 .Validate(Product, new Infrastructure.Repositories.CategoryRepository())
                 .ToList();
@@ -50,7 +49,6 @@ namespace BookstoreManagementSystem.Pages.Products
             }
             catch (ValidationException vex)
             {
-                // UI request: add validation messages to ModelState and repopulate selects
                 foreach (var e in vex.Errors)
                     ModelState.AddModelError($"Product.{e.Field}", e.Message);
                 LoadCategories();

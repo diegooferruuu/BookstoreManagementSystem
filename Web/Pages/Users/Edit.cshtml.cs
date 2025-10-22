@@ -65,13 +65,11 @@ namespace BookstoreManagementSystem.Pages.Users
             if (user == null)
                 return RedirectToPage("Index");
 
-            // Update user
             user.Email = Email.Trim().ToLowerInvariant();
             user.Username = Email.Split('@')[0].ToLowerInvariant();
             
             _service.Update(user);
 
-            // Update role
             if (!string.IsNullOrWhiteSpace(SelectedRole))
             {
                 _service.UpdateUserRoles(UserId, new List<string> { SelectedRole });

@@ -6,7 +6,6 @@
 
 @if (!(User?.Identity?.IsAuthenticated ?? false))
 {
-    <!-- Banner para visitantes no autenticados -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-custom text-center">
@@ -23,7 +22,6 @@
 }
 else
 {
-    <!-- Encabezado y estadísticas visuales para usuarios autenticados -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-custom fade-in-up">

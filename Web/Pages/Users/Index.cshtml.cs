@@ -22,7 +22,6 @@ namespace BookstoreManagementSystem.Pages.Users
         {
             Users = _service.GetAll();
             
-            // Get roles for each user
             foreach (var user in Users)
             {
                 UserRoles[user.Id] = _service.GetUserRoles(user.Id);

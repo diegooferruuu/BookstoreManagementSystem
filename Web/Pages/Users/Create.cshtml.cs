@@ -42,16 +42,13 @@ namespace BookstoreManagementSystem.Pages.Users
 
         public IActionResult OnPost()
         {
-            // Normalización previa
             Email = (Email ?? string.Empty).Trim().ToLowerInvariant();
             SelectedRole = (SelectedRole ?? string.Empty).Trim();
 
-            // Validaciones adicionales del servidor
             var allowedRoles = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Admin", "Employee" };
             if (!allowedRoles.Contains(SelectedRole))
                 ModelState.AddModelError("SelectedRole", "Debe seleccionar un rol válido.");
 
-            // Duplicados de correo
             var emailExists = _userService.GetAll()
                 .Any(u => !string.IsNullOrEmpty(u.Email) && u.Email.Equals(Email, StringComparison.OrdinalIgnoreCase));
             if (emailExists)
@@ -63,14 +60,12 @@ namespace BookstoreManagementSystem.Pages.Users
             try
             {
                 
-                // 1. Generar username único desde el email
                 var baseUsername = _usernameGenerator.GenerateUsernameFromEmail(Email);
                 var uniqueUsername = _usernameGenerator.EnsureUniqueUsername(
                     baseUsername,
                     username => _userService.GetAll().Any(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase))
                 );
 
-                // Duplicados de usuario por si el generador no cubre un caso extremo
                 var usernameExists = _userService.GetAll().Any(u => u.Username.Equals(uniqueUsername, StringComparison.OrdinalIgnoreCase));
                 if (usernameExists)
                 {
@@ -78,14 +73,11 @@ namespace BookstoreManagementSystem.Pages.Users
                     return Page();
                 }
 
-                // 2. Generar contraseña segura
                 var generatedPassword = _passwordGenerator.GenerateSecurePassword();
 
-                // 3. Hashear la contraseña para guardarla en la BD
-                var tempUser = new User(); // temporal para el hasher
+                var tempUser = new User();
                 var passwordHash = _passwordHasher.HashPassword(tempUser, generatedPassword);
 
-                // 4. Crear el usuario
                 var user = new User
                 {
                     Email = Email,
@@ -98,7 +90,6 @@ namespace BookstoreManagementSystem.Pages.Users
 
                 _userService.Create(user);
 
-                // 5. Asignar rol
                 var createdUser = _userService.GetAll()
                     .FirstOrDefault(u => u.Username.Equals(uniqueUsername, StringComparison.OrdinalIgnoreCase));
                 
@@ -107,12 +98,10 @@ namespace BookstoreManagementSystem.Pages.Users
                     _userService.UpdateUserRoles(createdUser.Id, new List<string> { SelectedRole });
                 }
 
-                // 6. Enviar email con la contraseña en texto plano (antes de hashear)
                 var emailSubject = "Bienvenido - Tu cuenta ha sido creada";
                 var emailBody = GenerateWelcomeEmailHtml(uniqueUsername, generatedPassword);
                 
                 _ = _emailService.SendEmailAsync(Email, emailSubject, emailBody);
-                // Note: Fire and forget - en producción considera manejar fallos
 
                 TempData["SuccessMessage"] = $"Usuario creado exitosamente. Las credenciales han sido enviadas a {Email}";
                 return RedirectToPage("Index");

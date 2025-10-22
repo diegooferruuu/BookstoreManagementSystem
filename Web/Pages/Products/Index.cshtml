@@ -18,8 +18,8 @@
                 <thead>
                     <tr>
                         <th class="th-blue">Nombre</th>
-                        <th class="th-blue">Descripcion</th>
-                        <th class="th-blue">Categoria</th>
+                        <th class="th-blue">Descripción</th>
+                        <th class="th-blue">Categoría</th>
                         <th class="th-blue">Precio</th>
                         <th class="th-blue">Inventario</th>
                         @if (User.IsInRole("Admin"))
@@ -62,28 +62,20 @@
     </div>
 </div>
 
-@if (!Model.Products.Any())
-{
-    <div class="alert alert-info">
-        No tienes productos registrados.
-    </div>
-}
-
-
 <div class="modal fade" id="confirmDeleteProductModal" tabindex="-1" aria-labelledby="confirmDeleteProductLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post" asp-page-handler="Delete">
                 <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="confirmDeleteProductLabel">Confirmar eliminacion?</h5>
+                    <h5 class="modal-title" id="confirmDeleteProductLabel">¿Confirmar eliminación?</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    Estas seguro de que deseas eliminar este producto?
+                    ¿Estás seguro de que deseas eliminar este producto?
                     <input type="hidden" id="deleteProductId" name="id" />
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-danger">Si, eliminar</button>
+                    <button type="submit" class="btn btn-danger">Sí, eliminar</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 </div>
             </form>

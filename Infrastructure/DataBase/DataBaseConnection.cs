@@ -10,7 +10,6 @@ namespace BookstoreManagementSystem.Infrastructure.DataBase
         private static DataBaseConnection instance;
         private static readonly object padlock = new object();
         private readonly string _connectionString;
-        private NpgsqlConnection _sharedConnection;
 
         private DataBaseConnection()
         {
@@ -21,8 +20,6 @@ namespace BookstoreManagementSystem.Infrastructure.DataBase
             IConfiguration config = builder.Build();
 
             _connectionString = config.GetConnectionString("DefaultConnection");
-            _sharedConnection = new NpgsqlConnection(_connectionString);
-            _sharedConnection.Open();
         }
 
         public static DataBaseConnection Instance
@@ -47,28 +44,9 @@ namespace BookstoreManagementSystem.Infrastructure.DataBase
 
         public NpgsqlConnection GetConnection()
         {
-            if (_sharedConnection == null)
-            {
-                _sharedConnection = new NpgsqlConnection(_connectionString);
-            }
-
-            if (_sharedConnection.State != System.Data.ConnectionState.Open)
-            {
-                try { _sharedConnection.Open(); }
-                catch
-                {
-                    // recreate connection if broken
-                    try { _sharedConnection.Dispose(); } catch { }
-                    _sharedConnection = new NpgsqlConnection(_connectionString);
-                    _sharedConnection.Open();
-                }
-            }
-
-            return _sharedConnection;
+            var conn = new NpgsqlConnection(_connectionString);
+            conn.Open();
+            return conn;
         }
-
-
-
-
     }
 }

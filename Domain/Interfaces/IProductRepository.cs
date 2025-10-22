@@ -6,6 +6,5 @@ namespace BookstoreManagementSystem.Domain.Interfaces
 {
     public interface IProductRepository : IDataBase<Product>
     {
-        // Métodos adicionales específicos de Product
     }
 }

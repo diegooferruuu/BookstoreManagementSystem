@@ -9,18 +9,12 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 {
     public class ProductRepository : IProductRepository
     {
-        private readonly NpgsqlConnection _connection;
-
-        public ProductRepository()
-        {
-            _connection = DataBaseConnection.Instance.GetConnection();
-        }
-
         public void Create(Product product)
         {
+            using var conn = DataBaseConnection.Instance.GetConnection();
             using var cmd = new NpgsqlCommand(@"
         INSERT INTO products (name, description, category_id, price, stock)
-        VALUES (@name, @description, @category_id, @price, @stock)", _connection);
+        VALUES (@name, @description, @category_id, @price, @stock)", conn);
 
             cmd.Parameters.AddWithValue("@name", product.Name);
             cmd.Parameters.AddWithValue("@description", product.Description ?? (object)DBNull.Value);
@@ -38,11 +32,12 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 
         public Product? Read(Guid id)
         {
+            using var conn = DataBaseConnection.Instance.GetConnection();
             using var cmd = new NpgsqlCommand(@"
             SELECT p.*, c.name AS category_name 
             FROM products p 
             LEFT JOIN categories c ON p.category_id = c.id 
-            WHERE p.id = @id", _connection);
+            WHERE p.id = @id", conn);
 
             cmd.Parameters.AddWithValue("@id", NpgsqlTypes.NpgsqlDbType.Uuid, id);
 
@@ -79,6 +74,7 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 
         public void Update(Product product)
         {
+            using var conn = DataBaseConnection.Instance.GetConnection();
             using var cmd = new NpgsqlCommand(@"
                 UPDATE products SET 
                     name = @name,
@@ -86,7 +82,7 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
                     category_id = @category_id,
                     price = @price,
                     stock = @stock
-                WHERE id = @id", _connection);
+                WHERE id = @id", conn);
 
             cmd.Parameters.AddWithValue("@id", product.Id);
             cmd.Parameters.AddWithValue("@name", product.Name);
@@ -106,7 +102,8 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
 
         public void Delete(Guid id)
         {
-            using var cmd = new NpgsqlCommand("UPDATE products SET is_active = FALSE WHERE id = @id", _connection);
+            using var conn = DataBaseConnection.Instance.GetConnection();
+            using var cmd = new NpgsqlCommand("UPDATE products SET is_active = FALSE WHERE id = @id", conn);
             cmd.Parameters.AddWithValue("@id",NpgsqlTypes.NpgsqlDbType.Uuid, id);
             cmd.ExecuteNonQuery();
         }
@@ -114,12 +111,13 @@ namespace BookstoreManagementSystem.Infrastructure.Repositories
         public List<Product> GetAll()
         {
             var products = new List<Product>();
+            using var conn = DataBaseConnection.Instance.GetConnection();
             using var cmd = new NpgsqlCommand(@"
                 SELECT p.*, c.name as category_name 
                 FROM products p 
                 LEFT JOIN categories c ON p.category_id = c.id
                 WHERE p.is_active = TRUE
-                ORDER BY p.name", _connection);
+                ORDER BY p.name", conn);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {

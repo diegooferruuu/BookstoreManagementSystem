@@ -26,7 +26,6 @@ namespace BookstoreManagementSystem.Application.Services
             _repository.Create(client);
         }
 
-        // Opcional: exposición del patrón Result sin cambiar la firma existente
         public Result<bool> CreateResult(Client client)
         {
             var list = ClientValidation.Validate(client).ToList();

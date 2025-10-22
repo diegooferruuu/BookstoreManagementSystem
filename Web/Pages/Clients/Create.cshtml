@@ -1,5 +1,4 @@
-﻿
-@page
+﻿@page
 @model BookstoreManagementSystem.Pages.Clients.CreateModel
 @{
     ViewData["Title"] = "Añadir cliente";
@@ -32,13 +31,18 @@
                 <span asp-validation-for="Client.Email" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label class="form-label">Telefono</label>
+                <label class="form-label">Teléfono</label>
                 <input asp-for="Client.Phone" class="form-control" />
                 <span asp-validation-for="Client.Phone" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label class="form-label">Direccion</label>
-                <input asp-for="Client.Address" class="form-control" />
+                <label class="form-label">Dirección</label>
+                <input asp-for="Client.Address" class="form-control"
+                       data-val="true"
+                       data-val-length="La dirección no debe superar 60 caracteres."
+                       data-val-length-max="60"
+                       data-val-addresscbba="true"
+                       data-val-addresscbba-msg="Dirección inválida. Ej.: 'Av. América Este N1759', 'Calle Corrales S/N', 'No. 1234'." />
                 <span asp-validation-for="Client.Address" class="text-danger"></span>
             </div>
             <div class="d-flex gap-2">
@@ -48,3 +52,7 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -12,7 +12,7 @@ namespace BookstoreManagementSystem.Pages.Distributors
 
         public List<Distributor> Distributors { get; set; } = new();
 
-        public IndexModel() // Cambia el constructor para que no requiera inyección
+        public IndexModel()
         {
             _service = new DistributorService(new DistributorRepository());
         }

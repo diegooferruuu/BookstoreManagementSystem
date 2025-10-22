@@ -16,7 +16,6 @@ using BookstoreManagementSystem.Domain.Validations;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorPages()
     .AddRazorPagesOptions(options =>
     {
@@ -129,18 +128,15 @@ builder.Services.AddRateLimiter(_ => _.AddPolicy("login", httpContext =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 
-// Seed roles/admin on startup (await to ensure availability)
 await BookstoreManagementSystem.Infrastructure.DataBase.Scripts.AuthSeed.EnsureAuthSeedAsync();
 
 app.UseHttpsRedirection();
-// Middleware global para convertir ValidationException en 400 JSON para llamadas API/Postman
 app.Use(async (context, next) =>
 {
     try
@@ -161,7 +157,6 @@ app.Use(async (context, next) =>
             return;
         }
 
-        // No es una petición API/JSON: rethrow para que Razor Pages o el handler predeterminado puedan procesarla
         throw;
     }
 });
@@ -176,7 +171,6 @@ app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
 
-// Minimal API: /api/auth/login
 app.MapPost("/api/auth/login", async (IJwtAuthService auth, AuthRequestDto req, HttpContext http, CancellationToken ct) =>
 {
     var result = await auth.SignInAsync(req, ct);
@@ -185,7 +179,6 @@ app.MapPost("/api/auth/login", async (IJwtAuthService auth, AuthRequestDto req, 
         : Results.Unauthorized();
 }).RequireRateLimiting("login").AllowAnonymous();
 
-// Dev-only endpoint to run Auth seed on demand
 if (app.Environment.IsDevelopment())
 {
     app.MapPost("/api/dev/seed-auth", async (CancellationToken ct) =>

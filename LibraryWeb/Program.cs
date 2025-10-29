@@ -15,6 +15,7 @@ using ServiceClients.Application.Services;
 using ServiceClients.Infrastructure.Repositories;
 using ServiceUsers.Domain.Interfaces;
 using ServiceUsers.Application.Services;
+using ServiceUsers.Application.Facade;
 using ServiceUsers.Infrastructure.Auth;
 using ServiceUsers.Infrastructure.Repositories;
 using ServiceUsers.Infrastructure.Security;
@@ -75,6 +76,7 @@ builder.Services.AddSingleton<IPasswordGenerator, SecurePasswordGenerator>();
 builder.Services.AddSingleton<IUsernameGenerator, UsernameGenerator>();
 builder.Services.AddSingleton<ITokenGenerator, JwtTokenGenerator>();
 builder.Services.AddSingleton<IJwtAuthService, JwtAuthService>();
+builder.Services.AddScoped<IUserFacade, UserFacade>();
 
 builder.Services.AddSingleton<IProductRepository, ProductRepository>();
 builder.Services.AddSingleton<ServiceProducts.Domain.Interfaces.ICategoryRepository, CategoryRepository>();
@@ -163,14 +165,16 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapRazorPages();
 
-app.MapPost("/api/auth/login", async (IJwtAuthService auth, ServiceUsers.Application.DTOs.AuthRequestDto req, CancellationToken ct) =>
+// Login API usando la fachada
+app.MapPost("/api/auth/login", async (IUserFacade facade, ServiceUsers.Application.DTOs.AuthRequestDto req, CancellationToken ct) =>
 {
-    var result = await auth.SignInAsync(req, ct);
-    return result.IsSuccess && result.Value is not null
-        ? Results.Ok(result.Value)
+    var token = await facade.LoginAsync(req, ct);
+    return token is not null
+        ? Results.Ok(token)
         : Results.Unauthorized();
 }).AllowAnonymous();
 
+// Seed de usuario admin
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<IDataBase>();
@@ -218,6 +222,5 @@ using (var scope = app.Services.CreateScope())
         linkCmd.ExecuteNonQuery();
     }
 }
-
 
 app.Run();

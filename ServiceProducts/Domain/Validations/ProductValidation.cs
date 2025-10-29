@@ -1,38 +1,15 @@
-using System.Collections.Generic;
 using ServiceProducts.Domain.Models;
 using ServiceProducts.Domain.Interfaces;
 using ServiceCommon.Domain.Validations;
-using System.Linq;
+using ServiceCommon.Domain.Results;
 
 namespace ServiceProducts.Domain.Validations
 {
     public static class ProductValidation
     {
-        private const int DescriptionMaxLength = 120;
-        private const int NameMaxLength = 80;
-
-        public const decimal MaxPrice = 9999m;
-
-        public static bool IsValidName(string? s)
-        {
-            return !TextRules.GetProductNameErrors(s).Any();
-        }
-
-        public static bool IsValidCategoryId(Guid s, ICategoryRepository categoryRepository)
-        {
-            if (s == Guid.Empty) return false;
-            var category = categoryRepository.Read(s);
-            return category != null;
-        }
-
-        public static bool IsValidDescriptionContent(string? s)
-        {
-            return TextRules.IsValidProductDescriptionLoose(s);
-        }
-
-        public static bool IsValidPrice(decimal? price) => price.HasValue && price.Value > 0m && price.Value <= MaxPrice;
-
-        public static bool IsValidStock(int? stock) => stock.HasValue && stock.Value >= 0;
+        private const int DescriptionMaxLength = 500;
+        private const int NameMaxLength = 100;
+        public const decimal MaxPrice = 999999.99m;
 
         public static void Normalize(Product p)
         {
@@ -43,59 +20,46 @@ namespace ServiceProducts.Domain.Validations
 
         public static IEnumerable<ValidationError> Validate(Product p, ICategoryRepository categoryRepository)
         {
-            var nName = TextRules.NormalizeSpaces(p.Name);
-            if (!string.IsNullOrEmpty(nName) && nName.Length > NameMaxLength)
-            {
+            var nameTrim = TextRules.NormalizeSpaces(p.Name);
+            if (string.IsNullOrWhiteSpace(nameTrim))
+                yield return new ValidationError(nameof(p.Name), "El nombre es obligatorio.");
+            else if (nameTrim.Length > NameMaxLength)
                 yield return new ValidationError(nameof(p.Name), $"El nombre no debe superar {NameMaxLength} caracteres.");
-            }
             else
             {
-                var nameErrors = TextRules.GetProductNameErrors(p.Name).ToList();
-                foreach (var msg in nameErrors)
+                foreach (var msg in TextRules.GetProductNameErrors(p.Name))
                     yield return new ValidationError(nameof(p.Name), msg);
             }
 
-            if (!IsValidCategoryId(p.CategoryId, categoryRepository))
-                yield return new ValidationError(nameof(p.CategoryId),
-                    "Categoría inválida.");
+            if (p.CategoryId == Guid.Empty || categoryRepository.Read(p.CategoryId) == null)
+                yield return new ValidationError(nameof(p.CategoryId), "Debe seleccionar una categoría válida.");
 
-            var descNorm = TextRules.NormalizeSpaces(p.Description);
-            if (!string.IsNullOrEmpty(descNorm) && descNorm.Length > DescriptionMaxLength)
-            {
-                yield return new ValidationError(nameof(p.Description),
-                    $"La descripción no debe superar {DescriptionMaxLength} caracteres.");
-            }
-            else if (!IsValidDescriptionContent(p.Description))
-            {
-                yield return new ValidationError(nameof(p.Description),
-                    "Descripción inválida. Letras, números, espacios, puntos y comas.");
-            }
+            var descTrim = TextRules.NormalizeSpaces(p.Description);
+            if (string.IsNullOrWhiteSpace(descTrim))
+                yield return new ValidationError(nameof(p.Description), "La descripción es obligatoria.");
+            else if (descTrim.Length > DescriptionMaxLength)
+                yield return new ValidationError(nameof(p.Description), $"La descripción no debe superar {DescriptionMaxLength} caracteres.");
+            else if (!TextRules.IsValidProductDescriptionLoose(descTrim))
+                yield return new ValidationError(nameof(p.Description), "La descripción contiene caracteres inválidos.");
 
             if (p.Price <= 0)
-            {
-                yield return new ValidationError(nameof(p.Price),
-                    "Precio inválido. Debe ser mayor a 0.");
-            }
+                yield return new ValidationError(nameof(p.Price), "El precio debe ser mayor a 0.");
             else if (p.Price > MaxPrice)
-            {
-                yield return new ValidationError(nameof(p.Price),
-                    $"El precio no debe superar {MaxPrice}.");
-            }
+                yield return new ValidationError(nameof(p.Price), $"El precio no debe superar {MaxPrice}.");
 
-            if (!IsValidStock(p.Stock))
-                yield return new ValidationError(nameof(p.Stock),
-                    "Stock inválido. No puede ser negativo.");
+            if (p.Stock < 0)
+                yield return new ValidationError(nameof(p.Stock), "El stock no puede ser negativo.");
         }
 
-        public static ServiceCommon.Domain.Results.Result ValidateAsResult(Product p, ICategoryRepository categoryRepository)
-            => ServiceCommon.Domain.Results.Result.FromValidation(Validate(p, categoryRepository));
+        public static Result ValidateAsResult(Product p, ICategoryRepository categoryRepository)
+            => Result.FromValidation(Validate(p, categoryRepository));
 
-        public static ServiceCommon.Domain.Results.Result<Product> ValidateAndWrap(Product p, ICategoryRepository categoryRepository)
+        public static Result<Product> ValidateAndWrap(Product p, ICategoryRepository categoryRepository)
         {
             var errors = Validate(p, categoryRepository).ToList();
             return errors.Count == 0
-                ? ServiceCommon.Domain.Results.Result<Product>.Ok(p)
-                : ServiceCommon.Domain.Results.Result<Product>.FromErrors(errors);
+                ? Result<Product>.Ok(p)
+                : Result<Product>.FromErrors(errors);
         }
     }
 }

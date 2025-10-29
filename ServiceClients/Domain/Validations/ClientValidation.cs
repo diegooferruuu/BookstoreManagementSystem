@@ -1,66 +1,75 @@
 using ServiceClients.Domain.Models;
+using ServiceCommon.Domain.Results;
 using ServiceCommon.Domain.Validations;
 
 namespace ServiceClients.Domain.Validations
 {
     public static class ClientValidation
     {
-        public static bool IsValidSingleWordName(string? s) =>
-            TextRules.IsSingleWordLettersOnly(s) && TextRules.MinLen(s, 3) && TextRules.MaxLen(s, 15);
-
-        public static bool IsValidOptionalSingleWord(string? s) =>
-            string.IsNullOrWhiteSpace(s) || IsValidSingleWordName(s);
-
-        public static bool IsValidEmail(string? s) =>
-            !string.IsNullOrWhiteSpace(s) && TextRules.MaxLen(s, 100);
-
-        public static bool IsValidPhone(string? s) =>
-            !string.IsNullOrWhiteSpace(s) && TextRules.IsDigitsOnly(s) && TextRules.LenEquals(s, 8);
-
-        public static bool IsValidAddress(string? s)
-        {
-            if (string.IsNullOrWhiteSpace(s)) return true;
-            var n = TextRules.NormalizeSpaces(s);
-            if (!TextRules.IsValidCbbaAddress(n)) return false;
-            return TextRules.MaxLen(n, 60);
-        }
+        private const int FirstNameMaxLength = 50;
+        private const int LastNameMaxLength = 100;
+        private const int EmailMaxLength = 150;
+        private const int AddressMaxLength = 200;
 
         public static void Normalize(Client c)
         {
-            c.FirstName = TextRules.CanonicalTitle(c.FirstName);
-            c.LastName = TextRules.CanonicalTitle(c.LastName);
-            if (!string.IsNullOrWhiteSpace(c.MiddleName))
-                c.MiddleName = TextRules.CanonicalTitle(c.MiddleName);
-
-            if (!string.IsNullOrWhiteSpace(c.Address))
-                c.Address = TextRules.CanonicalTitle(c.Address);
+            c.FirstName = TextRules.CanonicalPersonName(c.FirstName);
+            c.LastName = TextRules.CanonicalPersonName(c.LastName);
+            c.Email = c.Email?.Trim().ToLowerInvariant() ?? string.Empty;
+            c.Phone = TextRules.NormalizeSpaces(c.Phone);
+            c.Address = TextRules.CanonicalSentence(c.Address);
         }
 
         public static IEnumerable<ValidationError> Validate(Client c)
         {
-            if (!IsValidSingleWordName(c.FirstName))
-                yield return new ValidationError(nameof(c.FirstName),
-                    "Nombre inválido. Solo letras. Una palabra. Mínimo 3 letras.");
+            var first = TextRules.NormalizeSpaces(c.FirstName);
+            if (string.IsNullOrWhiteSpace(first))
+                yield return new ValidationError(nameof(c.FirstName), "El nombre es obligatorio.");
+            else if (first.Contains(' '))
+                yield return new ValidationError(nameof(c.FirstName), "El nombre no debe contener espacios.");
+            else if (first.Length > FirstNameMaxLength)
+                yield return new ValidationError(nameof(c.FirstName), $"El nombre no debe superar {FirstNameMaxLength} caracteres.");
+            else if (!TextRules.IsValidLettersOnly(first))
+                yield return new ValidationError(nameof(c.FirstName), "El nombre solo puede contener letras.");
 
-            if (!(TextRules.IsCompoundLastName(c.LastName) || IsValidSingleWordName(c.LastName)))
-                yield return new ValidationError(nameof(c.LastName),
-                    "Apellido inválido. Solo letras. Acepta compuesto con partículas. Mínimo 3 en partes principales.");
+            var last = TextRules.NormalizeSpaces(c.LastName);
+            if (string.IsNullOrWhiteSpace(last))
+                yield return new ValidationError(nameof(c.LastName), "El apellido es obligatorio.");
+            else if (last.Length > LastNameMaxLength)
+                yield return new ValidationError(nameof(c.LastName), $"El apellido no debe superar {LastNameMaxLength} caracteres.");
+            else if (!TextRules.IsValidLettersAndSpaces(last))
+                yield return new ValidationError(nameof(c.LastName), "El apellido solo puede contener letras y espacios.");
 
-            if (!IsValidOptionalSingleWord(c.MiddleName))
-                yield return new ValidationError(nameof(c.MiddleName),
-                    "Segundo nombre inválido. Solo letras. Una palabra. Mínimo 3 letras.");
+            var email = c.Email?.Trim();
+            if (string.IsNullOrWhiteSpace(email))
+                yield return new ValidationError(nameof(c.Email), "El correo electrónico es obligatorio.");
+            else if (email.Length > EmailMaxLength)
+                yield return new ValidationError(nameof(c.Email), $"El correo no debe superar {EmailMaxLength} caracteres.");
+            else if (!TextRules.IsValidEmail(email))
+                yield return new ValidationError(nameof(c.Email), "Debe ingresar un correo electrónico válido.");
 
-            if (!string.IsNullOrWhiteSpace(c.Email) && !IsValidEmail(c.Email))
-                yield return new ValidationError(nameof(c.Email),
-                    "Correo inválido.");
+            var phone = TextRules.NormalizeSpaces(c.Phone);
+            if (string.IsNullOrWhiteSpace(phone))
+                yield return new ValidationError(nameof(c.Phone), "El número de teléfono es obligatorio.");
+            else if (!System.Text.RegularExpressions.Regex.IsMatch(phone, @"^\d{8}$"))
+                yield return new ValidationError(nameof(c.Phone), "El número de teléfono debe tener exactamente 8 dígitos.");
 
-            if (!string.IsNullOrWhiteSpace(c.Phone) && !IsValidPhone(c.Phone))
-                yield return new ValidationError(nameof(c.Phone),
-                    "Teléfono inválido. Debe tener 8 dígitos.");
+            var address = TextRules.NormalizeSpaces(c.Address);
+            if (string.IsNullOrWhiteSpace(address))
+                yield return new ValidationError(nameof(c.Address), "La dirección es obligatoria.");
+            else if (address.Length > AddressMaxLength)
+                yield return new ValidationError(nameof(c.Address), $"La dirección no debe superar {AddressMaxLength} caracteres.");
+        }
 
-            if (!string.IsNullOrWhiteSpace(c.Address) && !IsValidAddress(c.Address))
-                yield return new ValidationError(nameof(c.Address),
-                    "Dirección inválida. Solo letras, números, espacios, punto y '/'.");
+        public static Result ValidateAsResult(Client c)
+            => Result.FromValidation(Validate(c));
+
+        public static Result<Client> ValidateAndWrap(Client c)
+        {
+            var errors = Validate(c).ToList();
+            return errors.Count == 0
+                ? Result<Client>.Ok(c)
+                : Result<Client>.FromErrors(errors);
         }
     }
 }

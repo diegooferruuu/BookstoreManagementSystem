@@ -2,8 +2,6 @@ using ServiceProducts.Domain.Interfaces;
 using ServiceProducts.Domain.Models;
 using ServiceProducts.Domain.Validations;
 using ServiceCommon.Application.Services;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace ServiceProducts.Application.Services
 {

@@ -1,121 +1,63 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using ServiceDistributors.Domain.Models;
+using ServiceCommon.Domain.Results;
 using ServiceCommon.Domain.Validations;
 
 namespace ServiceDistributors.Domain.Validations
 {
     public static class DistributorValidation
     {
-        private static readonly Regex RxNameAllowed =
-            new Regex(@"^[A-Za-zÁÉÍÓÚÑáéíóúÜüñ0-9&.' \-]+$", RegexOptions.Compiled);
-
-        private static readonly HashSet<string> Connectors = new(System.StringComparer.OrdinalIgnoreCase)
-        {
-            "de","del","la","las","los","el","y","en","para","por","con","san","santa"
-        };
-
-        private static readonly HashSet<string> LegalSuffixes = new(System.StringComparer.OrdinalIgnoreCase)
-        {
-            "SRL","SA","LTDA","EIRL","CIA","CÍA"
-        };
-
-        public static bool IsValidName(string? s)
-        {
-            if (string.IsNullOrWhiteSpace(s)) return false;
-            var n = TextRules.NormalizeSpaces(s);
-            if (!RxNameAllowed.IsMatch(n)) return false;
-            if (!TextRules.MaxLen(n, 60)) return false;
-
-            var tokens = n.Split(' ', System.StringSplitOptions.RemoveEmptyEntries);
-            var hasMainWord = false;
-            for (int i = 0; i < tokens.Length; i++)
-            {
-                var raw = tokens[i];
-                if (Connectors.Contains(raw)) continue;
-
-                var noDots = raw.Replace(".", string.Empty).ToUpperInvariant();
-                if (LegalSuffixes.Contains(noDots)) continue;
-
-                if (raw.All(char.IsLetter))
-                {
-                    if (raw.Length < 3) return false;
-                    hasMainWord = true;
-                    continue;
-                }
-                if (raw.All(char.IsDigit))
-                {
-                    continue;
-                }
-
-                string[] segs = raw.Split(new[] { '&', '-', '\'', }, System.StringSplitOptions.RemoveEmptyEntries);
-                if (segs.Length == 0) return false;
-                bool allSegsOk = true;
-                int lettersInToken = 0;
-                foreach (var seg in segs)
-                {
-                    if (string.IsNullOrWhiteSpace(seg)) { allSegsOk = false; break; }
-                    var allValidChars = seg.All(ch => char.IsLetterOrDigit(ch));
-                    if (!allValidChars) { allSegsOk = false; break; }
-                    lettersInToken += seg.Count(char.IsLetter);
-                }
-                if (!allSegsOk) return false;
-                if (lettersInToken >= 3) hasMainWord = true;
-            }
-
-            return hasMainWord;
-        }
-
-        public static bool IsValidEmail(string? s) =>
-            !string.IsNullOrWhiteSpace(s) && TextRules.IsValidEmail(s) && TextRules.MaxLen(s, 100);
-
-        public static bool IsValidPhone(string? s) =>
-            !string.IsNullOrWhiteSpace(s) && TextRules.IsDigitsOnly(s) && TextRules.LenEquals(s, 8);
-
-        public static bool IsValidAddress(string? s)
-        {
-            if (string.IsNullOrWhiteSpace(s)) return true;
-            var n = TextRules.NormalizeSpaces(s);
-            if (!TextRules.IsValidCbbaAddress(n)) return false;
-            return TextRules.MaxLen(n, 60);
-        }
+        private const int NameMaxLength = 100;
+        private const int EmailMaxLength = 150;
+        private const int AddressMaxLength = 200;
 
         public static void Normalize(Distributor d)
         {
-            d.Name = TextRules.CanonicalBusinessName(d.Name);
-            if (!string.IsNullOrWhiteSpace(d.Address))
-                d.Address = TextRules.CanonicalTitle(d.Address);
+            d.Name = TextRules.CanonicalSentence(d.Name);
+            d.ContactEmail = d.ContactEmail?.Trim().ToLowerInvariant() ?? string.Empty;
+            d.Phone = TextRules.NormalizeSpaces(d.Phone);
+            d.Address = TextRules.CanonicalSentence(d.Address);
         }
 
         public static IEnumerable<ValidationError> Validate(Distributor d)
         {
-            if (!IsValidName(d.Name))
-                yield return new ValidationError(nameof(d.Name),
-                    "Nombre inválido. Solo letras, dígitos, espacios y & . - '. Conectores 'de/del/la/…' permitidos. Debe incluir al menos una palabra principal (≥3 letras).");
+            var name = TextRules.NormalizeSpaces(d.Name);
+            if (string.IsNullOrWhiteSpace(name))
+                yield return new ValidationError(nameof(d.Name), "El nombre es obligatorio.");
+            else if (name.Length > NameMaxLength)
+                yield return new ValidationError(nameof(d.Name), $"El nombre no debe superar {NameMaxLength} caracteres.");
+            else if (!TextRules.IsValidProductDescriptionLoose(name))
+                yield return new ValidationError(nameof(d.Name), "El nombre contiene caracteres inválidos.");
 
-            if (!IsValidEmail(d.ContactEmail))
-                yield return new ValidationError(nameof(d.ContactEmail),
-                    "Correo inválido.");
+            var email = d.ContactEmail?.Trim();
+            if (string.IsNullOrWhiteSpace(email))
+                yield return new ValidationError(nameof(d.ContactEmail), "El correo electrónico es obligatorio.");
+            else if (email.Length > EmailMaxLength)
+                yield return new ValidationError(nameof(d.ContactEmail), $"El correo no debe superar {EmailMaxLength} caracteres.");
+            else if (!TextRules.IsValidEmail(email))
+                yield return new ValidationError(nameof(d.ContactEmail), "Debe ingresar un correo electrónico válido.");
 
-            if (!IsValidPhone(d.Phone))
-                yield return new ValidationError(nameof(d.Phone),
-                    "Teléfono inválido. Debe tener 8 dígitos.");
+            var phone = TextRules.NormalizeSpaces(d.Phone);
+            if (string.IsNullOrWhiteSpace(phone))
+                yield return new ValidationError(nameof(d.Phone), "El teléfono es obligatorio.");
+            else if (!System.Text.RegularExpressions.Regex.IsMatch(phone, @"^\d{8}$"))
+                yield return new ValidationError(nameof(d.Phone), "El teléfono debe tener exactamente 8 dígitos.");
 
-            if (!IsValidAddress(d.Address))
-                yield return new ValidationError(nameof(d.Address),
-                    "Dirección inválida. Formatos comunes: 'Av. América Este N1759', 'Calle Corrales S/N', 'No. 1234'. Solo letras, números, espacios, punto y '/'.");
+            var address = TextRules.NormalizeSpaces(d.Address);
+            if (string.IsNullOrWhiteSpace(address))
+                yield return new ValidationError(nameof(d.Address), "La dirección es obligatoria.");
+            else if (address.Length > AddressMaxLength)
+                yield return new ValidationError(nameof(d.Address), $"La dirección no debe superar {AddressMaxLength} caracteres.");
         }
 
-        public static ServiceCommon.Domain.Results.Result ValidateAsResult(Distributor d)
-            => ServiceCommon.Domain.Results.Result.FromValidation(Validate(d));
+        public static Result ValidateAsResult(Distributor d)
+            => Result.FromValidation(Validate(d));
 
-        public static ServiceCommon.Domain.Results.Result<Distributor> ValidateAndWrap(Distributor d)
+        public static Result<Distributor> ValidateAndWrap(Distributor d)
         {
             var errors = Validate(d).ToList();
             return errors.Count == 0
-                ? ServiceCommon.Domain.Results.Result<Distributor>.Ok(d)
-                : ServiceCommon.Domain.Results.Result<Distributor>.FromErrors(errors);
+                ? Result<Distributor>.Ok(d)
+                : Result<Distributor>.FromErrors(errors);
         }
     }
 }

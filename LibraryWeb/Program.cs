@@ -1,7 +1,10 @@
 using System.Text;
+using System.Globalization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Http;
 using ServiceCommon.Domain.Services;
 using ServiceCommon.Infrastructure.DataBase;
 using ServiceCommon.Domain.Interfaces;
@@ -21,11 +24,9 @@ using ServiceProducts.Infrastructure.Repositories;
 using ServiceDistributors.Domain.Interfaces;
 using ServiceDistributors.Application.Services;
 using ServiceDistributors.Infrastructure.Repositories;
-using Microsoft.AspNetCore.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add Razor Pages
 builder.Services.AddRazorPages()
     .AddRazorPagesOptions(options =>
     {
@@ -33,46 +34,55 @@ builder.Services.AddRazorPages()
         options.Conventions.AllowAnonymousToPage("/Auth/Login");
         options.Conventions.AllowAnonymousToPage("/Auth/Logout");
         options.Conventions.AllowAnonymousToPage("/Index");
+    })
+    .AddMvcOptions(options =>
+    {
+        options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "Debe seleccionar una categoría.");
+        options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((x, y) => "El valor ingresado no es válido.");
+        options.ModelBindingMessageProvider.SetMissingBindRequiredValueAccessor(x => $"Falta el valor para {x}.");
     });
 
-// Get connection string and create singleton database connection
+var cultureInfo = new CultureInfo("es-ES");
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = new RequestCulture(cultureInfo);
+});
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 var database = DataBaseConnection.GetInstance(connectionString);
 builder.Services.AddSingleton<IDataBase>(database);
 
-// Configure JWT
 var jwtSection = builder.Configuration.GetSection("Jwt");
-var jwtOptions = jwtSection.Get<ServiceUsers.Infrastructure.Auth.JwtOptions>() 
+var jwtOptions = jwtSection.Get<ServiceUsers.Infrastructure.Auth.JwtOptions>()
     ?? new ServiceUsers.Infrastructure.Auth.JwtOptions();
 builder.Services.AddSingleton(jwtOptions);
 
-// Configure SendGrid
 var sendGridSection = builder.Configuration.GetSection("SendGrid");
-var sendGridOptions = sendGridSection.Get<SendGridOptions>() 
+var sendGridOptions = sendGridSection.Get<SendGridOptions>()
     ?? new SendGridOptions();
 builder.Services.AddSingleton(sendGridOptions);
 builder.Services.AddSingleton<IEmailService, SendGridEmailService>();
 
-// Register Services
 builder.Services.AddSingleton<IClientRepository, ClientRepository>();
 builder.Services.AddSingleton<IClientService, ClientService>();
 
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IUserService, ServiceUsers.Application.Services.UserService>();
-builder.Services.AddSingleton<IPasswordGenerator, ServiceUsers.Infrastructure.Security.SecurePasswordGenerator>();
-builder.Services.AddSingleton<IUsernameGenerator, ServiceUsers.Infrastructure.Security.UsernameGenerator>();
+builder.Services.AddSingleton<IPasswordGenerator, SecurePasswordGenerator>();
+builder.Services.AddSingleton<IUsernameGenerator, UsernameGenerator>();
 builder.Services.AddSingleton<ITokenGenerator, JwtTokenGenerator>();
 builder.Services.AddSingleton<IJwtAuthService, JwtAuthService>();
 
-builder.Services.AddSingleton<IProductRepository, ServiceProducts.Infrastructure.Repositories.ProductRepository>();
-builder.Services.AddSingleton<ServiceProducts.Domain.Interfaces.ICategoryRepository, ServiceProducts.Infrastructure.Repositories.CategoryRepository>();
-builder.Services.AddSingleton<IProductService, ServiceProducts.Application.Services.ProductService>();
+builder.Services.AddSingleton<IProductRepository, ProductRepository>();
+builder.Services.AddSingleton<ServiceProducts.Domain.Interfaces.ICategoryRepository, CategoryRepository>();
+builder.Services.AddSingleton<IProductService, ProductService>();
 
-builder.Services.AddSingleton<IDistributorRepository, ServiceDistributors.Infrastructure.Repositories.DistributorRepository>();
-builder.Services.AddSingleton<IDistributorService, ServiceDistributors.Application.Services.DistributorService>();
+builder.Services.AddSingleton<IDistributorRepository, DistributorRepository>();
+builder.Services.AddSingleton<IDistributorService, DistributorService>();
 
-// Configure Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = "AppScheme";
@@ -123,7 +133,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-// Middleware for validation exceptions
 app.Use(async (context, next) =>
 {
     try
@@ -154,7 +163,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapRazorPages();
 
-// API Endpoints
 app.MapPost("/api/auth/login", async (IJwtAuthService auth, ServiceUsers.Application.DTOs.AuthRequestDto req, CancellationToken ct) =>
 {
     var result = await auth.SignInAsync(req, ct);

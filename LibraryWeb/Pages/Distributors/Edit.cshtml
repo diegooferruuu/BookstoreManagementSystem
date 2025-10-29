@@ -1,0 +1,50 @@
+@page
+@model LibraryWeb.Pages.Distributors.EditModel
+@{
+    ViewData["Title"] = "Editar Distribuidor";
+}
+
+<h3 class="mb-3 text-primary">Editar Distribuidor</h3>
+
+<form method="post" novalidate>
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <input type="hidden" asp-for="Distributor.Id" />
+
+    <div class="mb-3">
+        <label asp-for="Distributor.Name" class="form-label"></label>
+        <input asp-for="Distributor.Name" class="form-control" />
+        <span asp-validation-for="Distributor.Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Distributor.ContactEmail" class="form-label"></label>
+        <input asp-for="Distributor.ContactEmail" class="form-control" />
+        <span asp-validation-for="Distributor.ContactEmail" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Distributor.Phone" class="form-label"></label>
+        <input asp-for="Distributor.Phone" class="form-control" />
+        <span asp-validation-for="Distributor.Phone" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Distributor.Address" class="form-label"></label>
+        <textarea asp-for="Distributor.Address" class="form-control"></textarea>
+        <span asp-validation-for="Distributor.Address" class="text-danger"></span>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-save"></i> Guardar
+        </button>
+        <a asp-page="Index" class="btn btn-secondary">
+            <i class="bi bi-x-lg"></i> Cancelar
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

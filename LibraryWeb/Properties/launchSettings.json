@@ -1,12 +1,12 @@
 {
   "profiles": {
-    "BookstoreManagementSystem": {
+    "LibraryWeb": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://localhost:65154;http://localhost:65156"
+      "applicationUrl": "https://localhost:65155;http://localhost:65157"
     }
   }
 }

@@ -171,4 +171,53 @@ app.MapPost("/api/auth/login", async (IJwtAuthService auth, ServiceUsers.Applica
         : Results.Unauthorized();
 }).AllowAnonymous();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<IDataBase>();
+    using var conn = db.GetConnection();
+
+    var checkAdminSql = "SELECT COUNT(*) FROM users WHERE LOWER(username)='admin'";
+    using var checkCmd = new Npgsql.NpgsqlCommand(checkAdminSql, conn);
+    var count = (long)checkCmd.ExecuteScalar()!;
+
+    if (count == 0)
+    {
+        var passwordHasher = new Microsoft.AspNetCore.Identity.PasswordHasher<ServiceUsers.Domain.Models.User>();
+        var admin = new ServiceUsers.Domain.Models.User
+        {
+            Id = Guid.NewGuid(),
+            Username = "admin",
+            Email = "admin@local",
+            FirstName = "Administrador",
+            LastName = "",
+            PasswordHash = passwordHasher.HashPassword(null!, "admin123456"),
+            IsActive = true
+        };
+
+        var insertUserSql = @"INSERT INTO users (id, username, email, first_name, last_name, middle_name, password_hash, is_active)
+                              VALUES (@id, @username, @email, @first, @last, NULL, @hash, TRUE)";
+        using var insertUserCmd = new Npgsql.NpgsqlCommand(insertUserSql, conn);
+        insertUserCmd.Parameters.AddWithValue("@id", admin.Id);
+        insertUserCmd.Parameters.AddWithValue("@username", admin.Username);
+        insertUserCmd.Parameters.AddWithValue("@email", admin.Email);
+        insertUserCmd.Parameters.AddWithValue("@first", admin.FirstName);
+        insertUserCmd.Parameters.AddWithValue("@last", admin.LastName);
+        insertUserCmd.Parameters.AddWithValue("@hash", admin.PasswordHash);
+        insertUserCmd.ExecuteNonQuery();
+
+        var ensureRoleSql = @"INSERT INTO roles (id, name)
+                              SELECT gen_random_uuid(), 'Admin'
+                              WHERE NOT EXISTS (SELECT 1 FROM roles WHERE name='Admin')";
+        using var ensureRoleCmd = new Npgsql.NpgsqlCommand(ensureRoleSql, conn);
+        ensureRoleCmd.ExecuteNonQuery();
+
+        var linkRoleSql = @"INSERT INTO user_roles (user_id, role_id)
+                            SELECT @userId, r.id FROM roles r WHERE r.name='Admin'";
+        using var linkCmd = new Npgsql.NpgsqlCommand(linkRoleSql, conn);
+        linkCmd.Parameters.AddWithValue("@userId", admin.Id);
+        linkCmd.ExecuteNonQuery();
+    }
+}
+
+
 app.Run();

@@ -81,7 +81,7 @@ namespace ServiceSales.Application.Services
 
             // Usar el director para construir el reporte
             var director = new ReportDirector(builder);
-            
+
             // Configurar el builder con todos los datos
             builder
                 .SetTitle(title)
@@ -90,8 +90,8 @@ namespace ServiceSales.Application.Services
                 .SetMetadata("Sistema de Ventas", $"Reporte de Ventas - {filterDescription}")
                 .SetCreatedBy(createdBy);
 
-            // Solo agregar gráfico en PDF si hay datos
-            if (reportType.ToLower() == "pdf" && chartData.Any())
+            // Agregar gráfico para ambos formatos si hay datos
+            if (chartData.Any())
             {
                 builder.SetChartData(chartData);
             }

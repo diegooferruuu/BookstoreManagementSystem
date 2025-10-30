@@ -35,18 +35,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages(options =>
 {
-    // Páginas accesibles sin autenticación
+    // Paginas accesibles sin autenticaciï¿½n
     options.Conventions.AllowAnonymousToPage("/Auth/Login");
     options.Conventions.AllowAnonymousToPage("/Auth/Logout");
     options.Conventions.AllowAnonymousToPage("/Users/ChangePassword");
 
-    // Todo lo demás requiere autenticación
+    // Todo lo dema requiere autenticaciï¿½n
     options.Conventions.AuthorizeFolder("/");
 })
 .AddMvcOptions(options =>
 {
-    options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "Debe seleccionar una categor�a.");
-    options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((x, y) => "El valor ingresado no es v�lido.");
+    options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "Debe seleccionar una categorï¿½a.");
+    options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((x, y) => "El valor ingresado no es vï¿½lido.");
     options.ModelBindingMessageProvider.SetMissingBindRequiredValueAccessor(x => $"Falta el valor para {x}.");
 });
 
@@ -156,7 +156,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapRazorPages();
 
-// Endpoint API de autenticaci�n
+// API de autenticacion (usa fachada)
 app.MapPost("/api/auth/login", async (IUserFacade facade, ServiceUsers.Application.DTOs.AuthRequestDto req, CancellationToken ct) =>
 {
     var token = await facade.LoginAsync(req, ct);

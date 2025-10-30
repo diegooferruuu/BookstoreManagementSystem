@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication;  // agrega esto
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -59,7 +59,11 @@ namespace LibraryWeb.Pages.Users
                 return Page();
             }
 
-            var regex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$");
+            // Mayúscula, minúscula, número y al menos un símbolo/puntuación Unicode. Longitud 8–64.
+            var regex = new Regex(
+                @"^(?=.*[a-záéíóúñç])(?=.*[A-ZÁÉÍÓÚÑÇ])(?=.*\d)(?=.*[\p{P}\p{S}]).{8,64}$",
+                RegexOptions.CultureInvariant
+            );
             if (!regex.IsMatch(NewPassword))
             {
                 ModelState.AddModelError(nameof(NewPassword),
@@ -75,14 +79,11 @@ namespace LibraryWeb.Pages.Users
                 return Page();
             }
 
-            // Actualizar hash de contraseña
             user.PasswordHash = _hasher.HashPassword(user, NewPassword);
             _userService.Update(user);
 
-            // Guardar mensaje de éxito
             TempData["SuccessMessage"] = "ok";
 
-            // Cerrar sesión actual
             await HttpContext.SignOutAsync();
 
             return Page();

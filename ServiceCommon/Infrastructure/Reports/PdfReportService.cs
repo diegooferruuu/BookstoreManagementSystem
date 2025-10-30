@@ -3,6 +3,7 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using ServiceCommon.Domain.Interfaces;
 using ServiceCommon.Domain.Models;
+using SkiaSharp;
 
 namespace ServiceCommon.Infrastructure.Reports
 {
@@ -127,25 +128,45 @@ namespace ServiceCommon.Infrastructure.Reports
                                 }
                             });
 
-                            // Gráfico de torta visual si hay datos
+                            // Gráfico de tortas si hay datos
                             if (_reportData.ChartData != null && _reportData.ChartData.Any())
                             {
                                 column.Item().PageBreak();
                                 
                                 column.Item().PaddingTop(20);
-                                column.Item().Text("Distribución de Ventas por Cliente")
+                                column.Item().Text("Gráfico de Tortas - Distribución de Ventas")
                                     .SemiBold()
                                     .FontSize(16)
                                     .FontColor(Colors.Blue.Medium);
                                 
                                 column.Item().PaddingTop(10);
-                                
-                                // Dibujar gráfico de barras horizontales como representación visual
-                                var total = _reportData.ChartData.Values.Sum();
-                                var colors = new[] 
-                                { 
-                                    Colors.Blue.Medium, 
-                                    Colors.Orange.Medium, 
+
+                                // Preparar datos y paleta de colores (máx. 8 categorías)
+                                var items = _reportData.ChartData
+                                    .OrderByDescending(x => x.Value)
+                                    .Take(8)
+                                    .ToList();
+
+                                var total = items.Sum(x => x.Value);
+
+                                // Paleta para Skia (imagen)
+                                var skiaColors = new SKColor[]
+                                {
+                                    SKColors.SteelBlue,
+                                    SKColors.Orange,
+                                    SKColors.MediumSeaGreen,
+                                    SKColors.IndianRed,
+                                    SKColors.MediumPurple,
+                                    SKColors.Teal,
+                                    SKColors.Indigo,
+                                    SKColors.HotPink
+                                };
+
+                                // Paleta para legendas en QuestPDF (mismo orden que Skia)
+                                var questColors = new[]
+                                {
+                                    Colors.Blue.Medium,
+                                    Colors.Orange.Medium,
                                     Colors.Green.Medium,
                                     Colors.Red.Medium,
                                     Colors.Purple.Medium,
@@ -153,37 +174,38 @@ namespace ServiceCommon.Infrastructure.Reports
                                     Colors.Indigo.Medium,
                                     Colors.Pink.Medium
                                 };
-                                
-                                var colorIndex = 0;
-                                foreach (var item in _reportData.ChartData.OrderByDescending(x => x.Value).Take(8))
+
+                                // Generar imagen del gráfico de tortas con SkiaSharp
+                                var pieImage = CreatePieChartImage(items, skiaColors);
+
+                                // Layout: gráfico + leyenda
+                                column.Item().Row(r =>
                                 {
-                                    var percentage = (double)item.Value / (double)total * 100;
-                                    var barWidth = percentage;
-                                    
-                                    column.Item().PaddingTop(8).Column(col =>
+                                    r.ConstantItem(320).Height(320).Image(pieImage).FitArea();
+
+                                    r.RelativeItem().PaddingLeft(20).Column(legend =>
                                     {
-                                        col.Item().Text($"{item.Key}")
-                                            .FontSize(10)
-                                            .SemiBold();
-                                        
-                                        col.Item().PaddingTop(3).Row(row =>
+                                        legend.Spacing(6);
+
+                                        for (int i = 0; i < items.Count; i++)
                                         {
-                                            row.RelativeItem((float)barWidth)
-                                                .Height(25)
-                                                .Background(colors[colorIndex % colors.Length])
-                                                .AlignMiddle()
-                                                .PaddingLeft(5)
-                                                .Text($"${item.Value:N2} ({percentage:F1}%)")
-                                                .FontSize(9)
-                                                .FontColor(Colors.White);
-                                            
-                                            if (barWidth < 100)
-                                                row.RelativeItem((float)(100 - barWidth));
-                                        });
+                                            var item = items[i];
+                                            var percentage = total == 0 ? 0 : (double)item.Value / (double)total * 100d;
+                                            var color = questColors[i % questColors.Length];
+
+                                            legend.Item().Row(row =>
+                                            {
+                                                row.ConstantItem(12).Height(12).Background(color).Border(1).BorderColor(Colors.Grey.Lighten1);
+                                                row.RelativeItem().PaddingLeft(6).Text($"{item.Key}: ${item.Value:N2} ({percentage:F1}%)");
+                                            });
+                                        }
                                     });
-                                    
-                                    colorIndex++;
-                                }
+                                });
+
+                                // Nota
+                                column.Item().PaddingTop(6).Text("Incluye hasta 8 categorías principales.")
+                                    .FontSize(9)
+                                    .FontColor(Colors.Grey.Darken1);
                             }
                         });
 
@@ -210,6 +232,54 @@ namespace ServiceCommon.Infrastructure.Reports
         public string GetFileExtension()
         {
             return ".pdf";
+        }
+
+        // Genera una imagen PNG en memoria con el gráfico de tortas
+        private static byte[] CreatePieChartImage(List<KeyValuePair<string, decimal>> items, SKColor[] palette)
+        {
+            const int size = 600; // imagen cuadrada
+            const int chartSize = 600;
+            int width = size;
+            int height = size;
+
+            using var surface = SKSurface.Create(new SKImageInfo(width, height));
+            var canvas = surface.Canvas;
+            canvas.Clear(SKColors.Transparent);
+
+            // Área del círculo
+            var cx = width / 2f;
+            var cy = height / 2f;
+            var radius = Math.Min(width, height) * 0.42f;
+            var rect = new SKRect(cx - radius, cy - radius, cx + radius, cy + radius);
+
+            // Sombra suave
+            using (var shadowPaint = new SKPaint { IsAntialias = true, Color = new SKColor(0, 0, 0, 30), ImageFilter = SKImageFilter.CreateBlur(10, 10) })
+            {
+                var shadowRect = rect; shadowRect.Offset(4, 4);
+                canvas.DrawOval(shadowRect, shadowPaint);
+            }
+
+            var total = items.Sum(i => (double)i.Value);
+            float startAngle = -90f; // comenzar arriba
+
+            for (int i = 0; i < items.Count; i++)
+            {
+                var sweep = total <= 0 ? 0f : (float)((double)items[i].Value / total * 360f);
+                var color = palette[i % palette.Length];
+
+                using var slicePaint = new SKPaint { IsAntialias = true, Style = SKPaintStyle.Fill, Color = color };
+                canvas.DrawArc(rect, startAngle, sweep, true, slicePaint);
+
+                // borde separador
+                using var borderPaint = new SKPaint { IsAntialias = true, Style = SKPaintStyle.Stroke, StrokeWidth = 2, Color = SKColors.White };
+                canvas.DrawArc(rect, startAngle, sweep, true, borderPaint);
+
+                startAngle += sweep;
+            }
+
+            using var image = surface.Snapshot();
+            using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+            return data.ToArray();
         }
     }
 }

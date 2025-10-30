@@ -8,12 +8,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ServiceCommon\ServiceCommon.csproj" />
+    <ProjectReference Include="..\ServiceUsers\ServiceUsers.csproj" />
+    <ProjectReference Include="..\ServiceClients\ServiceClients.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="Npgsql" Version="9.0.4" />
-    <PackageReference Include="QuestPDF" Version="2025.7.3" />
   </ItemGroup>
 
 </Project>

@@ -29,19 +29,30 @@ namespace LibraryWeb.Pages.Users
         [BindProperty, Required(ErrorMessage = "Debe confirmar la nueva contraseña."), Compare(nameof(NewPassword), ErrorMessage = "Las contraseñas no coinciden."), Display(Name = "Confirmar nueva contraseña")]
         public string ConfirmPassword { get; set; } = string.Empty;
 
-        public IActionResult OnGet() => Page();
+        public IActionResult OnGet()
+        {
+            var username = User.Identity?.Name ?? TempData["PendingUser"]?.ToString();
+
+            if (string.IsNullOrEmpty(username))
+                return RedirectToPage("/Auth/Login");
+
+            if (TempData.ContainsKey("PendingUser"))
+                TempData.Keep("PendingUser");
+
+            if (TempData.ContainsKey("FirstLogin"))
+                ViewData["FirstLogin"] = true;
+
+            return Page();
+        }
 
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
                 return Page();
 
-            var username = User.Identity?.Name;
+            string? username = User.Identity?.Name ?? TempData["PendingUser"]?.ToString();
             if (string.IsNullOrEmpty(username))
-            {
-                ModelState.AddModelError(string.Empty, "No se encontró el usuario actual.");
-                return Page();
-            }
+                return RedirectToPage("/Auth/Login");
 
             var user = _userService.GetAll().FirstOrDefault(u =>
                 u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
@@ -59,34 +70,20 @@ namespace LibraryWeb.Pages.Users
                 return Page();
             }
 
-            // Mayúscula, minúscula, número y al menos un símbolo/puntuación Unicode. Longitud 8–64.
-            var regex = new Regex(
-                @"^(?=.*[a-záéíóúñç])(?=.*[A-ZÁÉÍÓÚÑÇ])(?=.*\d)(?=.*[\p{P}\p{S}]).{8,64}$",
-                RegexOptions.CultureInvariant
-            );
+            var regex = new Regex(@"^(?=.*[a-záéíóúñç])(?=.*[A-ZÁÉÍÓÚÑÇ])(?=.*\d)(?=.*[\p{P}\p{S}]).{8,64}$", RegexOptions.CultureInvariant);
             if (!regex.IsMatch(NewPassword))
             {
-                ModelState.AddModelError(nameof(NewPassword),
-                    "La nueva contraseña debe incluir mayúsculas, minúsculas, números y un carácter especial.");
-                NewPassword = string.Empty;
-                ConfirmPassword = string.Empty;
-                return Page();
-            }
-
-            if (NewPassword != ConfirmPassword)
-            {
-                ModelState.AddModelError(nameof(ConfirmPassword), "Las contraseñas no coinciden.");
+                ModelState.AddModelError(nameof(NewPassword), "La nueva contraseña debe incluir mayúsculas, minúsculas, números y al menos un carácter especial.");
                 return Page();
             }
 
             user.PasswordHash = _hasher.HashPassword(user, NewPassword);
+            user.MustChangePassword = false;
             _userService.Update(user);
-
-            TempData["SuccessMessage"] = "ok";
 
             await HttpContext.SignOutAsync();
 
-            return Page();
+            return RedirectToPage("/Auth/Login");
         }
     }
 }

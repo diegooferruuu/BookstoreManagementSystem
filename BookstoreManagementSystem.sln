@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceDistributors", "Serv
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryWeb", "LibraryWeb\LibraryWeb.csproj", "{A6666666-6666-6666-6666-666666666666}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookstoreManagementSystem", "BookstoreManagementSystem.csproj", "{7BDBC261-F5D3-2762-9741-B992438022AD}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,10 +45,6 @@ Global
 		{A6666666-6666-6666-6666-666666666666}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6666666-6666-6666-6666-666666666666}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6666666-6666-6666-6666-666666666666}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7BDBC261-F5D3-2762-9741-B992438022AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7BDBC261-F5D3-2762-9741-B992438022AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7BDBC261-F5D3-2762-9741-B992438022AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7BDBC261-F5D3-2762-9741-B992438022AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

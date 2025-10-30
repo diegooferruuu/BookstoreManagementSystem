@@ -10,5 +10,6 @@ namespace ServiceUsers.Domain.Models
         public string? MiddleName { get; set; }
         public string PasswordHash { get; set; } = string.Empty;
         public bool IsActive { get; set; }
+        public bool MustChangePassword { get; set; } = true;
     }
 }

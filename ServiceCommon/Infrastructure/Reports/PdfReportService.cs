@@ -32,16 +32,33 @@ namespace ServiceCommon.Infrastructure.Reports
                         .Column(column =>
                         {
                             column.Spacing(10);
-                            
+
                             // Logo y título
                             column.Item().Row(row =>
                             {
-                                // Logo de libro abierto (usando emoji/texto)
-                                row.ConstantItem(50).Height(50).Background(Colors.Blue.Medium)
-                                    .AlignCenter()
-                                    .AlignMiddle()
-                                    .Text("📖")
-                                    .FontSize(30);
+                                // Intentar cargar el logo desde wwwroot/img/logo.png
+                                var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", "logo.png");
+                                if (File.Exists(logoPath))
+                                {
+                                    var logoBytes = File.ReadAllBytes(logoPath);
+                                    row.ConstantItem(60)
+                                        .Height(50)
+                                        .AlignMiddle()
+                                        .AlignLeft()
+                                        .Image(logoBytes)
+                                        .FitHeight();
+                                }
+                                else
+                                {
+                                    // Si no hay logo, usa el ícono 📖 como fallback
+                                    row.ConstantItem(50)
+                                        .Height(50)
+                                        .Background(Colors.Blue.Medium)
+                                        .AlignCenter()
+                                        .AlignMiddle()
+                                        .Text("📖")
+                                        .FontSize(30);
+                                }
 
                                 row.RelativeItem().Column(col =>
                                 {
@@ -49,12 +66,13 @@ namespace ServiceCommon.Infrastructure.Reports
                                         .SemiBold()
                                         .FontSize(20)
                                         .FontColor(Colors.Blue.Medium);
-                                    
+
                                     col.Item().Text($"Generado: {_reportData.GeneratedDate:dd/MM/yyyy HH:mm}")
                                         .FontSize(9)
                                         .FontColor(Colors.Grey.Darken2);
                                 });
                             });
+
 
                             // Información del creador
                             if (!string.IsNullOrEmpty(_reportData.CreatedBy))

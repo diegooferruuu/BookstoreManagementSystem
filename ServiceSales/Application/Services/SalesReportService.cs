@@ -50,6 +50,9 @@ namespace ServiceSales.Application.Services
                 .OrderByDescending(x => x.Total)
                 .ToDictionary(x => x.Client, x => x.Total);
 
+            // Obtener datos para el gráfico de productos más vendidos
+            var productChartData = await _saleRepository.GetTopProductsSalesAsync(filter, ct);
+
             // Agregar fila de totales
             if (sales.Any())
             {
@@ -94,6 +97,12 @@ namespace ServiceSales.Application.Services
             if (chartData.Any())
             {
                 builder.SetChartData(chartData);
+            }
+
+            // Agregar gráfico de productos más vendidos
+            if (productChartData.Any())
+            {
+                builder.SetProductChartData(productChartData);
             }
 
             var reportService = builder.Build();

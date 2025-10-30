@@ -152,6 +152,81 @@ namespace ServiceCommon.Infrastructure.Reports
                 chartSheet.Cell(2, 1).Style.Font.FontSize = 10;
             }
 
+            // --- Hoja con gráfico de productos más vendidos ---
+            if (_reportData.ProductChartData != null && _reportData.ProductChartData.Any())
+            {
+                var productChartSheet = workbook.Worksheets.Add("Gráfico Productos");
+
+                productChartSheet.Cell(1, 1).Value = "Gráfico de Tortas - Productos Más Vendidos";
+                productChartSheet.Cell(1, 1).Style.Font.Bold = true;
+                productChartSheet.Cell(1, 1).Style.Font.FontSize = 16;
+
+                // Preparar 7+Otros
+                var orderedProducts = _reportData.ProductChartData
+                    .OrderByDescending(x => x.Value)
+                    .ToList();
+
+                List<KeyValuePair<string, decimal>> productItems;
+                if (orderedProducts.Count > 8)
+                {
+                    var top7 = orderedProducts.Take(7).ToList();
+                    var othersTotal = orderedProducts.Skip(7).Sum(x => x.Value);
+                    top7.Add(new KeyValuePair<string, decimal>("Otros", othersTotal));
+                    productItems = top7;
+                }
+                else
+                {
+                    productItems = orderedProducts;
+                }
+
+                var totalProducts = productItems.Sum(x => x.Value);
+
+                var skiaColorsProducts = new SKColor[]
+                {
+                    SKColors.DodgerBlue,
+                    SKColors.Coral,
+                    SKColors.LimeGreen,
+                    SKColors.Tomato,
+                    SKColors.Orchid,
+                    SKColors.DeepSkyBlue,
+                    SKColors.Gold,
+                    SKColors.Crimson
+                };
+
+                var pieProductsBytes = CreatePieChartImage(productItems, skiaColorsProducts);
+                using (var imgStream = new MemoryStream(pieProductsBytes))
+                {
+                    var picture = productChartSheet.AddPicture(imgStream)
+                        .MoveTo(productChartSheet.Cell(3, 1))
+                        .Scale(0.55);
+                    picture.Name = "PieChartProducts";
+                }
+
+                // Leyenda a la derecha
+                productChartSheet.Column(11).Width = 4;  // K: cuadrito color
+                productChartSheet.Column(12).Width = 50; // L: texto
+
+                for (int i = 0; i < productItems.Count; i++)
+                {
+                    var item = productItems[i];
+                    var percentage = totalProducts == 0 ? 0 : (double)item.Value / (double)totalProducts * 100d;
+                    var color = skiaColorsProducts[i % skiaColorsProducts.Length];
+
+                    var boxCell = productChartSheet.Cell(3 + i, 11); // K
+                    boxCell.Value = "";
+                    boxCell.Style.Fill.BackgroundColor = XLColor.FromArgb(color.Red, color.Green, color.Blue);
+                    boxCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    productChartSheet.Row(3 + i).Height = 18;
+
+                    var textCell = productChartSheet.Cell(3 + i, 12); // L
+                    textCell.Value = $"{item.Key}: {item.Value:N0} unidades ({percentage:F1}%)";
+                }
+
+                productChartSheet.Cell(2, 1).Value = "Muestra la cantidad total de unidades vendidas por producto. Incluye 7 productos principales y 'Otros' cuando aplica.";
+                productChartSheet.Cell(2, 1).Style.Font.FontColor = XLColor.Gray;
+                productChartSheet.Cell(2, 1).Style.Font.FontSize = 10;
+            }
+
             // Convertir a bytes
             using var stream = new MemoryStream();
             workbook.SaveAs(stream);

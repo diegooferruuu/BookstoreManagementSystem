@@ -219,6 +219,98 @@ namespace ServiceCommon.Infrastructure.Reports
                                     .FontSize(9)
                                     .FontColor(Colors.Grey.Darken1);
                             }
+
+                            // Gráfico de productos más vendidos
+                            if (_reportData.ProductChartData != null && _reportData.ProductChartData.Any())
+                            {
+                                column.Item().PageBreak();
+                                
+                                column.Item().PaddingTop(20);
+                                column.Item().Text("Gráfico de Tortas - Productos Más Vendidos")
+                                    .SemiBold()
+                                    .FontSize(16)
+                                    .FontColor(Colors.Blue.Medium);
+                                
+                                column.Item().PaddingTop(10);
+
+                                // Preparar datos y paleta de colores (7 principales + Otros)
+                                var orderedProducts = _reportData.ProductChartData
+                                    .OrderByDescending(x => x.Value)
+                                    .ToList();
+
+                                List<KeyValuePair<string, decimal>> productItems;
+                                if (orderedProducts.Count > 8)
+                                {
+                                    var top7 = orderedProducts.Take(7).ToList();
+                                    var othersTotal = orderedProducts.Skip(7).Sum(x => x.Value);
+                                    top7.Add(new KeyValuePair<string, decimal>("Otros", othersTotal));
+                                    productItems = top7;
+                                }
+                                else
+                                {
+                                    productItems = orderedProducts;
+                                }
+
+                                var totalProducts = productItems.Sum(x => x.Value);
+
+                                // Paleta para Skia (imagen)
+                                var skiaColorsProducts = new SKColor[]
+                                {
+                                    SKColors.DodgerBlue,
+                                    SKColors.Coral,
+                                    SKColors.LimeGreen,
+                                    SKColors.Tomato,
+                                    SKColors.Orchid,
+                                    SKColors.DeepSkyBlue,
+                                    SKColors.Gold,
+                                    SKColors.Crimson
+                                };
+
+                                // Paleta para legendas en QuestPDF (mismo orden que Skia)
+                                var questColorsProducts = new[]
+                                {
+                                    Colors.Blue.Darken1,
+                                    Colors.Orange.Darken1,
+                                    Colors.Green.Darken1,
+                                    Colors.Red.Darken1,
+                                    Colors.Purple.Darken1,
+                                    Colors.Cyan.Darken1,
+                                    Colors.Yellow.Darken2,
+                                    Colors.Pink.Darken2
+                                };
+
+                                // Generar imagen del gráfico de tortas con SkiaSharp
+                                var pieImageProducts = CreatePieChartImage(productItems, skiaColorsProducts);
+
+                                // Layout: gráfico + leyenda
+                                column.Item().Row(r =>
+                                {
+                                    r.ConstantItem(320).Height(320).Image(pieImageProducts).FitArea();
+
+                                    r.RelativeItem().PaddingLeft(20).Column(legend =>
+                                    {
+                                        legend.Spacing(6);
+
+                                        for (int i = 0; i < productItems.Count; i++)
+                                        {
+                                            var item = productItems[i];
+                                            var percentage = totalProducts == 0 ? 0 : (double)item.Value / (double)totalProducts * 100d;
+                                            var color = questColorsProducts[i % questColorsProducts.Length];
+
+                                            legend.Item().Row(row =>
+                                            {
+                                                row.ConstantItem(12).Height(12).Background(color).Border(1).BorderColor(Colors.Grey.Lighten1);
+                                                row.RelativeItem().PaddingLeft(6).Text($"{item.Key}: {item.Value:N0} unidades ({percentage:F1}%)");
+                                            });
+                                        }
+                                    });
+                                });
+
+                                // Nota
+                                column.Item().PaddingTop(6).Text("Muestra la cantidad total de unidades vendidas por producto. Incluye 7 productos principales y 'Otros' cuando aplica.")
+                                    .FontSize(9)
+                                    .FontColor(Colors.Grey.Darken1);
+                            }
                         });
 
                     page.Footer()
@@ -250,7 +342,6 @@ namespace ServiceCommon.Infrastructure.Reports
         private static byte[] CreatePieChartImage(List<KeyValuePair<string, decimal>> items, SKColor[] palette)
         {
             const int size = 600; // imagen cuadrada
-            const int chartSize = 600;
             int width = size;
             int height = size;
 

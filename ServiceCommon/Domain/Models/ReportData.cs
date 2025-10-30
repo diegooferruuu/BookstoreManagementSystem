@@ -10,5 +10,6 @@ namespace ServiceCommon.Domain.Models
         public DateTime GeneratedDate { get; set; } = DateTime.Now;
         public string CreatedBy { get; set; } = string.Empty;
         public Dictionary<string, decimal>? ChartData { get; set; }
+        public Dictionary<string, decimal>? ProductChartData { get; set; }
     }
 }

@@ -18,7 +18,7 @@ namespace ServiceCommon.Infrastructure.Reports
         public byte[] GenerateReport()
         {
             using var workbook = new XLWorkbook();
-            var worksheet = workbook.Worksheets.Add("Reporte");
+            var worksheet = workbook.Worksheets.Add("Reporte de Ventas");
 
             // Título
             worksheet.Cell(1, 1).Value = _reportData.Title;
@@ -80,7 +80,7 @@ namespace ServiceCommon.Infrastructure.Reports
             // --- Hoja con gráfico de tortas (7+Otros) ---
             if (_reportData.ChartData != null && _reportData.ChartData.Any())
             {
-                var chartSheet = workbook.Worksheets.Add("Gráfico");
+                var chartSheet = workbook.Worksheets.Add("Distribucion de Ventas");
 
                 chartSheet.Cell(1, 1).Value = "Gráfico de Tortas - Distribución de Ventas";
                 chartSheet.Cell(1, 1).Style.Font.Bold = true;
@@ -155,7 +155,7 @@ namespace ServiceCommon.Infrastructure.Reports
             // --- Hoja con tabla de ingresos por producto ---
             if (_reportData.ProductRevenueData != null && _reportData.ProductRevenueData.Any())
             {
-                var revenueSheet = workbook.Worksheets.Add("Ingresos Productos");
+                var revenueSheet = workbook.Worksheets.Add("Ingresos Por Productos");
 
                 revenueSheet.Cell(1, 1).Value = "Ingresos por Producto";
                 revenueSheet.Cell(1, 1).Style.Font.Bold = true;
@@ -231,7 +231,7 @@ namespace ServiceCommon.Infrastructure.Reports
             // --- Hoja con gráfico de productos más vendidos ---
             if (_reportData.ProductChartData != null && _reportData.ProductChartData.Any())
             {
-                var productChartSheet = workbook.Worksheets.Add("Gráfico Productos");
+                var productChartSheet = workbook.Worksheets.Add("Productos Más Vendidos");
 
                 productChartSheet.Cell(1, 1).Value = "Gráfico de Tortas - Productos Más Vendidos";
                 productChartSheet.Cell(1, 1).Style.Font.Bold = true;

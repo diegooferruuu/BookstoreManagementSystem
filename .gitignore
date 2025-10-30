@@ -426,3 +426,20 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+<<<<<<< HEAD
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+
+# Rider / IntelliJ
+.idea/
+*.iml
+
+# macOS
+.DS_Store
+EOF
+=======
+>>>>>>> Merge4

@@ -12,6 +12,7 @@
     <ProjectReference Include="..\ServiceUsers\ServiceUsers.csproj" />
     <ProjectReference Include="..\ServiceProducts\ServiceProducts.csproj" />
     <ProjectReference Include="..\ServiceDistributors\ServiceDistributors.csproj" />
+    <ProjectReference Include="..\ServiceSales\ServiceSales.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -20,28 +20,33 @@ using ServiceUsers.Infrastructure.Auth;
 using ServiceUsers.Infrastructure.Repositories;
 using ServiceUsers.Infrastructure.Security;
 using ServiceProducts.Domain.Interfaces;
+using ServiceProducts.Domain.Interfaces.Reports;
 using ServiceProducts.Application.Services;
+using ServiceProducts.Infrastructure.Reports;
 using ServiceProducts.Infrastructure.Repositories;
 using ServiceDistributors.Domain.Interfaces;
 using ServiceDistributors.Application.Services;
 using ServiceDistributors.Infrastructure.Repositories;
+using ServiceSales.Domain.Interfaces;
+using ServiceSales.Application.Services;
+using ServiceSales.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages(options =>
 {
-    // Páginas accesibles sin autenticación
+    // Paginas accesibles sin autenticaciÃ¯Â¿Â½n
     options.Conventions.AllowAnonymousToPage("/Auth/Login");
     options.Conventions.AllowAnonymousToPage("/Auth/Logout");
     options.Conventions.AllowAnonymousToPage("/Users/ChangePassword");
 
-    // Todo lo demás requiere autenticación
+    // Todo lo dema requiere autenticaciÃ¯Â¿Â½n
     options.Conventions.AuthorizeFolder("/");
 })
 .AddMvcOptions(options =>
 {
-    options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "Debe seleccionar una categoría.");
-    options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((x, y) => "El valor ingresado no es válido.");
+    options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "Debe seleccionar una categorÃ¯Â¿Â½a.");
+    options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((x, y) => "El valor ingresado no es vÃ¯Â¿Â½lido.");
     options.ModelBindingMessageProvider.SetMissingBindRequiredValueAccessor(x => $"Falta el valor para {x}.");
 });
 
@@ -84,8 +89,15 @@ builder.Services.AddSingleton<IProductRepository, ProductRepository>();
 builder.Services.AddSingleton<ServiceProducts.Domain.Interfaces.ICategoryRepository, CategoryRepository>();
 builder.Services.AddSingleton<IProductService, ProductService>();
 
+// Reportes
+builder.Services.AddScoped<IReportDirector, ProductReportDirector>();
+builder.Services.AddScoped<IProductReportService, ProductReportService>();
+
 builder.Services.AddSingleton<IDistributorRepository, DistributorRepository>();
 builder.Services.AddSingleton<IDistributorService, DistributorService>();
+
+builder.Services.AddSingleton<ISaleRepository, SaleRepository>();
+builder.Services.AddSingleton<ISalesReportService, SalesReportService>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -137,29 +149,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.Use(async (context, next) =>
-{
-    try
-    {
-        await next();
-    }
-    catch (ValidationException vex)
-    {
-        var wantsJson = context.Request.Path.StartsWithSegments("/api")
-                        || (context.Request.Headers.TryGetValue("Accept", out var a) && a.ToString().Contains("application/json"));
-
-        if (wantsJson)
-        {
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            context.Response.ContentType = "application/json";
-            var errors = vex.Errors.Select(e => new { field = e.Field, message = e.Message });
-            await context.Response.WriteAsJsonAsync(new { errors });
-            return;
-        }
-        throw;
-    }
-});
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
@@ -167,7 +156,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapRazorPages();
 
-// API de autenticación (usa fachada)
+// API de autenticacion (usa fachada)
 app.MapPost("/api/auth/login", async (IUserFacade facade, ServiceUsers.Application.DTOs.AuthRequestDto req, CancellationToken ct) =>
 {
     var token = await facade.LoginAsync(req, ct);
@@ -175,55 +164,5 @@ app.MapPost("/api/auth/login", async (IUserFacade facade, ServiceUsers.Applicati
         ? Results.Ok(token)
         : Results.Unauthorized();
 }).AllowAnonymous();
-
-// Usuario admin inicial
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<IDataBase>();
-    using var conn = db.GetConnection();
-
-    var checkAdminSql = "SELECT COUNT(*) FROM users WHERE LOWER(username)='admin'";
-    using var checkCmd = new Npgsql.NpgsqlCommand(checkAdminSql, conn);
-    var count = (long)checkCmd.ExecuteScalar()!;
-
-    if (count == 0)
-    {
-        var passwordHasher = new Microsoft.AspNetCore.Identity.PasswordHasher<ServiceUsers.Domain.Models.User>();
-        var admin = new ServiceUsers.Domain.Models.User
-        {
-            Id = Guid.NewGuid(),
-            Username = "admin",
-            Email = "admin@local",
-            FirstName = "Administrador",
-            LastName = "",
-            PasswordHash = passwordHasher.HashPassword(null!, "admin123456"),
-            IsActive = true,
-            MustChangePassword = true
-        };
-
-        var insertUserSql = @"INSERT INTO users (id, username, email, first_name, last_name, middle_name, password_hash, is_active, must_change_password)
-                              VALUES (@id, @username, @email, @first, @last, NULL, @hash, TRUE, TRUE)";
-        using var insertUserCmd = new Npgsql.NpgsqlCommand(insertUserSql, conn);
-        insertUserCmd.Parameters.AddWithValue("@id", admin.Id);
-        insertUserCmd.Parameters.AddWithValue("@username", admin.Username);
-        insertUserCmd.Parameters.AddWithValue("@email", admin.Email);
-        insertUserCmd.Parameters.AddWithValue("@first", admin.FirstName);
-        insertUserCmd.Parameters.AddWithValue("@last", admin.LastName);
-        insertUserCmd.Parameters.AddWithValue("@hash", admin.PasswordHash);
-        insertUserCmd.ExecuteNonQuery();
-
-        var ensureRoleSql = @"INSERT INTO roles (id, name)
-                              SELECT gen_random_uuid(), 'Admin'
-                              WHERE NOT EXISTS (SELECT 1 FROM roles WHERE name='Admin')";
-        using var ensureRoleCmd = new Npgsql.NpgsqlCommand(ensureRoleSql, conn);
-        ensureRoleCmd.ExecuteNonQuery();
-
-        var linkRoleSql = @"INSERT INTO user_roles (user_id, role_id)
-                            SELECT @userId, r.id FROM roles r WHERE r.name='Admin'";
-        using var linkCmd = new Npgsql.NpgsqlCommand(linkRoleSql, conn);
-        linkCmd.Parameters.AddWithValue("@userId", admin.Id);
-        linkCmd.ExecuteNonQuery();
-    }
-}
 
 app.Run();

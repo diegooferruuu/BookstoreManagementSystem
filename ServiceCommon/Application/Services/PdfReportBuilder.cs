@@ -62,6 +62,12 @@ namespace ServiceCommon.Application.Services
             return this;
         }
 
+        public IReportBuilder SetProductRevenueData(Dictionary<string, decimal> productRevenueData)
+        {
+            _reportData.ProductRevenueData = productRevenueData;
+            return this;
+        }
+
         public IReportService Build()
         {
             return new PdfReportService(_reportData);

@@ -220,6 +220,93 @@ namespace ServiceCommon.Infrastructure.Reports
                                     .FontColor(Colors.Grey.Darken1);
                             }
 
+                            // Tabla de ingresos por producto
+                            if (_reportData.ProductRevenueData != null && _reportData.ProductRevenueData.Any())
+                            {
+                                column.Item().PageBreak();
+                                
+                                column.Item().PaddingTop(20);
+                                column.Item().Text("Ingresos por Producto")
+                                    .SemiBold()
+                                    .FontSize(16)
+                                    .FontColor(Colors.Blue.Medium);
+                                
+                                column.Item().PaddingTop(10);
+
+                                // Ordenar por ingresos descendente
+                                var orderedRevenue = _reportData.ProductRevenueData
+                                    .OrderByDescending(x => x.Value)
+                                    .ToList();
+
+                                var totalRevenue = orderedRevenue.Sum(x => x.Value);
+
+                                // Tabla
+                                column.Item().Table(table =>
+                                {
+                                    // Definir columnas: Producto, Ingresos, Porcentaje
+                                    table.ColumnsDefinition(columns =>
+                                    {
+                                        columns.RelativeColumn(3); // Producto
+                                        columns.RelativeColumn(2); // Ingresos
+                                        columns.RelativeColumn(1); // Porcentaje
+                                    });
+
+                                    // Headers
+                                    table.Header(header =>
+                                    {
+                                        header.Cell().Element(HeaderStyle).Text("Producto").SemiBold();
+                                        header.Cell().Element(HeaderStyle).Text("Ingresos").SemiBold();
+                                        header.Cell().Element(HeaderStyle).Text("% del Total").SemiBold();
+
+                                        static IContainer HeaderStyle(IContainer container)
+                                        {
+                                            return container
+                                                .Border(1)
+                                                .BorderColor(Colors.Grey.Lighten2)
+                                                .Background(Colors.Blue.Lighten4)
+                                                .Padding(8);
+                                        }
+                                    });
+
+                                    // Rows
+                                    foreach (var item in orderedRevenue)
+                                    {
+                                        var percentage = totalRevenue == 0 ? 0 : (double)item.Value / (double)totalRevenue * 100d;
+
+                                        table.Cell().Element(CellStyle).Text(item.Key);
+                                        table.Cell().Element(CellStyle).Text($"${item.Value:N2}");
+                                        table.Cell().Element(CellStyle).Text($"{percentage:F1}%");
+
+                                        static IContainer CellStyle(IContainer container)
+                                        {
+                                            return container
+                                                .Border(1)
+                                                .BorderColor(Colors.Grey.Lighten2)
+                                                .Padding(8);
+                                        }
+                                    }
+
+                                    // Fila de totales
+                                    table.Cell().Element(TotalStyle).Text("TOTAL").SemiBold();
+                                    table.Cell().Element(TotalStyle).Text($"${totalRevenue:N2}").SemiBold();
+                                    table.Cell().Element(TotalStyle).Text("100%").SemiBold();
+
+                                    static IContainer TotalStyle(IContainer container)
+                                    {
+                                        return container
+                                            .Border(1)
+                                            .BorderColor(Colors.Grey.Lighten2)
+                                            .Background(Colors.Grey.Lighten3)
+                                            .Padding(8);
+                                    }
+                                });
+
+                                // Nota
+                                column.Item().PaddingTop(10).Text($"Total de productos diferentes: {orderedRevenue.Count}")
+                                    .FontSize(10)
+                                    .FontColor(Colors.Grey.Darken1);
+                            }
+
                             // Gráfico de productos más vendidos
                             if (_reportData.ProductChartData != null && _reportData.ProductChartData.Any())
                             {

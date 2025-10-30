@@ -11,5 +11,6 @@ namespace ServiceCommon.Domain.Models
         public string CreatedBy { get; set; } = string.Empty;
         public Dictionary<string, decimal>? ChartData { get; set; }
         public Dictionary<string, decimal>? ProductChartData { get; set; }
+        public Dictionary<string, decimal>? ProductRevenueData { get; set; }
     }
 }

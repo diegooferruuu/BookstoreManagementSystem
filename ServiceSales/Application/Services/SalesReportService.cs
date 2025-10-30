@@ -53,6 +53,9 @@ namespace ServiceSales.Application.Services
             // Obtener datos para el gráfico de productos más vendidos
             var productChartData = await _saleRepository.GetTopProductsSalesAsync(filter, ct);
 
+            // Obtener datos de ingresos por producto para la tabla
+            var productRevenueData = await _saleRepository.GetProductRevenueAsync(filter, ct);
+
             // Agregar fila de totales
             if (sales.Any())
             {
@@ -103,6 +106,12 @@ namespace ServiceSales.Application.Services
             if (productChartData.Any())
             {
                 builder.SetProductChartData(productChartData);
+            }
+
+            // Agregar datos de ingresos por producto
+            if (productRevenueData.Any())
+            {
+                builder.SetProductRevenueData(productRevenueData);
             }
 
             var reportService = builder.Build();

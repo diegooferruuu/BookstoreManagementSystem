@@ -9,5 +9,6 @@ namespace ServiceSales.Domain.Interfaces
         Task<Sale?> GetByIdAsync(Guid id, CancellationToken ct = default);
         Task<List<SaleDetail>> GetSaleDetailsAsync(Guid saleId, CancellationToken ct = default);
         Task<Dictionary<string, decimal>> GetTopProductsSalesAsync(SaleReportFilter filter, CancellationToken ct = default);
+        Task<Dictionary<string, decimal>> GetProductRevenueAsync(SaleReportFilter filter, CancellationToken ct = default);
     }
 }

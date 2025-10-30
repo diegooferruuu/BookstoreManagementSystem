@@ -223,6 +223,65 @@ namespace ServiceSales.Infrastructure.Repositories
             return result;
         }
 
+        public async Task<Dictionary<string, decimal>> GetProductRevenueAsync(SaleReportFilter filter, CancellationToken ct = default)
+        {
+            var query = @"
+                SELECT 
+                    p.name as product_name,
+                    SUM(sd.subtotal) as total_revenue
+                FROM sale_details sd
+                INNER JOIN sales s ON sd.sale_id = s.id
+                INNER JOIN products p ON sd.product_id = p.id
+                WHERE 1=1";
+
+            var parameters = new List<NpgsqlParameter>();
+
+            if (filter.UserId.HasValue)
+            {
+                query += " AND s.user_id = @userId";
+                parameters.Add(new NpgsqlParameter("@userId", filter.UserId.Value));
+            }
+
+            if (filter.ClientId.HasValue)
+            {
+                query += " AND s.client_id = @clientId";
+                parameters.Add(new NpgsqlParameter("@clientId", filter.ClientId.Value));
+            }
+
+            if (filter.StartDate.HasValue)
+            {
+                query += " AND s.sale_date >= @startDate";
+                parameters.Add(new NpgsqlParameter("@startDate", filter.StartDate.Value));
+            }
+
+            if (filter.EndDate.HasValue)
+            {
+                query += " AND s.sale_date <= @endDate";
+                parameters.Add(new NpgsqlParameter("@endDate", filter.EndDate.Value));
+            }
+
+            query += @"
+                GROUP BY p.name
+                ORDER BY total_revenue DESC";
+
+            using var connection = _database.GetConnection();
+
+            await using var command = new NpgsqlCommand(query, connection);
+            command.Parameters.AddRange(parameters.ToArray());
+
+            await using var reader = await command.ExecuteReaderAsync(ct);
+
+            var result = new Dictionary<string, decimal>();
+            while (await reader.ReadAsync(ct))
+            {
+                var productName = reader.GetString(0);
+                var totalRevenue = reader.GetDecimal(1);
+                result[productName] = totalRevenue;
+            }
+
+            return result;
+        }
+
         private Sale MapSaleFromReader(NpgsqlDataReader reader)
         {
             return new Sale

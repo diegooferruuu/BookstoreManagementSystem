@@ -1,8 +1,9 @@
 using Npgsql;
-using ServiceProducts.Domain.Models;
-using ServiceCommon.Domain.Services;
-using ServiceProducts.Domain.Interfaces;
 using NpgsqlTypes;
+using ServiceProducts.Domain.Models;
+using ServiceProducts.Domain.Reports;
+using ServiceProducts.Domain.Interfaces;
+using ServiceCommon.Domain.Services;
 
 namespace ServiceProducts.Infrastructure.Repositories
 {
@@ -57,15 +58,12 @@ namespace ServiceProducts.Infrastructure.Repositories
                     Description = reader.IsDBNull(reader.GetOrdinal("description"))
                         ? null
                         : reader.GetString(reader.GetOrdinal("description")),
-
                     CategoryId = reader.IsDBNull(reader.GetOrdinal("category_id"))
                         ? Guid.Empty
                         : reader.GetGuid(reader.GetOrdinal("category_id")),
-
                     CategoryName = reader.IsDBNull(reader.GetOrdinal("category_name"))
                         ? null
                         : reader.GetString(reader.GetOrdinal("category_name")),
-
                     Price = reader.GetDecimal(reader.GetOrdinal("price")),
                     Stock = reader.GetInt32(reader.GetOrdinal("stock")),
                     CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at"))
@@ -115,11 +113,12 @@ namespace ServiceProducts.Infrastructure.Repositories
             var products = new List<Product>();
             using var conn = _database.GetConnection();
             using var cmd = new NpgsqlCommand(@"
-                SELECT p.*, c.name as category_name 
+                SELECT p.*, c.name AS category_name 
                 FROM products p 
                 LEFT JOIN categories c ON p.category_id = c.id
                 WHERE p.is_active = TRUE
                 ORDER BY p.name", conn);
+
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -138,6 +137,66 @@ namespace ServiceProducts.Infrastructure.Repositories
                 });
             }
             return products;
+        }
+
+        // ---------------------------------------------
+        // MÉTODO NUEVO: CONSULTA PARA REPORTES
+        // ---------------------------------------------
+        public async Task<IReadOnlyList<ProductReportRow>> GetForReportAsync(
+            decimal? priceMin, decimal? priceMax, Guid? categoryId, CancellationToken ct)
+        {
+            var rows = new List<ProductReportRow>();
+            using var conn = _database.GetConnection();
+
+            // Si no se pasa rango, obtener el máximo actual
+            if (priceMin == null) priceMin = 0;
+
+            if (priceMax == null)
+            {
+                using var maxCmd = new NpgsqlCommand("SELECT COALESCE(MAX(price), 0) FROM products WHERE is_active = TRUE;", conn);
+                priceMax = Convert.ToDecimal(maxCmd.ExecuteScalar());
+            }
+
+            var sql = @"
+                SELECT p.name, 
+                       c.name AS category, 
+                       COALESCE(p.description, '') AS description,
+                       p.price, 
+                       p.stock
+                FROM products p
+                JOIN categories c ON c.id = p.category_id
+                WHERE p.is_active = TRUE
+                  AND p.price >= @min
+                  AND p.price <= @max
+                  AND (@cat IS NULL OR p.category_id = @cat)
+                ORDER BY c.name, p.name;";
+
+            using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.Parameters.Add("@min", NpgsqlDbType.Numeric).Value = priceMin.Value;
+            cmd.Parameters.Add("@max", NpgsqlDbType.Numeric).Value = priceMax.Value;
+
+            if (categoryId == null || categoryId == Guid.Empty)
+                cmd.Parameters.Add("@cat", NpgsqlDbType.Uuid).Value = DBNull.Value;
+            else
+                cmd.Parameters.Add("@cat", NpgsqlDbType.Uuid).Value = categoryId.Value;
+
+            using var reader = await cmd.ExecuteReaderAsync(ct);
+            int i = 0;
+
+            while (await reader.ReadAsync(ct))
+            {
+                rows.Add(new ProductReportRow
+                {
+                    Nro = ++i,
+                    Name = reader.GetString(0),
+                    Category = reader.GetString(1),
+                    Description = reader.GetString(2),
+                    Price = reader.GetDecimal(3),
+                    Stock = reader.GetInt32(4)
+                });
+            }
+
+            return rows;
         }
     }
 }

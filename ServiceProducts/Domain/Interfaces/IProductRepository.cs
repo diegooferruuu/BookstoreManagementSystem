@@ -1,4 +1,5 @@
 using ServiceProducts.Domain.Models;
+using ServiceProducts.Domain.Reports;
 
 namespace ServiceProducts.Domain.Interfaces
 {
@@ -9,5 +10,6 @@ namespace ServiceProducts.Domain.Interfaces
         void Create(Product product);
         void Update(Product product);
         void Delete(Guid id);
+        Task<IReadOnlyList<ProductReportRow>> GetForReportAsync(decimal? priceMin, decimal? priceMax, Guid? categoryId, CancellationToken ct);
     }
 }

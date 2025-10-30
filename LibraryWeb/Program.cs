@@ -25,23 +25,26 @@ using ServiceProducts.Infrastructure.Repositories;
 using ServiceDistributors.Domain.Interfaces;
 using ServiceDistributors.Application.Services;
 using ServiceDistributors.Infrastructure.Repositories;
+using ServiceSales.Domain.Interfaces;
+using ServiceSales.Application.Services;
+using ServiceSales.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages(options =>
 {
-    // Páginas accesibles sin autenticación
+    // Pï¿½ginas accesibles sin autenticaciï¿½n
     options.Conventions.AllowAnonymousToPage("/Auth/Login");
     options.Conventions.AllowAnonymousToPage("/Auth/Logout");
     options.Conventions.AllowAnonymousToPage("/Users/ChangePassword");
 
-    // Todo lo demás requiere autenticación
+    // Todo lo demï¿½s requiere autenticaciï¿½n
     options.Conventions.AuthorizeFolder("/");
 })
 .AddMvcOptions(options =>
 {
-    options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "Debe seleccionar una categoría.");
-    options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((x, y) => "El valor ingresado no es válido.");
+    options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "Debe seleccionar una categorï¿½a.");
+    options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((x, y) => "El valor ingresado no es vï¿½lido.");
     options.ModelBindingMessageProvider.SetMissingBindRequiredValueAccessor(x => $"Falta el valor para {x}.");
 });
 
@@ -86,6 +89,9 @@ builder.Services.AddSingleton<IProductService, ProductService>();
 
 builder.Services.AddSingleton<IDistributorRepository, DistributorRepository>();
 builder.Services.AddSingleton<IDistributorService, DistributorService>();
+
+builder.Services.AddSingleton<ISaleRepository, SaleRepository>();
+builder.Services.AddSingleton<ISalesReportService, SalesReportService>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -167,7 +173,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapRazorPages();
 
-// API de autenticación (usa fachada)
+// API de autenticaciï¿½n (usa fachada)
 app.MapPost("/api/auth/login", async (IUserFacade facade, ServiceUsers.Application.DTOs.AuthRequestDto req, CancellationToken ct) =>
 {
     var token = await facade.LoginAsync(req, ct);

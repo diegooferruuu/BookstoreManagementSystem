@@ -1,0 +1,133 @@
+@page
+@model LibraryWeb.Pages.Sales.Reports.IndexModel
+@{
+    ViewData["Title"] = "Reportes de Ventas";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="fas fa-chart-bar me-2 fs-4"></i>
+                    <h4 class="mb-0">Reportes de Ventas</h4>
+                </div>
+                <div class="card-body">
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form method="post">
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-3">
+                                            <i class="fas fa-filter me-2"></i>Filtros de Búsqueda
+                                        </h5>
+                                        
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label asp-for="Filter.UserId" class="form-label">
+                                                    <i class="fas fa-user me-1"></i>Usuario (Vendedor)
+                                                </label>
+                                                <select asp-for="Filter.UserId" asp-items="Model.Users" class="form-select">
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label asp-for="Filter.ClientId" class="form-label">
+                                                    <i class="fas fa-user-tie me-1"></i>Cliente
+                                                </label>
+                                                <select asp-for="Filter.ClientId" asp-items="Model.Clients" class="form-select">
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label asp-for="Filter.StartDate" class="form-label">
+                                                    <i class="fas fa-calendar-alt me-1"></i>Fecha Inicial
+                                                </label>
+                                                <input asp-for="Filter.StartDate" type="date" class="form-control" />
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label asp-for="Filter.EndDate" class="form-label">
+                                                    <i class="fas fa-calendar-alt me-1"></i>Fecha Final
+                                                </label>
+                                                <input asp-for="Filter.EndDate" type="date" class="form-control" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card border-primary">
+                                    <div class="card-body">
+                                        <h5 class="card-title mb-3">
+                                            <i class="fas fa-file-download me-2"></i>Generar Reporte
+                                        </h5>
+                                        <p class="text-muted mb-3">
+                                            Seleccione el formato en el que desea generar el reporte de ventas.
+                                        </p>
+                                        
+                                        <div class="d-flex gap-3 flex-wrap">
+                                            <button type="submit" asp-page-handler="GeneratePdf" class="btn btn-danger btn-lg flex-grow-1">
+                                                <i class="fas fa-file-pdf me-2"></i>Generar PDF
+                                            </button>
+                                            <button type="submit" asp-page-handler="GenerateExcel" class="btn btn-success btn-lg flex-grow-1">
+                                                <i class="fas fa-file-excel me-2"></i>Generar Excel
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="mt-4">
+                        <div class="alert alert-info" role="alert">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-info-circle me-2"></i>Información sobre los reportes
+                            </h6>
+                            <ul class="mb-0">
+                                <li>Si no selecciona ningún filtro, se generará un reporte con todas las ventas.</li>
+                                <li>Puede combinar múltiples filtros para obtener reportes más específicos.</li>
+                                <li>El reporte incluirá la fecha de venta, cliente, vendedor, método de pago y total.</li>
+                                <li>Al final del reporte se mostrará el total general de ventas.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Validación básica de fechas
+        document.addEventListener('DOMContentLoaded', function() {
+            const startDate = document.querySelector('input[name="Filter.StartDate"]');
+            const endDate = document.querySelector('input[name="Filter.EndDate"]');
+
+            if (startDate && endDate) {
+                endDate.addEventListener('change', function() {
+                    if (startDate.value && endDate.value) {
+                        if (new Date(endDate.value) < new Date(startDate.value)) {
+                            alert('La fecha final no puede ser anterior a la fecha inicial.');
+                            endDate.value = '';
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}

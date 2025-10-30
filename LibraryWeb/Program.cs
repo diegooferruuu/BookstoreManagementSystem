@@ -33,23 +33,52 @@ using ServiceSales.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// === Razor Pages ===
 builder.Services.AddRazorPages(options =>
 {
-    // Paginas accesibles sin autenticaciï¿½n
+    // Páginas accesibles sin autenticación
     options.Conventions.AllowAnonymousToPage("/Auth/Login");
     options.Conventions.AllowAnonymousToPage("/Auth/Logout");
     options.Conventions.AllowAnonymousToPage("/Users/ChangePassword");
 
-    // Todo lo dema requiere autenticaciï¿½n
+    // Todo lo demás requiere autenticación
     options.Conventions.AuthorizeFolder("/");
+
+    // === Productos ===
+    options.Conventions.AuthorizePage("/Products/Index", "AdminOrEmployee");
+    options.Conventions.AuthorizePage("/Products/Report", "AdminOrEmployee");
+    options.Conventions.AuthorizePage("/Products/Create", "AdminOnly");
+    options.Conventions.AuthorizePage("/Products/Edit", "AdminOnly");
+    options.Conventions.AuthorizePage("/Products/Delete", "AdminOnly");
+
+    // === Distribuidores ===
+    options.Conventions.AuthorizePage("/Distributors/Index", "AdminOrEmployee");
+    options.Conventions.AuthorizePage("/Distributors/Create", "AdminOnly");
+    options.Conventions.AuthorizePage("/Distributors/Edit", "AdminOnly");
+    options.Conventions.AuthorizePage("/Distributors/Delete", "AdminOnly");
+
+    // === Clientes ===
+    options.Conventions.AuthorizeFolder("/Clients", "AdminOrEmployee");
+
+    // === Ventas ===
+    options.Conventions.AuthorizeFolder("/Sales", "AdminOrEmployee");
+
+    // === Usuarios ===
+    options.Conventions.AuthorizeFolder("/Users", "AdminOnly");
+    options.Conventions.AuthorizePage("/Users/ChangePassword", "AdminOrEmployee");
+
+    // === Páginas generales ===
+    options.Conventions.AuthorizePage("/Index", "AdminOrEmployee");
+    options.Conventions.AuthorizePage("/Error", "AdminOrEmployee");
 })
 .AddMvcOptions(options =>
 {
-    options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "Debe seleccionar una categorï¿½a.");
-    options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((x, y) => "El valor ingresado no es vï¿½lido.");
+    options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "Debe seleccionar una categoría.");
+    options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((x, y) => "El valor ingresado no es válido.");
     options.ModelBindingMessageProvider.SetMissingBindRequiredValueAccessor(x => $"Falta el valor para {x}.");
 });
 
+// === Configuración regional ===
 var cultureInfo = new CultureInfo("es-ES");
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
@@ -58,22 +87,26 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.DefaultRequestCulture = new RequestCulture(cultureInfo);
 });
 
+// === Base de datos ===
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 var database = DataBaseConnection.GetInstance(connectionString);
 builder.Services.AddSingleton<IDataBase>(database);
 
+// === JWT ===
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtOptions = jwtSection.Get<ServiceUsers.Infrastructure.Auth.JwtOptions>()
     ?? new ServiceUsers.Infrastructure.Auth.JwtOptions();
 builder.Services.AddSingleton(jwtOptions);
 
+// === SendGrid ===
 var sendGridSection = builder.Configuration.GetSection("SendGrid");
 var sendGridOptions = sendGridSection.Get<SendGridOptions>()
     ?? new SendGridOptions();
 builder.Services.AddSingleton(sendGridOptions);
 builder.Services.AddSingleton<IEmailService, SendGridEmailService>();
 
+// === Dependencias ===
 builder.Services.AddSingleton<IClientRepository, ClientRepository>();
 builder.Services.AddSingleton<IClientService, ClientService>();
 
@@ -89,7 +122,6 @@ builder.Services.AddSingleton<IProductRepository, ProductRepository>();
 builder.Services.AddSingleton<ServiceProducts.Domain.Interfaces.ICategoryRepository, CategoryRepository>();
 builder.Services.AddSingleton<IProductService, ProductService>();
 
-// Reportes
 builder.Services.AddScoped<IReportDirector, ProductReportDirector>();
 builder.Services.AddScoped<IProductReportService, ProductReportService>();
 
@@ -99,6 +131,7 @@ builder.Services.AddSingleton<IDistributorService, DistributorService>();
 builder.Services.AddSingleton<ISaleRepository, SaleRepository>();
 builder.Services.AddSingleton<ISalesReportService, SalesReportService>();
 
+// === Autenticación ===
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = "AppScheme";
@@ -135,9 +168,14 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// === Autorización ===
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("RequireAdmin", p => p.RequireRole("Admin"));
+    options.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
+    options.AddPolicy("EmployeeOnly", p => p.RequireRole("Employee"));
+    options.AddPolicy("AdminOrEmployee", p => p.RequireRole("Admin", "Employee"));
+
+    // Compatibilidad con código existente
     options.AddPolicy("RequireEmployeeOrAdmin", p => p.RequireRole("Admin", "Employee"));
 });
 
@@ -156,7 +194,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapRazorPages();
 
-// API de autenticacion (usa fachada)
+// === API de autenticación ===
 app.MapPost("/api/auth/login", async (IUserFacade facade, ServiceUsers.Application.DTOs.AuthRequestDto req, CancellationToken ct) =>
 {
     var token = await facade.LoginAsync(req, ct);

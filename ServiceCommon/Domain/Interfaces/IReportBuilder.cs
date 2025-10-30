@@ -9,6 +9,8 @@ namespace ServiceCommon.Domain.Interfaces
         IReportBuilder SetMetadata(string author, string subject);
         IReportBuilder SetCreatedBy(string createdBy);
         IReportBuilder SetChartData(Dictionary<string, decimal> chartData);
+        IReportBuilder SetProductChartData(Dictionary<string, decimal> productChartData);
+        IReportBuilder SetProductRevenueData(Dictionary<string, decimal> productRevenueData);
         IReportService Build();
     }
 }

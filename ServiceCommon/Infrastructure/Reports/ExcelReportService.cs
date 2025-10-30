@@ -152,6 +152,157 @@ namespace ServiceCommon.Infrastructure.Reports
                 chartSheet.Cell(2, 1).Style.Font.FontSize = 10;
             }
 
+            // --- Hoja con tabla de ingresos por producto ---
+            if (_reportData.ProductRevenueData != null && _reportData.ProductRevenueData.Any())
+            {
+                var revenueSheet = workbook.Worksheets.Add("Ingresos Productos");
+
+                revenueSheet.Cell(1, 1).Value = "Ingresos por Producto";
+                revenueSheet.Cell(1, 1).Style.Font.Bold = true;
+                revenueSheet.Cell(1, 1).Style.Font.FontSize = 16;
+                revenueSheet.Cell(1, 1).Style.Font.FontColor = XLColor.FromArgb(0, 51, 102);
+
+                // Ordenar por ingresos descendente
+                var orderedRevenue = _reportData.ProductRevenueData
+                    .OrderByDescending(x => x.Value)
+                    .ToList();
+
+                var totalRevenue = orderedRevenue.Sum(x => x.Value);
+
+                // Headers (fila 3)
+                var revenueHeaderRow = 3;
+                revenueSheet.Cell(revenueHeaderRow, 1).Value = "Producto";
+                revenueSheet.Cell(revenueHeaderRow, 2).Value = "Ingresos";
+                revenueSheet.Cell(revenueHeaderRow, 3).Value = "% del Total";
+
+                // Estilo de headers
+                var headerRange = revenueSheet.Range(revenueHeaderRow, 1, revenueHeaderRow, 3);
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.Fill.BackgroundColor = XLColor.FromArgb(189, 215, 238);
+                headerRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                headerRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+                headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                // Datos
+                int revenueRow = revenueHeaderRow + 1;
+                foreach (var item in orderedRevenue)
+                {
+                    var percentage = totalRevenue == 0 ? 0 : (double)item.Value / (double)totalRevenue * 100d;
+
+                    revenueSheet.Cell(revenueRow, 1).Value = item.Key;
+                    revenueSheet.Cell(revenueRow, 2).Value = (double)item.Value;
+                    revenueSheet.Cell(revenueRow, 2).Style.NumberFormat.Format = "$#,##0.00";
+                    revenueSheet.Cell(revenueRow, 3).Value = percentage / 100;
+                    revenueSheet.Cell(revenueRow, 3).Style.NumberFormat.Format = "0.0%";
+
+                    // Bordes
+                    revenueSheet.Range(revenueRow, 1, revenueRow, 3).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    revenueSheet.Range(revenueRow, 1, revenueRow, 3).Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+
+                    revenueRow++;
+                }
+
+                // Fila de totales
+                revenueSheet.Cell(revenueRow, 1).Value = "TOTAL";
+                revenueSheet.Cell(revenueRow, 1).Style.Font.Bold = true;
+                revenueSheet.Cell(revenueRow, 2).Value = (double)totalRevenue;
+                revenueSheet.Cell(revenueRow, 2).Style.Font.Bold = true;
+                revenueSheet.Cell(revenueRow, 2).Style.NumberFormat.Format = "$#,##0.00";
+                revenueSheet.Cell(revenueRow, 3).Value = 1.0;
+                revenueSheet.Cell(revenueRow, 3).Style.Font.Bold = true;
+                revenueSheet.Cell(revenueRow, 3).Style.NumberFormat.Format = "0.0%";
+
+                var totalRange = revenueSheet.Range(revenueRow, 1, revenueRow, 3);
+                totalRange.Style.Fill.BackgroundColor = XLColor.FromArgb(217, 217, 217);
+                totalRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                totalRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+
+                // Ajustar anchos de columna
+                revenueSheet.Column(1).Width = 40;
+                revenueSheet.Column(2).Width = 15;
+                revenueSheet.Column(3).Width = 15;
+
+                // Nota
+                revenueSheet.Cell(revenueRow + 2, 1).Value = $"Total de productos diferentes: {orderedRevenue.Count}";
+                revenueSheet.Cell(revenueRow + 2, 1).Style.Font.FontColor = XLColor.Gray;
+                revenueSheet.Cell(revenueRow + 2, 1).Style.Font.FontSize = 10;
+            }
+
+            // --- Hoja con gráfico de productos más vendidos ---
+            if (_reportData.ProductChartData != null && _reportData.ProductChartData.Any())
+            {
+                var productChartSheet = workbook.Worksheets.Add("Gráfico Productos");
+
+                productChartSheet.Cell(1, 1).Value = "Gráfico de Tortas - Productos Más Vendidos";
+                productChartSheet.Cell(1, 1).Style.Font.Bold = true;
+                productChartSheet.Cell(1, 1).Style.Font.FontSize = 16;
+
+                // Preparar 7+Otros
+                var orderedProducts = _reportData.ProductChartData
+                    .OrderByDescending(x => x.Value)
+                    .ToList();
+
+                List<KeyValuePair<string, decimal>> productItems;
+                if (orderedProducts.Count > 8)
+                {
+                    var top7 = orderedProducts.Take(7).ToList();
+                    var othersTotal = orderedProducts.Skip(7).Sum(x => x.Value);
+                    top7.Add(new KeyValuePair<string, decimal>("Otros", othersTotal));
+                    productItems = top7;
+                }
+                else
+                {
+                    productItems = orderedProducts;
+                }
+
+                var totalProducts = productItems.Sum(x => x.Value);
+
+                var skiaColorsProducts = new SKColor[]
+                {
+                    SKColors.DodgerBlue,
+                    SKColors.Coral,
+                    SKColors.LimeGreen,
+                    SKColors.Tomato,
+                    SKColors.Orchid,
+                    SKColors.DeepSkyBlue,
+                    SKColors.Gold,
+                    SKColors.Crimson
+                };
+
+                var pieProductsBytes = CreatePieChartImage(productItems, skiaColorsProducts);
+                using (var imgStream = new MemoryStream(pieProductsBytes))
+                {
+                    var picture = productChartSheet.AddPicture(imgStream)
+                        .MoveTo(productChartSheet.Cell(3, 1))
+                        .Scale(0.55);
+                    picture.Name = "PieChartProducts";
+                }
+
+                // Leyenda a la derecha
+                productChartSheet.Column(11).Width = 4;  // K: cuadrito color
+                productChartSheet.Column(12).Width = 50; // L: texto
+
+                for (int i = 0; i < productItems.Count; i++)
+                {
+                    var item = productItems[i];
+                    var percentage = totalProducts == 0 ? 0 : (double)item.Value / (double)totalProducts * 100d;
+                    var color = skiaColorsProducts[i % skiaColorsProducts.Length];
+
+                    var boxCell = productChartSheet.Cell(3 + i, 11); // K
+                    boxCell.Value = "";
+                    boxCell.Style.Fill.BackgroundColor = XLColor.FromArgb(color.Red, color.Green, color.Blue);
+                    boxCell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    productChartSheet.Row(3 + i).Height = 18;
+
+                    var textCell = productChartSheet.Cell(3 + i, 12); // L
+                    textCell.Value = $"{item.Key}: {item.Value:N0} unidades ({percentage:F1}%)";
+                }
+
+                productChartSheet.Cell(2, 1).Value = "Muestra la cantidad total de unidades vendidas por producto. Incluye 7 productos principales y 'Otros' cuando aplica.";
+                productChartSheet.Cell(2, 1).Style.Font.FontColor = XLColor.Gray;
+                productChartSheet.Cell(2, 1).Style.Font.FontSize = 10;
+            }
+
             // Convertir a bytes
             using var stream = new MemoryStream();
             workbook.SaveAs(stream);

@@ -141,11 +141,23 @@ namespace ServiceCommon.Infrastructure.Reports
                                 
                                 column.Item().PaddingTop(10);
 
-                                // Preparar datos y paleta de colores (máx. 8 categorías)
-                                var items = _reportData.ChartData
+                                // Preparar datos y paleta de colores (7 principales + Otros)
+                                var ordered = _reportData.ChartData
                                     .OrderByDescending(x => x.Value)
-                                    .Take(8)
                                     .ToList();
+
+                                List<KeyValuePair<string, decimal>> items;
+                                if (ordered.Count > 8)
+                                {
+                                    var top7 = ordered.Take(7).ToList();
+                                    var othersTotal = ordered.Skip(7).Sum(x => x.Value);
+                                    top7.Add(new KeyValuePair<string, decimal>("Otros", othersTotal));
+                                    items = top7;
+                                }
+                                else
+                                {
+                                    items = ordered;
+                                }
 
                                 var total = items.Sum(x => x.Value);
 
@@ -203,7 +215,7 @@ namespace ServiceCommon.Infrastructure.Reports
                                 });
 
                                 // Nota
-                                column.Item().PaddingTop(6).Text("Incluye hasta 8 categorías principales.")
+                                column.Item().PaddingTop(6).Text("Incluye 7 categorías principales y 'Otros' cuando aplica.")
                                     .FontSize(9)
                                     .FontColor(Colors.Grey.Darken1);
                             }

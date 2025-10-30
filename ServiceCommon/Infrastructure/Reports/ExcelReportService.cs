@@ -77,7 +77,7 @@ namespace ServiceCommon.Infrastructure.Reports
             // Ajustar ancho de columnas
             worksheet.Columns().AdjustToContents();
 
-            // --- NUEVO: Hoja con gráfico de tortas ---
+            // --- Hoja con gráfico de tortas (7+Otros) ---
             if (_reportData.ChartData != null && _reportData.ChartData.Any())
             {
                 var chartSheet = workbook.Worksheets.Add("Gráfico");
@@ -86,11 +86,23 @@ namespace ServiceCommon.Infrastructure.Reports
                 chartSheet.Cell(1, 1).Style.Font.Bold = true;
                 chartSheet.Cell(1, 1).Style.Font.FontSize = 16;
 
-                // Top 8 categorías
-                var items = _reportData.ChartData
+                // Preparar 7+Otros
+                var ordered = _reportData.ChartData
                     .OrderByDescending(x => x.Value)
-                    .Take(8)
                     .ToList();
+
+                List<KeyValuePair<string, decimal>> items;
+                if (ordered.Count > 8)
+                {
+                    var top7 = ordered.Take(7).ToList();
+                    var othersTotal = ordered.Skip(7).Sum(x => x.Value);
+                    top7.Add(new KeyValuePair<string, decimal>("Otros", othersTotal));
+                    items = top7;
+                }
+                else
+                {
+                    items = ordered;
+                }
 
                 var total = items.Sum(x => x.Value);
 
@@ -135,7 +147,7 @@ namespace ServiceCommon.Infrastructure.Reports
                     textCell.Value = $"{item.Key}: ${item.Value:N2} ({percentage:F1}%)";
                 }
 
-                chartSheet.Cell(2, 1).Value = "Incluye hasta 8 categorías principales.";
+                chartSheet.Cell(2, 1).Value = "Incluye 7 categorías principales y 'Otros' cuando aplica.";
                 chartSheet.Cell(2, 1).Style.Font.FontColor = XLColor.Gray;
                 chartSheet.Cell(2, 1).Style.Font.FontSize = 10;
             }

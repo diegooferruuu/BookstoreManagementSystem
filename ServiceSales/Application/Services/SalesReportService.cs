@@ -90,8 +90,8 @@ namespace ServiceSales.Application.Services
                 .SetMetadata("Sistema de Ventas", $"Reporte de Ventas - {filterDescription}")
                 .SetCreatedBy(createdBy);
 
-            // Solo agregar gráfico en PDF si hay datos
-            if (reportType.ToLower() == "pdf" && chartData.Any())
+            // Agregar gráfico para ambos formatos si hay datos
+            if (chartData.Any())
             {
                 builder.SetChartData(chartData);
             }

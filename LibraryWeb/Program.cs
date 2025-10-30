@@ -28,20 +28,22 @@ using ServiceDistributors.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddRazorPages()
-    .AddRazorPagesOptions(options =>
-    {
-        options.RootDirectory = "/Pages";
-        options.Conventions.AllowAnonymousToPage("/Auth/Login");
-        options.Conventions.AllowAnonymousToPage("/Auth/Logout");
-        options.Conventions.AllowAnonymousToPage("/Index");
-    })
-    .AddMvcOptions(options =>
-    {
-        options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "Debe seleccionar una categoría.");
-        options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((x, y) => "El valor ingresado no es válido.");
-        options.ModelBindingMessageProvider.SetMissingBindRequiredValueAccessor(x => $"Falta el valor para {x}.");
-    });
+builder.Services.AddRazorPages(options =>
+{
+    // Páginas accesibles sin autenticación
+    options.Conventions.AllowAnonymousToPage("/Auth/Login");
+    options.Conventions.AllowAnonymousToPage("/Auth/Logout");
+    options.Conventions.AllowAnonymousToPage("/Users/ChangePassword");
+
+    // Todo lo demás requiere autenticación
+    options.Conventions.AuthorizeFolder("/");
+})
+.AddMvcOptions(options =>
+{
+    options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "Debe seleccionar una categoría.");
+    options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((x, y) => "El valor ingresado no es válido.");
+    options.ModelBindingMessageProvider.SetMissingBindRequiredValueAccessor(x => $"Falta el valor para {x}.");
+});
 
 var cultureInfo = new CultureInfo("es-ES");
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
@@ -106,7 +108,7 @@ builder.Services.AddAuthentication(options =>
     options.AccessDeniedPath = "/Auth/Login";
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SameSite = SameSiteMode.Strict;
 })
 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
 {
@@ -165,7 +167,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapRazorPages();
 
-// Login API usando la fachada
+// API de autenticación (usa fachada)
 app.MapPost("/api/auth/login", async (IUserFacade facade, ServiceUsers.Application.DTOs.AuthRequestDto req, CancellationToken ct) =>
 {
     var token = await facade.LoginAsync(req, ct);
@@ -174,7 +176,7 @@ app.MapPost("/api/auth/login", async (IUserFacade facade, ServiceUsers.Applicati
         : Results.Unauthorized();
 }).AllowAnonymous();
 
-// Seed de usuario admin
+// Usuario admin inicial
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<IDataBase>();
@@ -195,11 +197,12 @@ using (var scope = app.Services.CreateScope())
             FirstName = "Administrador",
             LastName = "",
             PasswordHash = passwordHasher.HashPassword(null!, "admin123456"),
-            IsActive = true
+            IsActive = true,
+            MustChangePassword = true
         };
 
-        var insertUserSql = @"INSERT INTO users (id, username, email, first_name, last_name, middle_name, password_hash, is_active)
-                              VALUES (@id, @username, @email, @first, @last, NULL, @hash, TRUE)";
+        var insertUserSql = @"INSERT INTO users (id, username, email, first_name, last_name, middle_name, password_hash, is_active, must_change_password)
+                              VALUES (@id, @username, @email, @first, @last, NULL, @hash, TRUE, TRUE)";
         using var insertUserCmd = new Npgsql.NpgsqlCommand(insertUserSql, conn);
         insertUserCmd.Parameters.AddWithValue("@id", admin.Id);
         insertUserCmd.Parameters.AddWithValue("@username", admin.Username);

@@ -13,7 +13,6 @@
 </head>
 <body>
     <header>
-
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center" asp-area="" asp-page="/Index">
@@ -23,12 +22,12 @@
                         <small class="d-block text-muted">Sistema De Administración</small>
                     </div>
                 </a>
-                
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                
+
                 <div class="navbar-collapse collapse">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
@@ -91,7 +90,7 @@
                             </li>
                         }
                     </ul>
-                    
+
                     <div class="d-flex align-items-center">
                         <div>
                             @if (User?.Identity?.IsAuthenticated == true)
@@ -122,6 +121,7 @@
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                         <li><a class="dropdown-item" asp-page="/Auth/Profile"><i class="fas fa-user me-2"></i>Perfil</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Users/ChangePassword"><i class="fas fa-key me-2"></i>Cambiar Contraseña</a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
                                             <form method="post" asp-page="/Auth/Logout" class="px-3 py-1">
@@ -143,6 +143,7 @@
             </div>
         </nav>
     </header>
+
     <div class="main-wrapper">
         <div class="breadcrumb-section bg-light py-2">
             <div class="container">

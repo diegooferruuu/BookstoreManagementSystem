@@ -44,6 +44,16 @@ namespace LibraryWeb.Pages.Auth
                 ReturnUrl = Url.Page("/Index");
 
             var result = await _authService.SignInAsync(Input, HttpContext.RequestAborted);
+
+            // Si el usuario debe cambiar contraseña
+            bool mustChange = result.Errors.Any(e => e.Field == "MustChangePassword");
+            if (mustChange)
+            {
+                TempData["PendingUser"] = Input.UserOrEmail;
+                TempData["FirstLogin"] = true;
+                return RedirectToPage("/Users/ChangePassword");
+            }
+
             if (!result.IsSuccess || result.Value is null)
             {
                 ErrorMessage = "Credenciales inválidas.";

@@ -24,13 +24,18 @@ namespace ServiceUsers.Infrastructure.Auth
         {
             var input = (req.UserOrEmail ?? string.Empty).Trim().ToLowerInvariant();
             var user = await _users.GetByUserOrEmailAsync(input, ct);
-            
+
             if (user is null || !user.IsActive)
                 return Result<AuthTokenDto>.Fail(new ServiceCommon.Domain.Validations.ValidationError("Credentials", "Credenciales inválidas."));
 
             var verify = _hasher.VerifyHashedPassword(null!, user.PasswordHash, req.Password ?? string.Empty);
             if (verify == PasswordVerificationResult.Failed)
                 return Result<AuthTokenDto>.Fail(new ServiceCommon.Domain.Validations.ValidationError("Credentials", "Credenciales inválidas."));
+
+            if (user.MustChangePassword)
+            {
+                return Result<AuthTokenDto>.Fail(new ServiceCommon.Domain.Validations.ValidationError("MustChangePassword", "Debe cambiar su contraseña antes de continuar."));
+            }
 
             var roles = await _users.GetRolesAsync(user.Id, ct);
             var now = DateTimeOffset.UtcNow;
